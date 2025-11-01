@@ -988,6 +988,207 @@ class BackendTester:
         except Exception as e:
             self.log_test("Report Type Filtering Scenarios", False, f"Exception: {str(e)}")
 
+    def test_vice_principal_dashboard_issue(self):
+        """Test Vice-Principal dashboard functionality to identify supervisor reports issue"""
+        print("\n=== Testing Vice-Principal Dashboard Issue ===")
+        
+        # Step 1: Create a Vice-Principal user
+        vp_user, vp_password = self.create_test_user("vice_principal", "boys")
+        if not vp_user:
+            self.log_test("VP Dashboard Setup", False, "Failed to create vice principal test user")
+            return
+            
+        vp_id = vp_user["id"]
+        vp_branch = vp_user["branch"]
+        
+        self.log_test("VP User Creation", True, f"Created VP: ID={vp_id}, Branch={vp_branch}")
+        
+        # Step 2: Create supervisors assigned to this VP
+        supervisor1_user, supervisor1_password = self.create_test_user("supervisor", "boys")
+        supervisor2_user, supervisor2_password = self.create_test_user("supervisor", "boys")
+        
+        if not supervisor1_user or not supervisor2_user:
+            self.log_test("Supervisors Creation", False, "Failed to create supervisor test users")
+            return
+            
+        # Step 3: Update supervisors to be assigned to the VP
+        try:
+            # Update supervisor1 to be assigned to VP
+            update_data1 = {"assigned_to": vp_id}
+            update_response1 = self.session.put(f"{BASE_URL}/users/{supervisor1_user['id']}", json=update_data1)
+            
+            # Update supervisor2 to be assigned to VP  
+            update_data2 = {"assigned_to": vp_id}
+            update_response2 = self.session.put(f"{BASE_URL}/users/{supervisor2_user['id']}", json=update_data2)
+            
+            if update_response1.status_code == 200 and update_response2.status_code == 200:
+                self.log_test("Supervisors Assignment", True, f"Assigned 2 supervisors to VP {vp_id}")
+            else:
+                self.log_test("Supervisors Assignment", False, f"Failed to assign supervisors: {update_response1.status_code}, {update_response2.status_code}")
+                return
+                
+        except Exception as e:
+            self.log_test("Supervisors Assignment", False, f"Exception: {str(e)}")
+            return
+            
+        # Step 4: Create supervisor reports from these supervisors
+        # Login as supervisor1 and create a report
+        login_result1 = self.login_as_user(supervisor1_user["username"], supervisor1_password)
+        if login_result1:
+            supervisor_data1 = {
+                "date": datetime.now(timezone.utc).date().isoformat(),
+                "student_discipline": 85,
+                "classroom_cleanliness": 90,
+                "teacher_attendance_rate": 95,
+                "general_behavior": 88,
+                "absent_students_count": 5
+            }
+            
+            try:
+                response1 = self.session.post(f"{BASE_URL}/reports/supervisor", json=supervisor_data1)
+                if response1.status_code == 200:
+                    report1 = response1.json()
+                    self.log_test("Supervisor1 Report Creation", True, f"Created report ID: {report1.get('id')}")
+                else:
+                    self.log_test("Supervisor1 Report Creation", False, f"Failed: {response1.status_code} - {response1.text}")
+            except Exception as e:
+                self.log_test("Supervisor1 Report Creation", False, f"Exception: {str(e)}")
+        
+        # Login as supervisor2 and create a report
+        login_result2 = self.login_as_user(supervisor2_user["username"], supervisor2_password)
+        if login_result2:
+            supervisor_data2 = {
+                "date": datetime.now(timezone.utc).date().isoformat(),
+                "student_discipline": 92,
+                "classroom_cleanliness": 88,
+                "teacher_attendance_rate": 98,
+                "general_behavior": 90,
+                "absent_students_count": 3
+            }
+            
+            try:
+                response2 = self.session.post(f"{BASE_URL}/reports/supervisor", json=supervisor_data2)
+                if response2.status_code == 200:
+                    report2 = response2.json()
+                    self.log_test("Supervisor2 Report Creation", True, f"Created report ID: {report2.get('id')}")
+                else:
+                    self.log_test("Supervisor2 Report Creation", False, f"Failed: {response2.status_code} - {response2.text}")
+            except Exception as e:
+                self.log_test("Supervisor2 Report Creation", False, f"Exception: {str(e)}")
+        
+        # Step 5: Login as Vice-Principal and test dashboard functionality
+        vp_login_result = self.login_as_user(vp_user["username"], vp_password)
+        if not vp_login_result:
+            self.log_test("VP Login", False, "Failed to login as VP")
+            return
+            
+        self.log_test("VP Login", True, f"Successfully logged in as VP: {vp_user['username']}")
+        
+        # Step 6: Check VP user data
+        try:
+            me_response = self.session.get(f"{BASE_URL}/auth/me")
+            if me_response.status_code == 200:
+                vp_data = me_response.json()
+                self.log_test("VP User Data Check", True, f"VP ID: {vp_data.get('id')}, Branch: {vp_data.get('branch')}")
+                
+                # Verify the VP data matches what we expect
+                if vp_data.get('id') == vp_id and vp_data.get('branch') == vp_branch:
+                    self.log_test("VP Data Verification", True, "VP ID and branch match expected values")
+                else:
+                    self.log_test("VP Data Verification", False, f"VP data mismatch. Expected ID: {vp_id}, Got: {vp_data.get('id')}")
+            else:
+                self.log_test("VP User Data Check", False, f"Failed: {me_response.status_code} - {me_response.text}")
+        except Exception as e:
+            self.log_test("VP User Data Check", False, f"Exception: {str(e)}")
+            
+        # Step 7: Check supervisors assigned to this VP
+        try:
+            users_response = self.session.get(f"{BASE_URL}/users")
+            if users_response.status_code == 200:
+                all_users = users_response.json()
+                assigned_supervisors = [u for u in all_users if u.get("assigned_to") == vp_id and u.get("role") == "supervisor"]
+                
+                self.log_test("Check Assigned Supervisors", True, f"Found {len(assigned_supervisors)} supervisors assigned to VP {vp_id}")
+                
+                for i, supervisor in enumerate(assigned_supervisors, 1):
+                    self.log_test(f"Supervisor {i} Details", True, f"ID: {supervisor.get('id')}, Username: {supervisor.get('username')}, Branch: {supervisor.get('branch')}")
+                    
+            else:
+                self.log_test("Check Assigned Supervisors", False, f"Failed to get users: {users_response.status_code} - {users_response.text}")
+        except Exception as e:
+            self.log_test("Check Assigned Supervisors", False, f"Exception: {str(e)}")
+            
+        # Step 8: Test supervisor reports endpoint as VP
+        try:
+            supervisor_reports_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+            if supervisor_reports_response.status_code == 200:
+                supervisor_reports = supervisor_reports_response.json()
+                self.log_test("VP Get Supervisor Reports", True, f"VP can access {len(supervisor_reports)} supervisor reports")
+                
+                # Check if reports are from assigned supervisors
+                assigned_supervisor_ids = [supervisor1_user["id"], supervisor2_user["id"]]
+                vp_supervisor_reports = [r for r in supervisor_reports if r.get("user_id") in assigned_supervisor_ids]
+                
+                self.log_test("VP Supervisor Reports Filter", True, f"Found {len(vp_supervisor_reports)} reports from VP's assigned supervisors")
+                
+                if len(vp_supervisor_reports) > 0:
+                    for i, report in enumerate(vp_supervisor_reports, 1):
+                        self.log_test(f"VP Report {i} Details", True, f"Report ID: {report.get('id')}, User ID: {report.get('user_id')}, Date: {report.get('date')}")
+                else:
+                    self.log_test("VP Reports Issue", False, "VP cannot see any reports from assigned supervisors - THIS IS THE ISSUE!")
+                    
+            else:
+                self.log_test("VP Get Supervisor Reports", False, f"Failed: {supervisor_reports_response.status_code} - {supervisor_reports_response.text}")
+        except Exception as e:
+            self.log_test("VP Get Supervisor Reports", False, f"Exception: {str(e)}")
+            
+        # Step 9: Debug - Check all supervisor reports in system
+        # Login back as admin to see all reports
+        self.test_authentication()
+        
+        try:
+            all_reports_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+            if all_reports_response.status_code == 200:
+                all_reports = all_reports_response.json()
+                self.log_test("Debug - All Supervisor Reports", True, f"Total supervisor reports in system: {len(all_reports)}")
+                
+                # Check which reports belong to our test supervisors
+                test_supervisor_reports = [r for r in all_reports if r.get("user_id") in [supervisor1_user["id"], supervisor2_user["id"]]]
+                self.log_test("Debug - Test Supervisor Reports", True, f"Reports from test supervisors: {len(test_supervisor_reports)}")
+                
+                for report in test_supervisor_reports:
+                    self.log_test("Debug - Report Details", True, f"Report: ID={report.get('id')}, User={report.get('user_id')}, Branch={report.get('branch')}")
+                    
+            else:
+                self.log_test("Debug - All Supervisor Reports", False, f"Failed: {all_reports_response.status_code}")
+        except Exception as e:
+            self.log_test("Debug - All Supervisor Reports", False, f"Exception: {str(e)}")
+            
+        # Step 10: Debug - Check user assignments
+        try:
+            users_response = self.session.get(f"{BASE_URL}/users")
+            if users_response.status_code == 200:
+                all_users = users_response.json()
+                
+                # Find our VP
+                vp_in_system = next((u for u in all_users if u.get("id") == vp_id), None)
+                if vp_in_system:
+                    self.log_test("Debug - VP in System", True, f"VP found: ID={vp_in_system.get('id')}, Role={vp_in_system.get('role')}, Branch={vp_in_system.get('branch')}")
+                else:
+                    self.log_test("Debug - VP in System", False, "VP not found in system")
+                    
+                # Find supervisors assigned to this VP
+                assigned_supervisors = [u for u in all_users if u.get("assigned_to") == vp_id]
+                self.log_test("Debug - Assigned Supervisors", True, f"Supervisors assigned to VP {vp_id}: {len(assigned_supervisors)}")
+                
+                for supervisor in assigned_supervisors:
+                    self.log_test("Debug - Supervisor Assignment", True, f"Supervisor: ID={supervisor.get('id')}, Role={supervisor.get('role')}, Branch={supervisor.get('branch')}, Assigned_to={supervisor.get('assigned_to')}")
+                    
+            else:
+                self.log_test("Debug - Users Check", False, f"Failed: {users_response.status_code}")
+        except Exception as e:
+            self.log_test("Debug - Users Check", False, f"Exception: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
@@ -1000,18 +1201,8 @@ class BackendTester:
             print("❌ Authentication failed - cannot proceed with other tests")
             return
             
-        # Test all endpoints
-        self.test_teachers_endpoint()
-        self.test_users_endpoint()
-        self.test_supervisor_reports()
-        self.test_activities_reports()
-        self.test_social_specialist_reports()
-        self.test_quality_reports()
-        self.test_vice_principal_reports()
-        
-        # Test director dashboard specific functionality
-        self.test_director_dashboard_filtering()
-        self.test_report_type_filtering_scenarios()
+        # Test Vice-Principal dashboard issue specifically
+        self.test_vice_principal_dashboard_issue()
         
         # Print summary
         self.print_summary()
