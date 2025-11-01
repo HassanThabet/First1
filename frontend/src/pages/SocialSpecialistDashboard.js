@@ -647,6 +647,197 @@ const SocialSpecialistDashboard = () => {
             </DialogContent>
           </Dialog>
         </TabsContent>
+
+        <TabsContent value="merged">
+          <div className="space-y-6">
+            {/* Period Filter */}
+            <Card>
+              <CardHeader>
+                <CardTitle>فترة التقرير المدمج</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>الفترة</Label>
+                    <Select value={mergedPeriod} onValueChange={setMergedPeriod}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="weekly">هذا الأسبوع (السبت - الأربعاء)</SelectItem>
+                        <SelectItem value="monthly">هذا الشهر</SelectItem>
+                        <SelectItem value="custom">نطاق مخصص</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {mergedPeriod === "custom" && (
+                    <>
+                      <div>
+                        <Label>من تاريخ</Label>
+                        <Input
+                          type="date"
+                          value={mergedStartDate}
+                          onChange={(e) => setMergedStartDate(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label>إلى تاريخ</Label>
+                        <Input
+                          type="date"
+                          value={mergedEndDate}
+                          onChange={(e) => setMergedEndDate(e.target.value)}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Merged Statistics */}
+            {(() => {
+              const stats = getMergedStatistics();
+              const mergedReports = getMergedReports();
+              
+              return (
+                <>
+                  {/* Total Cases */}
+                  <div className="p-6 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-300 shadow-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-2xl font-bold text-purple-800 mb-2">📊 إجمالي الحالات الطلابية</p>
+                        <p className="text-sm text-purple-600">مجموع جميع الحالات في الفترة المحددة</p>
+                      </div>
+                      <div className="text-6xl font-extrabold bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                        {stats.totalCases}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cases Breakdown */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات النفسية</div>
+                        <div className="text-4xl font-bold text-cyan-700">{stats.totalPsychological}</div>
+                        <p className="text-xs text-gray-600 mt-2">حالة</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات الأكاديمية</div>
+                        <div className="text-4xl font-bold text-blue-700">{stats.totalAcademic}</div>
+                        <p className="text-xs text-gray-600 mt-2">حالة</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات السلوكية</div>
+                        <div className="text-4xl font-bold text-purple-700">{stats.totalBehavioral}</div>
+                        <p className="text-xs text-gray-600 mt-2">حالة</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Actions Taken */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>الإجراءات المتخذة</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                          <div className="text-sm font-bold text-green-800">الجلسات</div>
+                          <div className="text-3xl font-bold text-green-600 mt-2">{stats.totalSessions}</div>
+                        </div>
+                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="text-sm font-bold text-blue-800">التواصل مع الأسر</div>
+                          <div className="text-3xl font-bold text-blue-600 mt-2">{stats.totalFamilies}</div>
+                        </div>
+                        <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                          <div className="text-sm font-bold text-orange-800">الإحالات</div>
+                          <div className="text-3xl font-bold text-orange-600 mt-2">{stats.totalReferrals}</div>
+                        </div>
+                        <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                          <div className="text-sm font-bold text-purple-800">المتابعات</div>
+                          <div className="text-3xl font-bold text-purple-600 mt-2">{stats.totalFollowUps}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* All Reports Details */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>تفاصيل جميع التقارير ({stats.totalReports})</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {mergedReports.map((report, index) => (
+                          <div key={report.id} className="p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
+                            <div className="flex items-start justify-between mb-3">
+                              <div>
+                                <h4 className="font-bold text-gray-800 text-lg">
+                                  تقرير {index + 1} - {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                </h4>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  إجمالي الحالات: {report.psychological_cases + report.academic_cases + report.behavioral_cases}
+                                </p>
+                              </div>
+                            </div>
+                            
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                              <div className="text-sm">
+                                <span className="text-gray-600">نفسية:</span>
+                                <span className="font-bold text-cyan-700 mr-1">{report.psychological_cases}</span>
+                              </div>
+                              <div className="text-sm">
+                                <span className="text-gray-600">أكاديمية:</span>
+                                <span className="font-bold text-blue-700 mr-1">{report.academic_cases}</span>
+                              </div>
+                              <div className="text-sm">
+                                <span className="text-gray-600">سلوكية:</span>
+                                <span className="font-bold text-purple-700 mr-1">{report.behavioral_cases}</span>
+                              </div>
+                              <div className="text-sm">
+                                <span className="text-gray-600">جلسات:</span>
+                                <span className="font-bold text-green-700 mr-1">{report.sessions_count}</span>
+                              </div>
+                            </div>
+                            
+                            {report.guidance_programs && (
+                              <div className="mt-3 p-3 bg-cyan-50 rounded border border-cyan-200">
+                                <div className="text-xs font-bold text-cyan-800 mb-1">البرامج الإرشادية</div>
+                                <p className="text-sm text-gray-700">{report.guidance_programs}</p>
+                              </div>
+                            )}
+                            
+                            {report.challenges && (
+                              <div className="mt-2 p-3 bg-orange-50 rounded border border-orange-200">
+                                <div className="text-xs font-bold text-orange-800 mb-1">التحديات</div>
+                                <p className="text-sm text-gray-700">{report.challenges}</p>
+                              </div>
+                            )}
+                            
+                            {report.recommendations && (
+                              <div className="mt-2 p-3 bg-green-50 rounded border border-green-200">
+                                <div className="text-xs font-bold text-green-800 mb-1">التوصيات</div>
+                                <p className="text-sm text-gray-700">{report.recommendations}</p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              );
+            })()}
+          </div>
+        </TabsContent>
       </Tabs>
     </DashboardLayout>
   );
