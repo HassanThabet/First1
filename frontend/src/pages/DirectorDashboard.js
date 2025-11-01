@@ -215,22 +215,61 @@ const DirectorDashboard = () => {
             {/* Time Filter */}
             <Card>
               <CardHeader>
-                <CardTitle>الفترة الزمنية</CardTitle>
+                <CardTitle>التصفية</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <Select value={timeFilter} onValueChange={setTimeFilter}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">جميع الفترات</SelectItem>
-                      <SelectItem value="daily">اليوم</SelectItem>
-                      <SelectItem value="weekly">هذا الأسبوع</SelectItem>
-                      <SelectItem value="monthly">هذا الشهر</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">الفرع</label>
+                    <Input 
+                      value={user.branch === "boys" ? "البنين" : "البنات"} 
+                      disabled 
+                      className="bg-gray-100"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">الوكيل</label>
+                    <Select value={selectedVPForStats} onValueChange={setSelectedVPForStats}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الوكلاء</SelectItem>
+                        {users
+                          .filter(u => u.role === "vice_principal" && u.branch === user.branch)
+                          .map(vp => (
+                            <SelectItem key={vp.id} value={vp.id}>
+                              {vp.username}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
+                    <Select value={timeFilter} onValueChange={setTimeFilter}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الفترات</SelectItem>
+                        <SelectItem value="daily">اليوم</SelectItem>
+                        <SelectItem value="weekly">هذا الأسبوع</SelectItem>
+                        <SelectItem value="monthly">هذا الشهر</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
+                
+                {selectedVPForStats !== "all" && stats.supervisorCount > 0 && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>📊 الإحصائيات الحالية:</strong> تعرض بيانات {stats.supervisorCount} مشرف تابع للوكيل المختار
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
