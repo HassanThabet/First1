@@ -33,6 +33,8 @@ const DirectorDashboard = () => {
   const [monthFilter, setMonthFilter] = useState("");
   const [reportTypeFilter, setReportTypeFilter] = useState("all"); // all, vice_principal, supervisor, activities, social, quality
   const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all"); // For specific employee within type
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
   
   // Modal states
   const [selectedReport, setSelectedReport] = useState(null);
