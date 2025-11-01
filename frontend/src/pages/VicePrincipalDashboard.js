@@ -781,14 +781,24 @@ const VicePrincipalDashboard = () => {
                     <span className="text-2xl">
                       إحصائيات مدمجة من {supervisorReports.length} تقرير
                     </span>
-                    <Button
-                      onClick={exportToExcel}
-                      variant="secondary"
-                      className="bg-white text-cyan-700 hover:bg-cyan-50"
-                    >
-                      <FileDown className="w-4 h-4 ml-2" />
-                      تصدير إلى Excel
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={exportToPDF}
+                        variant="secondary"
+                        className="bg-white text-red-600 hover:bg-red-50"
+                      >
+                        <FileDown className="w-4 h-4 ml-2" />
+                        تصدير PDF
+                      </Button>
+                      <Button
+                        onClick={exportToExcel}
+                        variant="secondary"
+                        className="bg-white text-cyan-700 hover:bg-cyan-50"
+                      >
+                        <FileDown className="w-4 h-4 ml-2" />
+                        تصدير Excel
+                      </Button>
+                    </div>
                   </CardTitle>
                 </CardHeader>
               </Card>
