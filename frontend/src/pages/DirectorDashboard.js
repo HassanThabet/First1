@@ -632,14 +632,6 @@ const DirectorDashboard = () => {
                     </div>
                   )}
                 </div>
-                
-                {selectedVPForStats !== "all" && stats.supervisorCount > 0 && (
-                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                      <strong>📊 الإحصائيات الحالية:</strong> تعرض بيانات {stats.supervisorCount} مشرف تابع للوكيل المختار
-                    </p>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
