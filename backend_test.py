@@ -1252,6 +1252,160 @@ class BackendTester:
         except Exception as e:
             self.log_test("Check Existing Data", False, f"Exception: {str(e)}")
 
+    def investigate_supervisor_reports_issue(self):
+        """Investigate the supervisor reports issue as requested"""
+        print("\n=== INVESTIGATING SUPERVISOR REPORTS ISSUE ===")
+        
+        try:
+            # Step 1: Check Supervisor Reports
+            print("\n1. Checking Supervisor Reports...")
+            reports_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+            
+            if reports_response.status_code == 200:
+                supervisor_reports = reports_response.json()
+                total_reports = len(supervisor_reports)
+                self.log_test("Get Supervisor Reports", True, f"Total supervisor reports in database: {total_reports}")
+                
+                # Show sample report with user_id
+                if supervisor_reports:
+                    sample_report = supervisor_reports[0]
+                    self.log_test("Sample Supervisor Report", True, f"Sample report ID: {sample_report.get('id')}, User ID: {sample_report.get('user_id')}, Date: {sample_report.get('date')}, Branch: {sample_report.get('branch')}")
+                else:
+                    self.log_test("Sample Supervisor Report", False, "No supervisor reports found in database")
+            else:
+                self.log_test("Get Supervisor Reports", False, f"Failed to get supervisor reports: {reports_response.status_code} - {reports_response.text}")
+                return
+                
+            # Step 2: Check Current Supervisors
+            print("\n2. Checking Current Supervisors...")
+            users_response = self.session.get(f"{BASE_URL}/users")
+            
+            if users_response.status_code == 200:
+                all_users = users_response.json()
+                supervisors = [u for u in all_users if u.get("role") == "supervisor"]
+                total_supervisors = len(supervisors)
+                
+                self.log_test("Get Current Supervisors", True, f"Total current supervisors: {total_supervisors}")
+                
+                # List all supervisor IDs and assigned_to values
+                supervisor_ids = []
+                for i, supervisor in enumerate(supervisors, 1):
+                    supervisor_id = supervisor.get('id')
+                    assigned_to = supervisor.get('assigned_to')
+                    supervisor_ids.append(supervisor_id)
+                    self.log_test(f"Supervisor {i}", True, f"ID: {supervisor_id}, Username: {supervisor.get('username')}, Branch: {supervisor.get('branch')}, Assigned_to: {assigned_to}")
+                    
+            else:
+                self.log_test("Get Current Supervisors", False, f"Failed to get users: {users_response.status_code} - {users_response.text}")
+                return
+                
+            # Step 3: Match Reports to Users
+            print("\n3. Matching Reports to Users...")
+            
+            # Check if any report's user_id matches current supervisor IDs
+            matched_reports = []
+            orphaned_reports = []
+            
+            for report in supervisor_reports:
+                report_user_id = report.get('user_id')
+                if report_user_id in supervisor_ids:
+                    matched_reports.append(report)
+                else:
+                    orphaned_reports.append(report)
+                    
+            matched_count = len(matched_reports)
+            orphaned_count = len(orphaned_reports)
+            
+            self.log_test("Matched Reports", True, f"Reports where user_id matches current supervisors: {matched_count}")
+            self.log_test("Orphaned Reports", True if orphaned_count == 0 else False, f"Reports where user_id doesn't match any current supervisor: {orphaned_count}")
+            
+            # Step 4: Verify the Issue
+            print("\n4. Issue Verification...")
+            
+            if orphaned_count > 0:
+                self.log_test("Issue Identified", False, f"ISSUE CONFIRMED: {orphaned_count} supervisor reports are orphaned (user_id doesn't match any current supervisor)")
+                
+                # Show details of orphaned reports
+                print("\n   Orphaned Reports Details:")
+                for i, report in enumerate(orphaned_reports[:5], 1):  # Show first 5
+                    self.log_test(f"Orphaned Report {i}", False, f"Report ID: {report.get('id')}, User ID: {report.get('user_id')}, Date: {report.get('date')}, Branch: {report.get('branch')}")
+                    
+                # Check if these user_ids exist in any users (not just supervisors)
+                all_user_ids = [u.get('id') for u in all_users]
+                completely_orphaned = []
+                role_changed = []
+                
+                for report in orphaned_reports:
+                    report_user_id = report.get('user_id')
+                    if report_user_id in all_user_ids:
+                        # User exists but role might have changed
+                        user = next((u for u in all_users if u.get('id') == report_user_id), None)
+                        if user:
+                            role_changed.append({
+                                'report': report,
+                                'user': user
+                            })
+                    else:
+                        # User doesn't exist at all
+                        completely_orphaned.append(report)
+                        
+                if role_changed:
+                    self.log_test("Role Changed Users", False, f"{len(role_changed)} reports belong to users whose role changed from supervisor")
+                    for item in role_changed[:3]:  # Show first 3
+                        user = item['user']
+                        report = item['report']
+                        self.log_test("Role Changed Detail", False, f"User {user.get('username')} (ID: {user.get('id')}) now has role '{user.get('role')}' but has supervisor report from {report.get('date')}")
+                        
+                if completely_orphaned:
+                    self.log_test("Completely Orphaned", False, f"{len(completely_orphaned)} reports belong to users that no longer exist in the system")
+                    for report in completely_orphaned[:3]:  # Show first 3
+                        self.log_test("Deleted User Report", False, f"Report ID: {report.get('id')} belongs to deleted user ID: {report.get('user_id')}")
+                        
+            else:
+                self.log_test("No Issues Found", True, "All supervisor reports have matching current supervisor users")
+                
+            # Step 5: Solution Recommendations
+            print("\n5. Solution Recommendations...")
+            
+            if orphaned_count > 0:
+                self.log_test("Solution A", True, f"Create new supervisor reports with current supervisor accounts ({total_supervisors} supervisors available)")
+                self.log_test("Solution B", True, f"Update existing {orphaned_count} orphaned reports' user_id to match current supervisors")
+                
+                # Check if current supervisors have any reports
+                supervisors_with_reports = []
+                supervisors_without_reports = []
+                
+                for supervisor in supervisors:
+                    supervisor_id = supervisor.get('id')
+                    has_reports = any(r.get('user_id') == supervisor_id for r in supervisor_reports)
+                    if has_reports:
+                        supervisors_with_reports.append(supervisor)
+                    else:
+                        supervisors_without_reports.append(supervisor)
+                        
+                self.log_test("Supervisors with Reports", True, f"{len(supervisors_with_reports)} current supervisors have reports")
+                self.log_test("Supervisors without Reports", True if len(supervisors_without_reports) == 0 else False, f"{len(supervisors_without_reports)} current supervisors have NO reports")
+                
+                if supervisors_without_reports:
+                    print("\n   Supervisors without any reports:")
+                    for supervisor in supervisors_without_reports:
+                        self.log_test("No Reports Supervisor", False, f"Supervisor: {supervisor.get('username')} (ID: {supervisor.get('id')}, Branch: {supervisor.get('branch')}) has no reports")
+                        
+            # Step 6: Final Summary
+            print("\n6. Investigation Summary...")
+            self.log_test("Total Supervisor Reports", True, f"{total_reports}")
+            self.log_test("Total Current Supervisors", True, f"{total_supervisors}")
+            self.log_test("Matched Reports", True, f"{matched_count}")
+            self.log_test("Orphaned Reports", True if orphaned_count == 0 else False, f"{orphaned_count}")
+            
+            if orphaned_count > 0:
+                self.log_test("ISSUE STATUS", False, f"CONFIRMED: {orphaned_count} supervisor reports are orphaned and need attention")
+            else:
+                self.log_test("ISSUE STATUS", True, "NO ISSUES: All supervisor reports have valid current supervisor users")
+                
+        except Exception as e:
+            self.log_test("Investigation Error", False, f"Exception during investigation: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
@@ -1264,11 +1418,8 @@ class BackendTester:
             print("❌ Authentication failed - cannot proceed with other tests")
             return
             
-        # Check existing VP and supervisor data first
-        self.check_existing_vp_supervisor_data()
-        
-        # Test Vice-Principal dashboard issue specifically
-        self.test_vice_principal_dashboard_issue()
+        # Run the specific supervisor reports investigation
+        self.investigate_supervisor_reports_issue()
         
         # Print summary
         self.print_summary()
