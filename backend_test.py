@@ -507,6 +507,245 @@ class BackendTester:
         # Login back as admin for other tests
         self.test_authentication()
         
+    def test_supervisor_reports(self):
+        """Test supervisor reports endpoints"""
+        print("\n=== Testing Supervisor Reports ===")
+        
+        # First, create a supervisor user
+        supervisor_user, password = self.create_test_user("supervisor", "boys")
+        if not supervisor_user:
+            self.log_test("Supervisor Reports Setup", False, "Failed to create supervisor test user")
+            return
+            
+        # Login as supervisor user
+        login_result = self.login_as_user(supervisor_user["username"], password)
+        if not login_result:
+            self.log_test("Supervisor Reports Setup", False, "Failed to login as supervisor user")
+            return
+            
+        self.log_test("Supervisor User Login", True, f"Logged in as {supervisor_user['username']}")
+        
+        # Test POST - Create supervisor report
+        supervisor_data = {
+            "date": datetime.now(timezone.utc).date().isoformat(),
+            "student_discipline": 85,
+            "student_discipline_notes": "انضباط جيد بشكل عام",
+            "classroom_cleanliness": 90,
+            "classroom_cleanliness_notes": "نظافة ممتازة في معظم الفصول",
+            "teacher_attendance_rate": 95,
+            "late_teachers": [
+                {"teacher": "أحمد محمد", "subject": "رياضيات", "minutes_late": 10},
+                {"teacher": "فاطمة علي", "subject": "علوم", "minutes_late": 5}
+            ],
+            "teacher_attendance_notes": "حضور جيد مع تأخير بسيط لبعض المعلمين",
+            "student_movement": "منتظم",
+            "student_movement_classes": ["الصف الأول أ", "الصف الثاني ب"],
+            "student_movement_notes": "حركة طلابية منتظمة",
+            "general_behavior": 88,
+            "general_notes": "سلوك عام جيد",
+            "incidents": [
+                {"type": "شجار", "description": "شجار بسيط بين طالبين", "action": "تم حل المشكلة ودياً"},
+                {"type": "تأخير", "description": "تأخير مجموعة من الطلاب", "action": "تم توجيههم وتحذيرهم"}
+            ],
+            "absent_teachers": [
+                {"teacher": "سارة أحمد", "subject": "لغة عربية", "reason": "مرض"}
+            ],
+            "covering_teachers": [
+                {"teacher": "محمد سالم", "covered_subject": "لغة عربية", "original_teacher": "سارة أحمد"}
+            ],
+            "absent_students_count": 12
+        }
+        
+        try:
+            response = self.session.post(f"{BASE_URL}/reports/supervisor", json=supervisor_data)
+            
+            if response.status_code == 200:
+                created_report = response.json()
+                report_id = created_report.get("id")
+                self.log_test(
+                    "Create Supervisor Report", 
+                    True, 
+                    f"Created report with ID: {report_id}"
+                )
+                
+                # Test GET - Retrieve supervisor reports
+                get_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+                if get_response.status_code == 200:
+                    reports = get_response.json()
+                    self.log_test(
+                        "Get Supervisor Reports", 
+                        True, 
+                        f"Retrieved {len(reports)} supervisor reports"
+                    )
+                    
+                    # Test with branch filter
+                    branch_response = self.session.get(f"{BASE_URL}/reports/supervisor?branch=boys")
+                    if branch_response.status_code == 200:
+                        branch_reports = branch_response.json()
+                        self.log_test(
+                            "Get Supervisor Reports (Boys Branch)", 
+                            True, 
+                            f"Retrieved {len(branch_reports)} reports for boys branch"
+                        )
+                    else:
+                        self.log_test(
+                            "Get Supervisor Reports (Boys Branch)", 
+                            False, 
+                            f"Failed: {branch_response.status_code} - {branch_response.text}"
+                        )
+                        
+                    # Test PUT - Update supervisor report
+                    if report_id:
+                        update_data = {
+                            "student_discipline": 90,
+                            "student_discipline_notes": "تحسن في الانضباط",
+                            "general_behavior": 92,
+                            "general_notes": "تحسن ملحوظ في السلوك العام"
+                        }
+                        
+                        update_response = self.session.put(f"{BASE_URL}/reports/supervisor/{report_id}", json=update_data)
+                        if update_response.status_code == 200:
+                            self.log_test(
+                                "Update Supervisor Report", 
+                                True, 
+                                "Successfully updated supervisor report"
+                            )
+                        else:
+                            self.log_test(
+                                "Update Supervisor Report", 
+                                False, 
+                                f"Failed: {update_response.status_code} - {update_response.text}"
+                            )
+                else:
+                    self.log_test(
+                        "Get Supervisor Reports", 
+                        False, 
+                        f"Failed: {get_response.status_code} - {get_response.text}"
+                    )
+            else:
+                self.log_test(
+                    "Create Supervisor Report", 
+                    False, 
+                    f"Failed: {response.status_code} - {response.text}"
+                )
+                
+        except Exception as e:
+            self.log_test("Supervisor Reports", False, f"Exception: {str(e)}")
+            
+        # Login back as admin for other tests
+        self.test_authentication()
+        
+    def test_vice_principal_reports(self):
+        """Test vice principal reports endpoints"""
+        print("\n=== Testing Vice Principal Reports ===")
+        
+        # First, create a vice principal user
+        vp_user, password = self.create_test_user("vice_principal", "girls")
+        if not vp_user:
+            self.log_test("Vice Principal Reports Setup", False, "Failed to create vice principal test user")
+            return
+            
+        # Login as vice principal user
+        login_result = self.login_as_user(vp_user["username"], password)
+        if not login_result:
+            self.log_test("Vice Principal Reports Setup", False, "Failed to login as vice principal user")
+            return
+            
+        self.log_test("Vice Principal User Login", True, f"Logged in as {vp_user['username']}")
+        
+        # Test POST - Create vice principal report
+        vp_data = {
+            "week_start": "2024-01-15",
+            "week_end": "2024-01-19",
+            "problems": [
+                {"category": "انضباط", "description": "تأخير بعض الطلاب"},
+                {"category": "نظافة", "description": "حاجة لتحسين نظافة بعض الفصول"}
+            ],
+            "suggestions": [
+                "زيادة الرقابة في بداية اليوم الدراسي",
+                "تنظيم حملة نظافة أسبوعية",
+                "تفعيل دور مجلس الطلاب"
+            ],
+            "supervisor_reports": []  # Will be filled with actual supervisor report IDs in real scenario
+        }
+        
+        try:
+            response = self.session.post(f"{BASE_URL}/reports/vice-principal", json=vp_data)
+            
+            if response.status_code == 200:
+                created_report = response.json()
+                report_id = created_report.get("id")
+                self.log_test(
+                    "Create Vice Principal Report", 
+                    True, 
+                    f"Created report with ID: {report_id}"
+                )
+                
+                # Test GET - Retrieve vice principal reports
+                get_response = self.session.get(f"{BASE_URL}/reports/vice-principal")
+                if get_response.status_code == 200:
+                    reports = get_response.json()
+                    self.log_test(
+                        "Get Vice Principal Reports", 
+                        True, 
+                        f"Retrieved {len(reports)} vice principal reports"
+                    )
+                else:
+                    self.log_test(
+                        "Get Vice Principal Reports", 
+                        False, 
+                        f"Failed: {get_response.status_code} - {get_response.text}"
+                    )
+            else:
+                self.log_test(
+                    "Create Vice Principal Report", 
+                    False, 
+                    f"Failed: {response.status_code} - {response.text}"
+                )
+                
+        except Exception as e:
+            self.log_test("Vice Principal Reports", False, f"Exception: {str(e)}")
+            
+        # Login back as admin for other tests
+        self.test_authentication()
+        
+    def test_users_endpoint(self):
+        """Test users management endpoints"""
+        print("\n=== Testing Users Endpoint ===")
+        
+        try:
+            # Test GET /users (as admin)
+            response = self.session.get(f"{BASE_URL}/users")
+            
+            if response.status_code == 200:
+                users = response.json()
+                self.log_test(
+                    "Get Users", 
+                    True, 
+                    f"Retrieved {len(users)} users"
+                )
+                
+                # Verify admin user exists
+                admin_found = any(user.get("username") == ADMIN_USERNAME for user in users)
+                if admin_found:
+                    self.log_test(
+                        "Admin User Exists", 
+                        True, 
+                        "Admin user found in users list"
+                    )
+                else:
+                    self.log_test(
+                        "Admin User Exists", 
+                        False, 
+                        "Admin user not found in users list"
+                    )
+                    
+            else:
+                self.log_test("Get Users", False, f"Failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_test("Get Users", False, f"Exception: {str(e)}")
+        
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
