@@ -361,7 +361,7 @@ const SocialSpecialistDashboard = () => {
 
           // Reports Details
           {
-            text: `تفاصيل التقارير (${stats.totalReports})`,
+            text: `تفاصيل التقارير (${stats.totalReports || 0})`,
             style: 'sectionHeader',
             margin: [0, 0, 0, 10]
           },
