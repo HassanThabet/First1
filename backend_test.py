@@ -1703,6 +1703,163 @@ class BackendTester:
         except Exception as e:
             self.log_test("VP Investigation", False, f"Exception during investigation: {str(e)}")
 
+    def test_vp_credentials_and_login(self):
+        """Test Vice-Principal user credentials and login as requested"""
+        print("\n=== Testing Vice-Principal Credentials and Login ===")
+        
+        try:
+            # Step 1: Query MongoDB to list all Vice-Principal users
+            users_response = self.session.get(f"{BASE_URL}/users")
+            
+            if users_response.status_code == 200:
+                all_users = users_response.json()
+                vp_users = [u for u in all_users if u.get("role") == "vice_principal"]
+                
+                self.log_test("Query VP Users", True, f"Found {len(vp_users)} Vice-Principal users in database")
+                
+                if not vp_users:
+                    self.log_test("VP Users Check", False, "No Vice-Principal users found in the system")
+                    return
+                    
+                # List all VP users with their usernames
+                print("\n📋 Vice-Principal Users List:")
+                for i, vp in enumerate(vp_users, 1):
+                    username = vp.get('username', 'N/A')
+                    user_id = vp.get('id', 'N/A')
+                    branch = vp.get('branch', 'N/A')
+                    print(f"   {i}. Username: {username}")
+                    print(f"      ID: {user_id}")
+                    print(f"      Branch: {branch}")
+                    self.log_test(f"VP User {i} Details", True, f"Username: {username}, ID: {user_id}, Branch: {branch}")
+                
+                # Step 2: Test login with each VP user using password 'password123'
+                print(f"\n🔐 Testing Login for {len(vp_users)} VP Users with password 'password123':")
+                
+                successful_logins = []
+                failed_logins = []
+                
+                for i, vp in enumerate(vp_users, 1):
+                    username = vp.get('username')
+                    if not username:
+                        self.log_test(f"VP {i} Login Test", False, "Username is missing")
+                        failed_logins.append({"user": f"VP {i}", "reason": "Missing username"})
+                        continue
+                    
+                    # Test login with password 'password123'
+                    login_data = {
+                        "username": username,
+                        "password": "password123",
+                        "remember_me": False
+                    }
+                    
+                    try:
+                        # Create a new session for each login test to avoid conflicts
+                        test_session = requests.Session()
+                        login_response = test_session.post(f"{BASE_URL}/auth/login", json=login_data)
+                        
+                        if login_response.status_code == 200:
+                            login_result = login_response.json()
+                            if "user" in login_result and "token" in login_result:
+                                user_info = login_result["user"]
+                                self.log_test(f"VP {i} Login Success", True, f"Successfully logged in as {username}")
+                                successful_logins.append({
+                                    "username": username,
+                                    "user_id": user_info.get('id'),
+                                    "role": user_info.get('role'),
+                                    "branch": user_info.get('branch')
+                                })
+                                
+                                # Test /auth/me endpoint to verify session
+                                me_response = test_session.get(f"{BASE_URL}/auth/me")
+                                if me_response.status_code == 200:
+                                    me_data = me_response.json()
+                                    self.log_test(f"VP {i} Session Verification", True, f"Session valid, user: {me_data.get('username')}")
+                                else:
+                                    self.log_test(f"VP {i} Session Verification", False, f"Session invalid: {me_response.status_code}")
+                            else:
+                                self.log_test(f"VP {i} Login Response", False, f"Login response missing user or token for {username}")
+                                failed_logins.append({"user": username, "reason": "Invalid response format"})
+                        else:
+                            error_msg = login_response.text if login_response.text else f"HTTP {login_response.status_code}"
+                            self.log_test(f"VP {i} Login Failed", False, f"Login failed for {username}: {error_msg}")
+                            failed_logins.append({"user": username, "reason": error_msg})
+                            
+                    except Exception as e:
+                        self.log_test(f"VP {i} Login Exception", False, f"Exception during login for {username}: {str(e)}")
+                        failed_logins.append({"user": username, "reason": f"Exception: {str(e)}"})
+                
+                # Step 3: Summary of login test results
+                print(f"\n📊 Login Test Results Summary:")
+                print(f"   ✅ Successful logins: {len(successful_logins)}")
+                print(f"   ❌ Failed logins: {len(failed_logins)}")
+                
+                if successful_logins:
+                    print(f"\n✅ Successfully logged in VP users:")
+                    for login in successful_logins:
+                        print(f"   - {login['username']} (ID: {login['user_id']}, Branch: {login['branch']})")
+                        
+                if failed_logins:
+                    print(f"\n❌ Failed login attempts:")
+                    for failure in failed_logins:
+                        print(f"   - {failure['user']}: {failure['reason']}")
+                        
+                # Step 4: Check authentication logic if there are failures
+                if failed_logins:
+                    print(f"\n🔍 Analyzing Authentication Logic...")
+                    self.log_test("Authentication Analysis", True, "Checking server.py authentication logic for VP login failures")
+                    
+                    # The authentication logic is in the login endpoint
+                    # Let's check if the issue is with password hashing or user lookup
+                    print("   Authentication flow analysis:")
+                    print("   1. User lookup: db.users.find_one({'username': user_data.username})")
+                    print("   2. Password verification: verify_password(user_data.password, user['password'])")
+                    print("   3. Token generation and session creation")
+                    
+                    # Check if we can find the users in the database
+                    for failure in failed_logins:
+                        if failure['user'] != f"VP {i}":  # Skip entries without proper username
+                            username = failure['user']
+                            # Try to find this user in our user list
+                            user_found = next((u for u in vp_users if u.get('username') == username), None)
+                            if user_found:
+                                self.log_test(f"User Exists Check - {username}", True, f"User exists in database with ID: {user_found.get('id')}")
+                                self.log_test(f"Password Issue - {username}", False, f"User exists but password 'password123' is incorrect")
+                            else:
+                                self.log_test(f"User Exists Check - {username}", False, f"User not found in database")
+                
+                # Overall test result
+                if len(successful_logins) == len(vp_users):
+                    self.log_test("VP Credentials Test", True, f"All {len(vp_users)} VP users can login with 'password123'")
+                elif len(successful_logins) > 0:
+                    self.log_test("VP Credentials Test", False, f"Only {len(successful_logins)}/{len(vp_users)} VP users can login with 'password123'")
+                else:
+                    self.log_test("VP Credentials Test", False, f"None of the {len(vp_users)} VP users can login with 'password123'")
+                    
+            else:
+                self.log_test("Query VP Users", False, f"Failed to get users: {users_response.status_code} - {users_response.text}")
+                
+        except Exception as e:
+            self.log_test("VP Credentials Test", False, f"Exception during VP credentials test: {str(e)}")
+
+    def run_vp_credential_test_only(self):
+        """Run only the VP credential test as requested"""
+        print("🚀 Starting VP Credential Testing...")
+        print(f"Base URL: {BASE_URL}")
+        print("=" * 60)
+        
+        # First authenticate as admin to access user data
+        self.test_authentication()
+        
+        if not self.auth_token:
+            print("❌ Admin authentication failed - cannot proceed with VP credential test")
+            return
+        
+        # Run the specific VP credential test
+        self.test_vp_credentials_and_login()
+        
+        # Print summary
+        self.print_summary()
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
