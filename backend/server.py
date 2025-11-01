@@ -509,16 +509,21 @@ async def delete_supervisor_report(report_id: str, current_user: dict = Depends(
 
 # Vice Principal Reports
 @api_router.post("/reports/vice-principal", response_model=VicePrincipalReport)
-async def create_vice_principal_report(report_data: VicePrincipalReport, current_user: dict = Depends(get_current_user)):
+async def create_vice_principal_report(report_data: dict, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "vice_principal":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    report_data.user_id = current_user["id"]
-    report_data.branch = current_user["branch"]
+    # Add required fields
+    report_data["id"] = str(uuid.uuid4())
+    report_data["user_id"] = current_user["id"]
+    report_data["branch"] = current_user["branch"]
+    report_data["created_at"] = datetime.now(timezone.utc).isoformat()
     
-    doc = report_data.model_dump()
-    await db.vice_principal_reports.insert_one(doc)
-    return report_data
+    await db.vice_principal_reports.insert_one(report_data)
+    
+    # Return the created report
+    report_obj = VicePrincipalReport(**report_data)
+    return report_obj
 
 @api_router.get("/reports/vice-principal", response_model=List[VicePrincipalReport])
 async def get_vice_principal_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
