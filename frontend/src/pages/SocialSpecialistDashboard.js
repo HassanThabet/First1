@@ -488,7 +488,7 @@ const SocialSpecialistDashboard = () => {
                   {/* Cases Statistics */}
                   <div>
                     <h4 className="text-lg font-bold text-gray-800 mb-4">الحالات الطلابية</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                       <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
                         <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات النفسية</div>
                         <div className="text-3xl font-bold text-cyan-700">{selectedReport.psychological_cases}</div>
@@ -500,6 +500,19 @@ const SocialSpecialistDashboard = () => {
                       <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
                         <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات السلوكية</div>
                         <div className="text-3xl font-bold text-purple-700">{selectedReport.behavioral_cases}</div>
+                      </div>
+                    </div>
+                    
+                    {/* Total Cases */}
+                    <div className="p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-300 shadow-md">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-lg font-bold text-purple-800 mb-1">📊 إجمالي عدد الحالات الطلابية</p>
+                          <p className="text-sm text-purple-600">مجموع جميع الحالات المسجلة في التقرير</p>
+                        </div>
+                        <div className="text-5xl font-extrabold bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                          {selectedReport.psychological_cases + selectedReport.academic_cases + selectedReport.behavioral_cases}
+                        </div>
                       </div>
                     </div>
                   </div>
