@@ -81,11 +81,20 @@ const VicePrincipalDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API}/reports/vice-principal`, {
-        ...formData,
-        supervisor_reports: supervisorReports.map(r => r.id)
-      });
-      toast.success("تم إنشاء التقرير بنجاح");
+      if (editingReport) {
+        await axios.put(`${API}/reports/vice-principal/${editingReport.id}`, {
+          ...formData,
+          supervisor_reports: supervisorReports.map(r => r.id)
+        });
+        toast.success("تم تحديث التقرير بنجاح");
+        setEditingReport(null);
+      } else {
+        await axios.post(`${API}/reports/vice-principal`, {
+          ...formData,
+          supervisor_reports: supervisorReports.map(r => r.id)
+        });
+        toast.success("تم إنشاء التقرير بنجاح");
+      }
       fetchData();
       setActiveTab("reports");
       setFormData({ problems: [], suggestions: [], week_start: "", week_end: "" });
@@ -93,6 +102,29 @@ const VicePrincipalDashboard = () => {
       toast.error("فشل إنشاء التقرير");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (report) => {
+    setEditingReport(report);
+    setFormData({
+      problems: report.problems || [],
+      suggestions: report.suggestions || [],
+      week_start: report.week_start,
+      week_end: report.week_end
+    });
+    setActiveTab("create");
+  };
+
+  const handleDelete = async (reportId) => {
+    if (window.confirm("هل أنت متأكد من حذف هذا التقرير؟")) {
+      try {
+        await axios.delete(`${API}/reports/vice-principal/${reportId}`);
+        toast.success("تم حذف التقرير بنجاح");
+        fetchData();
+      } catch (error) {
+        toast.error("فشل حذف التقرير");
+      }
     }
   };
 
