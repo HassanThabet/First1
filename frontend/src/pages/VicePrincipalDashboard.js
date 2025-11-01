@@ -326,9 +326,19 @@ const VicePrincipalDashboard = () => {
             {myReports.map((report) => (
               <Card key={report.id}>
                 <CardHeader>
-                  <CardTitle>
-                    تقرير من {new Date(report.week_start).toLocaleDateString("ar-SA")} 
-                    إلى {new Date(report.week_end).toLocaleDateString("ar-SA")}
+                  <CardTitle className="flex items-center justify-between">
+                    <span>
+                      تقرير من {new Date(report.week_start).toLocaleDateString("ar-SA")} 
+                      إلى {new Date(report.week_end).toLocaleDateString("ar-SA")}
+                    </span>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEdit(report)}>
+                        تعديل
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleDelete(report.id)}>
+                        حذف
+                      </Button>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
