@@ -22,6 +22,11 @@ const VicePrincipalDashboard = () => {
   const [selectedMyReport, setSelectedMyReport] = useState(null);
   const [showSupervisorModal, setShowSupervisorModal] = useState(false);
   const [showMyReportModal, setShowMyReportModal] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  
+  // Export filters
+  const [exportStartDate, setExportStartDate] = useState("");
+  const [exportEndDate, setExportEndDate] = useState("");
 
   const [formData, setFormData] = useState({
     problems: [],
