@@ -1123,7 +1123,12 @@ const SupervisorDashboard = () => {
                 )}
               </DialogContent>
             </Dialog>
-                <Card key={report.id} className="report-card overflow-hidden">
+          </div>
+        </TabsContent>
+      </Tabs>
+    </DashboardLayout>
+  );
+};
                   <CardHeader className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
                     <CardTitle className="flex items-center justify-between">
                       <div>
