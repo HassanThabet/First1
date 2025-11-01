@@ -1715,11 +1715,8 @@ class BackendTester:
             print("❌ Authentication failed - cannot proceed with other tests")
             return
             
-        # Test the new cleanup endpoint as requested
-        self.test_cleanup_orphaned_reports()
-        
-        # Run the specific supervisor reports investigation
-        self.investigate_supervisor_reports_issue()
+        # Run the VP supervisor reports investigation as requested
+        self.investigate_vp_supervisor_reports_issue()
         
         # Print summary
         self.print_summary()
