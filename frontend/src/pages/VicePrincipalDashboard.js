@@ -1093,41 +1093,74 @@ const VicePrincipalDashboard = () => {
 
       {/* Export Date Range Dialog */}
       <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="text-xl">تصدير تقارير المشرفين إلى Excel</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-6 p-4">
-            <p className="text-sm text-gray-600">
-              اختر نطاق التواريخ لتصدير التقارير (اختياري). اترك الحقول فارغة لتصدير جميع التقارير.
-            </p>
+            <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-3">
+              <p className="text-sm text-cyan-800 font-semibold">
+                ✨ سيتم تصدير جميع التفاصيل الكاملة:
+              </p>
+              <ul className="text-xs text-cyan-700 mt-2 space-y-1 mr-4">
+                <li>• أسماء جميع المعلمين (المتأخرين، الغائبين، المغطين)</li>
+                <li>• تفاصيل الحوادث والإجراءات المتخذة</li>
+                <li>• الصفوف المتابعة للتنقل</li>
+                <li>• جميع الملاحظات والتقييمات</li>
+                <li>• إحصائيات إجمالية في نهاية الملف</li>
+              </ul>
+            </div>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">من تاريخ</label>
-                <input
-                  type="date"
-                  value={exportStartDate}
-                  onChange={(e) => setExportStartDate(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                />
+                <Label className="text-base font-semibold">نوع التصدير</Label>
+                <Select value={exportFilterType} onValueChange={setExportFilterType}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">جميع التقارير</SelectItem>
+                    <SelectItem value="daily">اليوم فقط</SelectItem>
+                    <SelectItem value="weekly">هذا الأسبوع (السبت - الأربعاء)</SelectItem>
+                    <SelectItem value="monthly">هذا الشهر</SelectItem>
+                    <SelectItem value="custom">نطاق مخصص</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
-                <input
-                  type="date"
-                  value={exportEndDate}
-                  onChange={(e) => setExportEndDate(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
-                />
-              </div>
+              {exportFilterType === "custom" && (
+                <div className="space-y-3 p-3 bg-gray-50 rounded-lg border">
+                  <p className="text-sm font-semibold text-gray-700">تحديد النطاق الزمني</p>
+                  <div>
+                    <Label className="text-sm">من تاريخ (اختياري)</Label>
+                    <input
+                      type="date"
+                      value={exportStartDate}
+                      onChange={(e) => setExportStartDate(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-sm">إلى تاريخ (اختياري)</Label>
+                    <input
+                      type="date"
+                      value={exportEndDate}
+                      onChange={(e) => setExportEndDate(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent mt-1"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    💡 يمكنك ترك أحد الحقلين فارغاً للتصدير من/إلى تاريخ معين
+                  </p>
+                </div>
+              )}
             </div>
             
-            <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-3">
-              <p className="text-sm text-cyan-800">
-                <strong>ملاحظة:</strong> سيتم تصدير جميع تفاصيل التقارير بما في ذلك أسماء المعلمين، الحوادث، والملاحظات الكاملة.
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-xs text-blue-800">
+                <strong>ملاحظة:</strong> سيتم دمج جميع البيانات في ملف Excel واحد شامل مع صفوف منفصلة لكل تقرير، وإحصائيات إجمالية في النهاية.
               </p>
             </div>
             
@@ -1137,7 +1170,7 @@ const VicePrincipalDashboard = () => {
                 className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
               >
                 <FileDown className="w-4 h-4 ml-2" />
-                تصدير
+                تصدير إلى Excel
               </Button>
               
               <Button
@@ -1146,6 +1179,7 @@ const VicePrincipalDashboard = () => {
                   setShowExportDialog(false);
                   setExportStartDate("");
                   setExportEndDate("");
+                  setExportFilterType("all");
                 }}
                 className="flex-1"
               >
