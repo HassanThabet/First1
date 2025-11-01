@@ -1526,6 +1526,183 @@ class BackendTester:
         except Exception as e:
             self.log_test("Cleanup Orphaned Reports Test", False, f"Exception: {str(e)}")
 
+    def investigate_vp_supervisor_reports_issue(self):
+        """Comprehensive investigation of VP supervisor reports issue as requested"""
+        print("\n=== 🔍 INVESTIGATING VP SUPERVISOR REPORTS ISSUE ===")
+        
+        try:
+            # Step 1: Check Current Supervisor Reports
+            print("\n1. 📊 Checking Current Supervisor Reports...")
+            reports_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+            
+            if reports_response.status_code == 200:
+                supervisor_reports = reports_response.json()
+                total_reports = len(supervisor_reports)
+                self.log_test("GET /api/reports/supervisor", True, f"Total supervisor reports: {total_reports}")
+                
+                # List ALL supervisor reports with details
+                for i, report in enumerate(supervisor_reports, 1):
+                    self.log_test(f"Report {i}", True, f"ID: {report.get('id')}, Date: {report.get('date')}, User_ID: {report.get('user_id')}")
+                    
+            else:
+                self.log_test("GET /api/reports/supervisor", False, f"Failed: {reports_response.status_code} - {reports_response.text}")
+                return
+                
+            # Step 2: Check Current Supervisors
+            print("\n2. 👥 Checking Current Supervisors...")
+            users_response = self.session.get(f"{BASE_URL}/users")
+            
+            if users_response.status_code == 200:
+                all_users = users_response.json()
+                supervisors = [u for u in all_users if u.get("role") == "supervisor"]
+                
+                self.log_test("GET /api/users (role=supervisor)", True, f"Total supervisors: {len(supervisors)}")
+                
+                # List ALL supervisors with assignment details
+                for i, supervisor in enumerate(supervisors, 1):
+                    self.log_test(f"Supervisor {i}", True, f"ID: {supervisor.get('id')}, Username: {supervisor.get('username')}, Branch: {supervisor.get('branch')}, Assigned_to: {supervisor.get('assigned_to')}")
+                    
+            else:
+                self.log_test("GET /api/users", False, f"Failed: {users_response.status_code} - {users_response.text}")
+                return
+                
+            # Step 3: Check Vice-Principals
+            print("\n3. 🎓 Checking Vice-Principals...")
+            vps = [u for u in all_users if u.get("role") == "vice_principal"]
+            
+            self.log_test("GET /api/users (role=vice_principal)", True, f"Total Vice-Principals: {len(vps)}")
+            
+            # List ALL VPs with details
+            for i, vp in enumerate(vps, 1):
+                self.log_test(f"Vice-Principal {i}", True, f"ID: {vp.get('id')}, Username: {vp.get('username')}, Branch: {vp.get('branch')}")
+                
+            # Step 4: Match Reports to VPs
+            print("\n4. 🔗 Matching Reports to VPs...")
+            
+            for i, vp in enumerate(vps, 1):
+                vp_id = vp.get('id')
+                vp_username = vp.get('username')
+                vp_branch = vp.get('branch')
+                
+                # Find supervisors assigned to this VP
+                assigned_supervisors = [s for s in supervisors if s.get('assigned_to') == vp_id]
+                
+                self.log_test(f"VP {i} ({vp_username}) Assigned Supervisors", True, f"Found {len(assigned_supervisors)} assigned supervisors")
+                
+                if assigned_supervisors:
+                    # List assigned supervisors
+                    for j, supervisor in enumerate(assigned_supervisors, 1):
+                        self.log_test(f"VP {i} Supervisor {j}", True, f"ID: {supervisor.get('id')}, Username: {supervisor.get('username')}, Branch: {supervisor.get('branch')}")
+                        
+                    # Find reports from these supervisors
+                    supervisor_ids = [s.get('id') for s in assigned_supervisors]
+                    vp_reports = [r for r in supervisor_reports if r.get('user_id') in supervisor_ids]
+                    
+                    self.log_test(f"VP {i} Supervisor Reports", True, f"Found {len(vp_reports)} reports from assigned supervisors")
+                    
+                    # Show the matching chain for each report
+                    for k, report in enumerate(vp_reports, 1):
+                        report_user_id = report.get('user_id')
+                        supervisor = next((s for s in assigned_supervisors if s.get('id') == report_user_id), None)
+                        if supervisor:
+                            self.log_test(f"VP {i} Report Chain {k}", True, f"Report {report.get('id')} → Supervisor {supervisor.get('username')} → VP {vp_username} → Branch {vp_branch}")
+                else:
+                    self.log_test(f"VP {i} Issue", False, f"VP {vp_username} has NO supervisors assigned - THIS IS WHY NO REPORTS SHOW!")
+                    
+            # Step 5: Test Vice-Principal View
+            print("\n5. 🧪 Testing Vice-Principal View...")
+            
+            # Find a VP with assigned supervisors to test
+            test_vp = None
+            for vp in vps:
+                assigned_supervisors = [s for s in supervisors if s.get('assigned_to') == vp.get('id')]
+                if assigned_supervisors:
+                    test_vp = vp
+                    break
+                    
+            if test_vp:
+                # Create a test VP user to login as
+                vp_user, vp_password = self.create_test_user("vice_principal", test_vp.get('branch', 'boys'))
+                if vp_user:
+                    # Assign some supervisors to this test VP
+                    test_supervisors = [s for s in supervisors if s.get('branch') == vp_user.get('branch')][:2]  # Take first 2 supervisors from same branch
+                    
+                    for supervisor in test_supervisors:
+                        update_data = {"assigned_to": vp_user['id']}
+                        update_response = self.session.put(f"{BASE_URL}/users/{supervisor['id']}", json=update_data)
+                        if update_response.status_code == 200:
+                            self.log_test("Assign Supervisor to Test VP", True, f"Assigned supervisor {supervisor.get('username')} to test VP")
+                        
+                    # Login as the test VP
+                    vp_login = self.login_as_user(vp_user["username"], vp_password)
+                    if vp_login:
+                        self.log_test("VP Login", True, f"Successfully logged in as test VP")
+                        
+                        # Test GET /api/reports/supervisor as VP
+                        vp_reports_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+                        if vp_reports_response.status_code == 200:
+                            vp_accessible_reports = vp_reports_response.json()
+                            
+                            # Manual filtering simulation
+                            assigned_supervisor_ids = [s.get('id') for s in test_supervisors]
+                            expected_reports = [r for r in supervisor_reports if r.get('user_id') in assigned_supervisor_ids]
+                            
+                            self.log_test("VP Access Test", True, f"VP can access {len(vp_accessible_reports)} reports")
+                            self.log_test("Expected vs Actual", True, f"Expected: {len(expected_reports)} reports, Actual: {len(vp_accessible_reports)} reports")
+                            
+                            if len(vp_accessible_reports) == len(expected_reports):
+                                self.log_test("VP Filtering Working", True, "VP filtering is working correctly!")
+                            else:
+                                self.log_test("VP Filtering Issue", False, f"VP filtering not working - Expected {len(expected_reports)}, Got {len(vp_accessible_reports)}")
+                        else:
+                            self.log_test("VP Access Test", False, f"VP cannot access reports: {vp_reports_response.status_code}")
+                    else:
+                        self.log_test("VP Login", False, "Failed to login as test VP")
+                else:
+                    self.log_test("Create Test VP", False, "Failed to create test VP user")
+            else:
+                self.log_test("VP Test Setup", False, "No VP with assigned supervisors found for testing")
+                
+            # Login back as admin
+            self.test_authentication()
+            
+            # Step 6: Summary and Root Cause Analysis
+            print("\n6. 📋 ROOT CAUSE ANALYSIS...")
+            
+            # Count VPs with and without assigned supervisors
+            vps_with_supervisors = 0
+            vps_without_supervisors = 0
+            
+            for vp in vps:
+                assigned_supervisors = [s for s in supervisors if s.get('assigned_to') == vp.get('id')]
+                if assigned_supervisors:
+                    vps_with_supervisors += 1
+                else:
+                    vps_without_supervisors += 1
+                    
+            self.log_test("VP Assignment Summary", True, f"VPs with supervisors: {vps_with_supervisors}, VPs without supervisors: {vps_without_supervisors}")
+            
+            # Check for orphaned reports
+            supervisor_ids = [s.get('id') for s in supervisors]
+            orphaned_reports = [r for r in supervisor_reports if r.get('user_id') not in supervisor_ids]
+            
+            if orphaned_reports:
+                self.log_test("Orphaned Reports Found", False, f"Found {len(orphaned_reports)} orphaned reports from deleted users")
+                for report in orphaned_reports[:5]:  # Show first 5
+                    self.log_test("Orphaned Report", False, f"Report ID: {report.get('id')}, User ID: {report.get('user_id')} (user no longer exists)")
+            else:
+                self.log_test("Orphaned Reports Check", True, "No orphaned reports found")
+                
+            # Final diagnosis
+            if vps_without_supervisors > 0:
+                self.log_test("ROOT CAUSE IDENTIFIED", False, f"ISSUE: {vps_without_supervisors} Vice-Principals have no supervisors assigned to them")
+                self.log_test("SOLUTION", True, "Admin needs to assign supervisors to VPs using the 'assigned_to' field in user management")
+            else:
+                self.log_test("VP Assignment Status", True, "All VPs have supervisors assigned - issue may be elsewhere")
+                
+        except Exception as e:
+            self.log_test("VP Investigation", False, f"Exception during investigation: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
