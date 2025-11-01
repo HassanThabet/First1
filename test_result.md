@@ -177,6 +177,21 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Implemented full CRUD operations, modal detail view, and filtering (daily, monthly) for activity reports"
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed PDF export with Arabic support using pdfmake library. Replaced jsPDF with pdfmake and added Cairo font for proper RTL rendering"
+
+  - task: "Arabic PDF Export for Activities Dashboard"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/ActivitiesDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented Arabic PDF export using pdfmake with Cairo font. Added comprehensive table with all activity details, statistics summary, and proper RTL layout"
 
   - task: "Social Specialist Dashboard with modal view and filtering"
     implemented: true
