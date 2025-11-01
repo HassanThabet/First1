@@ -18,6 +18,7 @@ const ActivitiesDashboard = () => {
   const [activeTab, setActiveTab] = useState("create");
   const [reports, setReports] = useState([]);
   const [allReports, setAllReports] = useState([]);
+  const [teachers, setTeachers] = useState([]); // New: teachers list
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
@@ -33,10 +34,10 @@ const ActivitiesDashboard = () => {
     date: "",
     target_group: "",
     type: "",
-    supervisor: "",
+    supervisors: [], // Changed from supervisor to supervisors (array)
     participants_count: 0,
     interaction_rate: 0,
-    teacher_cooperation: "",
+    cooperating_teachers: [], // Changed from teacher_cooperation to cooperating_teachers (array)
     admin_cooperation: "",
     educational_impact: "",
     problems: "",
@@ -45,11 +46,23 @@ const ActivitiesDashboard = () => {
 
   useEffect(() => {
     fetchReports();
+    fetchTeachers();
   }, []);
 
   useEffect(() => {
     filterReports();
   }, [viewMode, dateFilter, monthFilter, allReports]);
+
+  const fetchTeachers = async () => {
+    try {
+      const res = await axios.get(`${API}/teachers`);
+      // Filter by branch if user has branch
+      const branchTeachers = user.branch ? res.data.filter(t => t.branch === user.branch) : res.data;
+      setTeachers(branchTeachers);
+    } catch (error) {
+      console.error("Failed to load teachers:", error);
+    }
+  };
 
   const fetchReports = async () => {
     try {
