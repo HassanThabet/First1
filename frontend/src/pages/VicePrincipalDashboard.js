@@ -18,6 +18,10 @@ const VicePrincipalDashboard = () => {
   const [myReports, setMyReports] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingReport, setEditingReport] = useState(null);
+  const [selectedSupervisorReport, setSelectedSupervisorReport] = useState(null);
+  const [selectedMyReport, setSelectedMyReport] = useState(null);
+  const [showSupervisorModal, setShowSupervisorModal] = useState(false);
+  const [showMyReportModal, setShowMyReportModal] = useState(false);
 
   const [formData, setFormData] = useState({
     problems: [],
