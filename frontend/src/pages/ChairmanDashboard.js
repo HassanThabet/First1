@@ -26,10 +26,10 @@ const ChairmanDashboard = () => {
   
   // Filter states
   const [selectedBranch, setSelectedBranch] = useState("all"); // all, boys, girls
-  const [selectedVPForStats, setSelectedVPForStats] = useState("all"); // For overview tab
   const [selectedEmployee, setSelectedEmployee] = useState("all");
   const [timeFilter, setTimeFilter] = useState("all");
-  const [reportTypeFilter, setReportTypeFilter] = useState("all"); // all, supervisor, activities, social, quality
+  const [reportTypeFilter, setReportTypeFilter] = useState("all"); // all, vice_principal, supervisor, activities, social, quality
+  const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all"); // For specific employee within type
   
   // Modal states
   const [selectedReport, setSelectedReport] = useState(null);
