@@ -220,6 +220,205 @@ const SocialSpecialistDashboard = () => {
     };
   };
 
+  // Export to PDF
+  const exportToPDF = () => {
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const mergedReports = getMergedReports();
+    const stats = getMergedStatistics();
+
+    // Title
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    const title = 'تقرير الأخصائي الاجتماعي المدمج';
+    doc.text(title, 105, 20, { align: 'center' });
+
+    // Subtitle with period
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'normal');
+    let periodText = '';
+    if (mergedPeriod === 'weekly') {
+      periodText = 'هذا الأسبوع (السبت - الأربعاء)';
+    } else if (mergedPeriod === 'monthly') {
+      periodText = 'هذا الشهر';
+    } else if (mergedPeriod === 'custom' && mergedStartDate && mergedEndDate) {
+      periodText = `من ${mergedStartDate} إلى ${mergedEndDate}`;
+    }
+    doc.text(periodText, 105, 28, { align: 'center' });
+
+    // School name
+    doc.setFontSize(10);
+    doc.text('مدارس الفجر الجديد الأهلية', 105, 35, { align: 'center' });
+    
+    // Date
+    const currentDate = new Date().toLocaleDateString('ar-SA');
+    doc.text(`تاريخ التقرير: ${currentDate}`, 105, 41, { align: 'center' });
+
+    // Total Cases Box - Highlighted
+    doc.setFillColor(237, 231, 246);
+    doc.rect(15, 48, 180, 20, 'F');
+    doc.setDrawColor(156, 39, 176);
+    doc.setLineWidth(1.5);
+    doc.rect(15, 48, 180, 20, 'S');
+
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(123, 31, 162);
+    doc.text(`إجمالي الحالات الطلابية: ${stats.totalCases}`, 105, 60, { align: 'center' });
+
+    // Cases Breakdown
+    doc.setFillColor(224, 247, 250);
+    doc.rect(15, 75, 180, 30, 'F');
+    doc.setDrawColor(0, 188, 212);
+    doc.setLineWidth(0.5);
+    doc.rect(15, 75, 180, 30, 'S');
+
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 0, 0);
+    doc.text('توزيع الحالات', 105, 82, { align: 'center' });
+    
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    doc.text(`الحالات النفسية: ${stats.totalPsychological}`, 170, 89, { align: 'right' });
+    doc.text(`الحالات الأكاديمية: ${stats.totalAcademic}`, 170, 95, { align: 'right' });
+    doc.text(`الحالات السلوكية: ${stats.totalBehavioral}`, 170, 101, { align: 'right' });
+
+    // Actions Table
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text('الإجراءات المتخذة', 105, 115, { align: 'center' });
+
+    const actionsData = [
+      ['الجلسات', stats.totalSessions],
+      ['التواصل مع الأسر', stats.totalFamilies],
+      ['الإحالات', stats.totalReferrals],
+      ['المتابعات', stats.totalFollowUps]
+    ];
+
+    doc.autoTable({
+      startY: 120,
+      head: [['العدد', 'نوع الإجراء']],
+      body: actionsData,
+      styles: {
+        font: 'helvetica',
+        fontSize: 10,
+        halign: 'center'
+      },
+      headStyles: {
+        fillColor: [76, 175, 80],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+      margin: { left: 15, right: 15 }
+    });
+
+    let yPos = doc.lastAutoTable.finalY + 10;
+
+    // Detailed Reports Table
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text(`تفاصيل التقارير (${stats.totalReports})`, 105, yPos, { align: 'center' });
+
+    const reportsData = mergedReports.map((report, index) => {
+      const totalCases = report.psychological_cases + report.academic_cases + report.behavioral_cases;
+      return [
+        index + 1,
+        new Date(report.date).toLocaleDateString('ar-SA'),
+        totalCases,
+        report.psychological_cases,
+        report.academic_cases,
+        report.behavioral_cases,
+        report.sessions_count,
+        report.families_contacted
+      ];
+    });
+
+    doc.autoTable({
+      startY: yPos + 5,
+      head: [['#', 'التاريخ', 'إجمالي الحالات', 'نفسية', 'أكاديمية', 'سلوكية', 'جلسات', 'أسر']],
+      body: reportsData,
+      styles: {
+        font: 'helvetica',
+        fontSize: 9,
+        halign: 'center',
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [156, 39, 176],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      },
+      margin: { left: 10, right: 10 }
+    });
+
+    yPos = doc.lastAutoTable.finalY + 10;
+
+    // Programs and Recommendations
+    if (yPos < 240) {
+      doc.setFontSize(11);
+      doc.setFont(undefined, 'bold');
+      doc.text('ملاحظات وتوصيات', 105, yPos, { align: 'center' });
+      
+      yPos += 7;
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      
+      mergedReports.forEach((report, index) => {
+        if (yPos > 270) {
+          doc.addPage();
+          yPos = 20;
+        }
+        
+        if (report.guidance_programs || report.challenges || report.recommendations) {
+          doc.setFont(undefined, 'bold');
+          doc.text(`تقرير ${new Date(report.date).toLocaleDateString('ar-SA')}:`, 190, yPos, { align: 'right' });
+          yPos += 5;
+          
+          doc.setFont(undefined, 'normal');
+          if (report.guidance_programs) {
+            doc.text(`البرامج: ${report.guidance_programs.substring(0, 100)}...`, 190, yPos, { align: 'right', maxWidth: 170 });
+            yPos += 8;
+          }
+          if (report.recommendations) {
+            doc.text(`التوصيات: ${report.recommendations.substring(0, 100)}...`, 190, yPos, { align: 'right', maxWidth: 170 });
+            yPos += 8;
+          }
+        }
+      });
+    }
+
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(128);
+      doc.text(`صفحة ${i} من ${pageCount}`, 105, 285, { align: 'center' });
+    }
+
+    // Save PDF
+    let filename = 'تقرير_الأخصائي_الاجتماعي_المدمج';
+    if (mergedPeriod === 'weekly') {
+      filename += '_أسبوعي';
+    } else if (mergedPeriod === 'monthly') {
+      filename += '_شهري';
+    } else if (mergedPeriod === 'custom' && mergedStartDate && mergedEndDate) {
+      filename += `_${mergedStartDate}_${mergedEndDate}`;
+    }
+    filename += '.pdf';
+
+    doc.save(filename);
+    toast.success('تم تصدير التقرير إلى PDF بنجاح');
+  };
+
   return (
     <DashboardLayout title="لوحة تحكم الأخصائي الاجتماعي">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
