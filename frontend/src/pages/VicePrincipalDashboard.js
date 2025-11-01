@@ -404,8 +404,10 @@ const VicePrincipalDashboard = () => {
       // Prepare detailed reports data
       const reportsData = supervisorReports.map((report, index) => {
         const reportDate = new Date(report.date);
+        const supervisorName = getUserName(report.user_id);
         return [
           String(index + 1),
+          String(supervisorName),
           reportDate.toLocaleDateString('ar-SA'),
           String(report.late_teachers?.length || 0),
           String(report.absent_teachers?.length || 0),
