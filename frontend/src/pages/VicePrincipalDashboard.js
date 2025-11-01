@@ -98,75 +98,160 @@ const VicePrincipalDashboard = () => {
     };
   };
 
-  // Export to Excel
+  // Export to Excel with date range filtering
   const exportToExcel = () => {
+    setShowExportDialog(true);
+  };
+
+  const handleExportWithDateRange = () => {
     if (supervisorReports.length === 0) {
       toast.error("لا توجد تقارير للتصدير");
       return;
     }
 
-    // Prepare data for Excel
-    const excelData = supervisorReports.map(report => ({
-      'التاريخ': new Date(report.date).toLocaleDateString('ar-SA'),
-      'انضباط الطلاب': `${report.student_discipline}/10`,
-      'نظافة الفصول': `${report.classroom_cleanliness}/10`,
-      'التزام المعلمين': `${report.teacher_attendance_rate}/10`,
-      'السلوك العام': `${report.general_behavior}/10`,
-      'عدد الطلاب الغائبين': report.absent_students_count || 0,
-      'عدد المعلمين المتأخرين': report.late_teachers?.length || 0,
-      'عدد المعلمين الغائبين': report.absent_teachers?.length || 0,
-      'عدد المعلمين المغطين': report.covering_teachers?.length || 0,
-      'عدد الحوادث': report.incidents?.length || 0,
-      'الملاحظات العامة': report.general_notes || '-'
-    }));
-
-    // Add summary row
-    const stats = getMergedStatistics();
-    if (stats) {
-      excelData.push({
-        'التاريخ': 'المتوسط العام',
-        'انضباط الطلاب': `${stats.averages.discipline}/10`,
-        'نظافة الفصول': `${stats.averages.cleanliness}/10`,
-        'التزام المعلمين': `${stats.averages.attendance}/10`,
-        'السلوك العام': `${stats.averages.behavior}/10`,
-        'عدد الطلاب الغائبين': stats.totals.absentStudents,
-        'عدد المعلمين المتأخرين': stats.totals.lateTeachers,
-        'عدد المعلمين الغائبين': stats.totals.absentTeachers,
-        'عدد المعلمين المغطين': stats.totals.coveringTeachers,
-        'عدد الحوادث': stats.totals.incidents,
-        'الملاحظات العامة': `إجمالي ${stats.totals.reports} تقرير`
+    // Filter reports by date range if specified
+    let reportsToExport = [...supervisorReports];
+    
+    if (exportStartDate && exportEndDate) {
+      const startDate = new Date(exportStartDate);
+      const endDate = new Date(exportEndDate);
+      
+      reportsToExport = supervisorReports.filter(report => {
+        const reportDate = new Date(report.date);
+        return reportDate >= startDate && reportDate <= endDate;
+      });
+      
+      if (reportsToExport.length === 0) {
+        toast.error("لا توجد تقارير في النطاق الزمني المحدد");
+        return;
+      }
+    } else if (exportStartDate) {
+      const startDate = new Date(exportStartDate);
+      reportsToExport = supervisorReports.filter(report => {
+        const reportDate = new Date(report.date);
+        return reportDate >= startDate;
+      });
+    } else if (exportEndDate) {
+      const endDate = new Date(exportEndDate);
+      reportsToExport = supervisorReports.filter(report => {
+        const reportDate = new Date(report.date);
+        return reportDate <= endDate;
       });
     }
+
+    // Prepare detailed data for Excel with all information
+    const excelData = [];
+    
+    reportsToExport.forEach((report, index) => {
+      // Main report row
+      const mainRow = {
+        '#': index + 1,
+        'التاريخ': new Date(report.date).toLocaleDateString('ar-SA'),
+        'انضباط الطلاب': `${report.student_discipline}/10`,
+        'نظافة الفصول': `${report.classroom_cleanliness}/10`,
+        'التزام المعلمين': `${report.teacher_attendance_rate}/10`,
+        'السلوك العام': `${report.general_behavior}/10`,
+        'عدد الطلاب الغائبين': report.absent_students_count || 0,
+      };
+      
+      // Add teacher details
+      if (report.late_teachers && report.late_teachers.length > 0) {
+        mainRow['المعلمون المتأخرون'] = report.late_teachers.map(lt => 
+          `${lt.teacher} (${lt.subject} - حصة ${lt.period})`
+        ).join(' | ');
+      } else {
+        mainRow['المعلمون المتأخرون'] = '-';
+      }
+      
+      if (report.absent_teachers && report.absent_teachers.length > 0) {
+        mainRow['المعلمون الغائبون'] = report.absent_teachers.map(at => 
+          `${at.teacher} (${at.subject} - حصة ${at.period})`
+        ).join(' | ');
+      } else {
+        mainRow['المعلمون الغائبون'] = '-';
+      }
+      
+      if (report.covering_teachers && report.covering_teachers.length > 0) {
+        mainRow['المعلمون المغطون'] = report.covering_teachers.map(ct => 
+          `${ct.teacher} (${ct.subject} - حصة ${ct.period})`
+        ).join(' | ');
+      } else {
+        mainRow['المعلمون المغطون'] = '-';
+      }
+      
+      // Add incidents
+      if (report.incidents && report.incidents.length > 0) {
+        mainRow['الحوادث والمخالفات'] = report.incidents.map((inc, i) => 
+          `${i + 1}. ${inc.description} (الإجراء: ${inc.action})`
+        ).join(' | ');
+      } else {
+        mainRow['الحوادث والمخالفات'] = '-';
+      }
+      
+      // Add movement classes
+      if (report.student_movement_classes && report.student_movement_classes.length > 0) {
+        mainRow['الصفوف المتابعة للتنقل'] = report.student_movement_classes.join(' | ');
+      } else {
+        mainRow['الصفوف المتابعة للتنقل'] = '-';
+      }
+      
+      // Add notes
+      mainRow['ملاحظات الانضباط'] = report.student_discipline_notes || '-';
+      mainRow['ملاحظات النظافة'] = report.classroom_cleanliness_notes || '-';
+      mainRow['ملاحظات الالتزام'] = report.teacher_attendance_notes || '-';
+      mainRow['ملاحظات التنقل'] = report.student_movement_notes || '-';
+      mainRow['الملاحظات العامة'] = report.general_notes || '-';
+      
+      excelData.push(mainRow);
+    });
 
     // Create worksheet
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     
-    // Set column widths
+    // Set column widths for better readability
     worksheet['!cols'] = [
+      { wch: 5 },  // #
       { wch: 15 }, // التاريخ
-      { wch: 15 }, // انضباط الطلاب
-      { wch: 15 }, // نظافة الفصول
-      { wch: 15 }, // التزام المعلمين
-      { wch: 15 }, // السلوك العام
-      { wch: 20 }, // عدد الطلاب الغائبين
-      { wch: 20 }, // عدد المعلمين المتأخرين
-      { wch: 20 }, // عدد المعلمين الغائبين
-      { wch: 20 }, // عدد المعلمين المغطين
-      { wch: 15 }, // عدد الحوادث
-      { wch: 30 }  // الملاحظات العامة
+      { wch: 12 }, // انضباط الطلاب
+      { wch: 12 }, // نظافة الفصول
+      { wch: 12 }, // التزام المعلمين
+      { wch: 12 }, // السلوك العام
+      { wch: 15 }, // عدد الطلاب الغائبين
+      { wch: 40 }, // المعلمون المتأخرون
+      { wch: 40 }, // المعلمون الغائبون
+      { wch: 40 }, // المعلمون المغطون
+      { wch: 50 }, // الحوادث والمخالفات
+      { wch: 30 }, // الصفوف المتابعة للتنقل
+      { wch: 30 }, // ملاحظات الانضباط
+      { wch: 30 }, // ملاحظات النظافة
+      { wch: 30 }, // ملاحظات الالتزام
+      { wch: 30 }, // ملاحظات التنقل
+      { wch: 40 }  // الملاحظات العامة
     ];
 
     // Create workbook
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'تقارير المشرفين');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'تقارير المشرفين التفصيلية');
 
-    // Generate filename with date
-    const today = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
-    const filename = `تقارير_المشرفين_${today}.xlsx`;
+    // Generate filename with date range
+    let filename = 'تقارير_المشرفين_تفصيلية';
+    if (exportStartDate && exportEndDate) {
+      filename += `_من_${exportStartDate}_إلى_${exportEndDate}`;
+    } else if (exportStartDate) {
+      filename += `_من_${exportStartDate}`;
+    } else if (exportEndDate) {
+      filename += `_حتى_${exportEndDate}`;
+    } else {
+      filename += `_${new Date().toISOString().split('T')[0]}`;
+    }
+    filename += '.xlsx';
 
     // Download
     XLSX.writeFile(workbook, filename);
-    toast.success("تم تصدير التقارير بنجاح");
+    toast.success(`تم تصدير ${reportsToExport.length} تقرير بنجاح`);
+    setShowExportDialog(false);
+    setExportStartDate("");
+    setExportEndDate("");
   };
 
   const addProblem = () => {
