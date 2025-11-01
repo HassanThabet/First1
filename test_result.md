@@ -213,6 +213,18 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Users Management API endpoints working correctly. Successfully tested GET /api/users (retrieved 23 users), verified admin user exists in system. All operations functional with proper authentication and authorization."
 
+  - task: "Admin Cleanup Orphaned Reports API endpoint"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin cleanup endpoint working perfectly. Successfully tested POST /api/admin/cleanup-orphaned-reports. Found and deleted 23 orphaned reports across all collections (8 supervisor, 2 vice-principal, 4 activities, 5 social-specialist, 4 quality reports). All remaining reports now have valid user_ids. Cleanup functionality verified across all report types."
+
 frontend:
   - task: "Enhanced Excel export for Vice-Principal with date range filtering"
     implemented: true
