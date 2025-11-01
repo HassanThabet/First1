@@ -174,15 +174,6 @@ const ChairmanDashboard = () => {
     const avgBehavior = reports.length > 0 ?
       (reports.reduce((sum, r) => sum + r.general_behavior, 0) / reports.length).toFixed(1) : 0;
 
-    // Get supervisor count for the selected VP
-    let supervisorCount = 0;
-    if (selectedVPForStats !== "all") {
-      supervisorCount = users.filter(u => 
-        u.role === "supervisor" && 
-        u.assigned_to === selectedVPForStats
-      ).length;
-    }
-
     return {
       totalLateTeachers,
       totalAbsentTeachers,
@@ -193,8 +184,7 @@ const ChairmanDashboard = () => {
       avgCleanliness,
       avgAttendance,
       avgBehavior,
-      totalReports: reports.length,
-      supervisorCount
+      totalReports: reports.length
     };
   };
 
