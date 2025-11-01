@@ -32,6 +32,7 @@ const DirectorDashboard = () => {
   const [timeFilter, setTimeFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
+  const [reportTypeFilter, setReportTypeFilter] = useState("all"); // all, supervisor, activities, social, quality, educational
   
   // Modal states
   const [selectedReport, setSelectedReport] = useState(null);
