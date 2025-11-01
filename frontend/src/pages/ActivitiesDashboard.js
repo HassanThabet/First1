@@ -28,6 +28,11 @@ const ActivitiesDashboard = () => {
   const [viewMode, setViewMode] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
+  
+  // Merged reports filters
+  const [mergedPeriod, setMergedPeriod] = useState("weekly"); // weekly or monthly
+  const [mergedStartDate, setMergedStartDate] = useState("");
+  const [mergedEndDate, setMergedEndDate] = useState("");
 
   const [activities, setActivities] = useState([{
     name: "",
