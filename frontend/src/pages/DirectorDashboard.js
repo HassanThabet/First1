@@ -27,6 +27,7 @@ const DirectorDashboard = () => {
   
   // Filter states
   const [selectedEmployee, setSelectedEmployee] = useState("all");
+  const [selectedVPForStats, setSelectedVPForStats] = useState("all"); // For overview tab
   const [timeFilter, setTimeFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
