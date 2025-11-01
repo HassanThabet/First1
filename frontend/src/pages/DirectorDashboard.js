@@ -540,7 +540,7 @@ const DirectorDashboard = () => {
                 <CardTitle>التصفية</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">الفرع</label>
                     <Input 
@@ -565,6 +565,22 @@ const DirectorDashboard = () => {
                               {vp.username}
                             </SelectItem>
                           ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">نوع التقرير</label>
+                    <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع التقارير</SelectItem>
+                        <SelectItem value="supervisor">المشرفين</SelectItem>
+                        <SelectItem value="activities">الأنشطة</SelectItem>
+                        <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
+                        <SelectItem value="quality">الجودة</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
