@@ -27,7 +27,7 @@ const AdminDashboard = () => {
     username: "",
     password: "",
     role: "supervisor",
-    branch: "boys",
+    branch: "both",
     assigned_to: ""
   });
 
