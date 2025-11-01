@@ -791,16 +791,20 @@ async def delete_quality_report(report_id: str, current_user: dict = Depends(get
 
 # Director Reports
 @api_router.post("/reports/director", response_model=DirectorReport)
-async def create_director_report(report_data: DirectorReport, current_user: dict = Depends(get_current_user)):
+async def create_director_report(report_data: dict, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "director":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    report_data.user_id = current_user["id"]
-    report_data.branch = current_user["branch"]
+    # Add required fields
+    report_data["id"] = str(uuid.uuid4())
+    report_data["user_id"] = current_user["id"]
+    report_data["branch"] = current_user["branch"]
+    report_data["created_at"] = datetime.now(timezone.utc).isoformat()
     
-    doc = report_data.model_dump()
-    await db.director_reports.insert_one(doc)
-    return report_data
+    await db.director_reports.insert_one(report_data)
+    
+    report_obj = DirectorReport(**report_data)
+    return report_obj
 
 @api_router.get("/reports/director", response_model=List[DirectorReport])
 async def get_director_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
