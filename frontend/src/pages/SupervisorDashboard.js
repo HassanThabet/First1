@@ -22,11 +22,14 @@ const SupervisorDashboard = () => {
   const [reports, setReports] = useState([]);
   const [allReports, setAllReports] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
   
   // Filters
   const [dateFilter, setDateFilter] = useState("");
   const [weekFilter, setWeekFilter] = useState("");
-  const [viewMode, setViewMode] = useState("all"); // all, daily, weekly
+  const [monthFilter, setMonthFilter] = useState("");
+  const [viewMode, setViewMode] = useState("all"); // all, daily, weekly, monthly
 
   // Form state
   const [formData, setFormData] = useState({
