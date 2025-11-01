@@ -968,6 +968,71 @@ const VicePrincipalDashboard = () => {
           </Dialog>
         </TabsContent>
       </Tabs>
+
+      {/* Export Date Range Dialog */}
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl">تصدير تقارير المشرفين إلى Excel</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-6 p-4">
+            <p className="text-sm text-gray-600">
+              اختر نطاق التواريخ لتصدير التقارير (اختياري). اترك الحقول فارغة لتصدير جميع التقارير.
+            </p>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">من تاريخ</label>
+                <input
+                  type="date"
+                  value={exportStartDate}
+                  onChange={(e) => setExportStartDate(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
+                <input
+                  type="date"
+                  value={exportEndDate}
+                  onChange={(e) => setExportEndDate(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+            
+            <div className="bg-cyan-50 border border-cyan-200 rounded-lg p-3">
+              <p className="text-sm text-cyan-800">
+                <strong>ملاحظة:</strong> سيتم تصدير جميع تفاصيل التقارير بما في ذلك أسماء المعلمين، الحوادث، والملاحظات الكاملة.
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button
+                onClick={handleExportWithDateRange}
+                className="flex-1 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700"
+              >
+                <FileDown className="w-4 h-4 ml-2" />
+                تصدير
+              </Button>
+              
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowExportDialog(false);
+                  setExportStartDate("");
+                  setExportEndDate("");
+                }}
+                className="flex-1"
+              >
+                إلغاء
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
