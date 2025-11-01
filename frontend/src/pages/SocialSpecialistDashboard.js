@@ -222,136 +222,227 @@ const SocialSpecialistDashboard = () => {
   // Export to PDF - Simplified version for Arabic support
   const exportToPDF = () => {
     try {
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
       const mergedReports = getMergedReports();
       const stats = getMergedStatistics();
 
-      // Title
-      doc.setFontSize(20);
-      doc.text('Social Specialist Merged Report', 105, 20, { align: 'center' });
-
-      // Period
-      doc.setFontSize(12);
+      // Prepare period text
       let periodText = '';
       if (mergedPeriod === 'weekly') {
-        periodText = 'Weekly Report';
+        periodText = 'تقرير أسبوعي';
       } else if (mergedPeriod === 'monthly') {
-        periodText = 'Monthly Report';
+        periodText = 'تقرير شهري';
       } else if (mergedPeriod === 'custom' && mergedStartDate && mergedEndDate) {
-        periodText = `From ${mergedStartDate} to ${mergedEndDate}`;
+        periodText = `من ${mergedStartDate} إلى ${mergedEndDate}`;
       }
-      doc.text(periodText, 105, 28, { align: 'center' });
 
-      // School name
-      doc.setFontSize(10);
-      doc.text('Al-Fajr Al-Jadeed Private Schools', 105, 35, { align: 'center' });
-      doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 105, 41, { align: 'center' });
-
-      // Total Cases Box
-      doc.setFillColor(237, 231, 246);
-      doc.rect(15, 48, 180, 20, 'F');
-      doc.setDrawColor(156, 39, 176);
-      doc.setLineWidth(1.5);
-      doc.rect(15, 48, 180, 20, 'S');
-
-      doc.setFontSize(14);
-      doc.text(`Total Student Cases: ${stats.totalCases}`, 105, 60, { align: 'center' });
-
-      // Cases Breakdown
-      doc.setFillColor(224, 247, 250);
-      doc.rect(15, 75, 180, 25, 'F');
-      doc.setDrawColor(0, 188, 212);
-      doc.rect(15, 75, 180, 25, 'S');
-
-      doc.setFontSize(11);
-      doc.text('Cases Distribution:', 20, 82);
-      doc.setFontSize(10);
-      doc.text(`Psychological: ${stats.totalPsychological}`, 20, 88);
-      doc.text(`Academic: ${stats.totalAcademic}`, 20, 94);
-
-      // Actions Table
-      doc.setFontSize(12);
-      doc.text('Actions Taken:', 105, 110, { align: 'center' });
-
-      const actionsData = [
-        ['Sessions', stats.totalSessions],
-        ['Family Contacts', stats.totalFamilies],
-        ['Referrals', stats.totalReferrals],
-        ['Follow-ups', stats.totalFollowUps]
-      ];
-
-      doc.autoTable({
-        startY: 115,
-        head: [['Action Type', 'Count']],
-        body: actionsData,
-        styles: {
-          fontSize: 10,
-          cellPadding: 3
-        },
-        headStyles: {
-          fillColor: [76, 175, 80],
-          textColor: 255
-        }
-      });
-
-      let yPos = doc.lastAutoTable.finalY + 10;
-
-      // Reports Details Table
-      doc.setFontSize(12);
-      doc.text(`Report Details (${stats.totalReports})`, 105, yPos, { align: 'center' });
-
+      // Prepare reports data
       const reportsData = mergedReports.map((report, index) => {
         const total = report.psychological_cases + report.academic_cases + report.behavioral_cases;
         return [
           index + 1,
-          new Date(report.date).toLocaleDateString('en-GB'),
+          new Date(report.date).toLocaleDateString('ar-SA'),
           total,
           report.psychological_cases,
           report.academic_cases,
           report.behavioral_cases,
-          report.sessions_count
+          report.sessions_count,
+          report.family_contacts,
+          report.referrals_out,
+          report.follow_ups
         ];
       });
 
-      doc.autoTable({
-        startY: yPos + 5,
-        head: [['#', 'Date', 'Total', 'Psych', 'Academic', 'Behavior', 'Sessions']],
-        body: reportsData,
-        styles: {
-          fontSize: 9,
-          cellPadding: 2
+      // Define PDF document
+      const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'portrait',
+        defaultStyle: {
+          font: 'Cairo',
+          alignment: 'right'
         },
-        headStyles: {
-          fillColor: [156, 39, 176],
-          textColor: 255
+        content: [
+          // Header
+          {
+            text: 'مدارس الفجر الجديد الأهلية',
+            style: 'header',
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            text: 'تقرير الأخصائي الاجتماعي المدمج',
+            style: 'subheader',
+            alignment: 'center',
+            margin: [0, 0, 0, 5]
+          },
+          {
+            text: periodText,
+            alignment: 'center',
+            fontSize: 12,
+            margin: [0, 0, 0, 5]
+          },
+          {
+            text: `تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`,
+            alignment: 'center',
+            fontSize: 10,
+            margin: [0, 0, 0, 15]
+          },
+          
+          // Total Cases Box
+          {
+            table: {
+              widths: ['*'],
+              body: [
+                [
+                  { 
+                    text: `إجمالي حالات الطلاب: ${stats.totalCases}`, 
+                    style: 'totalCases',
+                    alignment: 'center',
+                    fillColor: '#E1BEE7',
+                    margin: [0, 5, 0, 5]
+                  }
+                ]
+              ]
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 10]
+          },
+
+          // Cases Distribution
+          {
+            table: {
+              widths: ['*', '*', '*', '*'],
+              body: [
+                [
+                  { text: 'توزيع الحالات', colSpan: 4, style: 'tableHeader', alignment: 'center' },
+                  {},
+                  {},
+                  {}
+                ],
+                [
+                  { text: `نفسية: ${stats.totalPsychological}`, alignment: 'center' },
+                  { text: `أكاديمية: ${stats.totalAcademic}`, alignment: 'center' },
+                  { text: `سلوكية: ${stats.totalBehavioral}`, alignment: 'center' },
+                  { text: `جلسات: ${stats.totalSessions}`, alignment: 'center' }
+                ]
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#9C27B0' : '#E1F5FE';
+              }
+            },
+            margin: [0, 0, 0, 10]
+          },
+
+          // Actions Summary
+          {
+            table: {
+              widths: ['*', '*', '*'],
+              body: [
+                [
+                  { text: 'ملخص الإجراءات', colSpan: 3, style: 'tableHeader', alignment: 'center' },
+                  {},
+                  {}
+                ],
+                [
+                  { text: `التواصل مع الأسر: ${stats.totalFamilies}`, alignment: 'center' },
+                  { text: `التحويلات: ${stats.totalReferrals}`, alignment: 'center' },
+                  { text: `المتابعات: ${stats.totalFollowUps}`, alignment: 'center' }
+                ]
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#4CAF50' : '#F1F8E9';
+              }
+            },
+            margin: [0, 0, 0, 15]
+          },
+
+          // Reports Details
+          {
+            text: `تفاصيل التقارير (${stats.totalReports})`,
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              headerRows: 1,
+              widths: [20, 50, 35, 35, 35, 35, 35, 35, 35, 35],
+              body: [
+                [
+                  { text: '#', style: 'tableHeader' },
+                  { text: 'التاريخ', style: 'tableHeader' },
+                  { text: 'المجموع', style: 'tableHeader' },
+                  { text: 'نفسية', style: 'tableHeader' },
+                  { text: 'أكاديمية', style: 'tableHeader' },
+                  { text: 'سلوكية', style: 'tableHeader' },
+                  { text: 'جلسات', style: 'tableHeader' },
+                  { text: 'أسر', style: 'tableHeader' },
+                  { text: 'تحويلات', style: 'tableHeader' },
+                  { text: 'متابعات', style: 'tableHeader' }
+                ],
+                ...reportsData
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#9C27B0' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            }
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            color: '#6A1B9A'
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            color: '#6A1B9A'
+          },
+          sectionHeader: {
+            fontSize: 14,
+            bold: true,
+            color: '#6A1B9A'
+          },
+          totalCases: {
+            fontSize: 16,
+            bold: true,
+            color: '#6A1B9A'
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 9,
+            color: 'white',
+            alignment: 'center'
+          }
+        },
+        footer: function(currentPage, pageCount) {
+          return {
+            text: `صفحة ${currentPage} من ${pageCount}`,
+            alignment: 'center',
+            fontSize: 9,
+            margin: [0, 10, 0, 0]
+          };
         }
-      });
+      };
 
-      // Footer
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: 'center' });
-      }
-
-      // Save
-      let filename = 'Social_Specialist_Report';
-      if (mergedPeriod === 'weekly') filename += '_Weekly';
-      else if (mergedPeriod === 'monthly') filename += '_Monthly';
+      // Generate filename
+      let filename = 'تقرير_الأخصائي_الاجتماعي';
+      if (mergedPeriod === 'weekly') filename += '_أسبوعي';
+      else if (mergedPeriod === 'monthly') filename += '_شهري';
       else if (mergedStartDate && mergedEndDate) filename += `_${mergedStartDate}_${mergedEndDate}`;
       filename += '.pdf';
 
-      doc.save(filename);
-      toast.success('PDF exported successfully');
+      // Create and download PDF
+      pdfMake.createPdf(docDefinition).download(filename);
+      toast.success('تم تصدير PDF بنجاح');
     } catch (error) {
       console.error('PDF Export Error:', error);
-      toast.error('Failed to export PDF. Please try again.');
+      toast.error('فشل تصدير PDF');
     }
   };
 
