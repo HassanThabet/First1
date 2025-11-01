@@ -222,8 +222,22 @@ const VicePrincipalDashboard = () => {
             </Card>
 
             <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-cyan-500 to-blue-600">
-              {loading ? "جاري الإرسال..." : "إرسال التقرير"}
+              {loading ? "جاري الإرسال..." : editingReport ? "تحديث التقرير" : "إرسال التقرير"}
             </Button>
+            
+            {editingReport && (
+              <Button
+                type="button"
+                onClick={() => {
+                  setEditingReport(null);
+                  setFormData({ problems: [], suggestions: [], week_start: "", week_end: "" });
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                إلغاء التعديل
+              </Button>
+            )}
           </form>
         </TabsContent>
 
