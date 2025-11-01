@@ -313,16 +313,45 @@ const ActivitiesDashboard = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label>المشرف على النشاط *</Label>
-                      <Input
-                        value={activity.supervisor}
-                        onChange={(e) => updateActivity(index, "supervisor", e.target.value)}
-                        required
-                        placeholder="اسم المشرف"
-                      />
+                  <div>
+                    <Label>المشرفون على النشاط *</Label>
+                    <div className="space-y-2">
+                      <Select onValueChange={(value) => addSupervisor(index, value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر معلم للإضافة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teachers.map(teacher => (
+                            <SelectItem key={teacher.id} value={teacher.id}>
+                              {teacher.name} - {teacher.subject}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      {activity.supervisors && activity.supervisors.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {activity.supervisors.map(teacherId => (
+                            <div 
+                              key={teacherId} 
+                              className="flex items-center gap-1 bg-cyan-100 text-cyan-800 px-3 py-1 rounded-full text-sm"
+                            >
+                              <span>{getTeacherName(teacherId)}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeSupervisor(index, teacherId)}
+                                className="text-cyan-600 hover:text-cyan-900"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label>عدد المشاركين *</Label>
                       <Input
@@ -346,25 +375,52 @@ const ActivitiesDashboard = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>تعاون المعلمين</Label>
-                      <Textarea
-                        value={activity.teacher_cooperation}
-                        onChange={(e) => updateActivity(index, "teacher_cooperation", e.target.value)}
-                        placeholder="وصف تعاون المعلمين"
-                        rows={3}
-                      />
+                  <div>
+                    <Label>المعلمون المتعاونون</Label>
+                    <div className="space-y-2">
+                      <Select onValueChange={(value) => addCooperatingTeacher(index, value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر معلم للإضافة" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teachers.map(teacher => (
+                            <SelectItem key={teacher.id} value={teacher.id}>
+                              {teacher.name} - {teacher.subject}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      {activity.cooperating_teachers && activity.cooperating_teachers.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {activity.cooperating_teachers.map(teacherId => (
+                            <div 
+                              key={teacherId} 
+                              className="flex items-center gap-1 bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm"
+                            >
+                              <span>{getTeacherName(teacherId)}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeCooperatingTeacher(index, teacherId)}
+                                className="text-green-600 hover:text-green-900"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <Label>تعاون الإدارة</Label>
-                      <Textarea
-                        value={activity.admin_cooperation}
-                        onChange={(e) => updateActivity(index, "admin_cooperation", e.target.value)}
-                        placeholder="وصف تعاون الإدارة"
-                        rows={3}
-                      />
-                    </div>
+                  </div>
+
+                  <div>
+                    <Label>تعاون الإدارة</Label>
+                    <Textarea
+                      value={activity.admin_cooperation}
+                      onChange={(e) => updateActivity(index, "admin_cooperation", e.target.value)}
+                      placeholder="وصف تعاون الإدارة"
+                      rows={3}
+                    />
                   </div>
 
                   <div>
