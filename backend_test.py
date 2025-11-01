@@ -1406,6 +1406,126 @@ class BackendTester:
         except Exception as e:
             self.log_test("Investigation Error", False, f"Exception during investigation: {str(e)}")
 
+    def test_cleanup_orphaned_reports(self):
+        """Test the cleanup orphaned reports endpoint"""
+        print("\n=== Testing Cleanup Orphaned Reports Endpoint ===")
+        
+        try:
+            # Step 1: Check current state before cleanup
+            print("\n1. Checking current state before cleanup...")
+            
+            # Get current supervisor reports
+            reports_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+            if reports_response.status_code == 200:
+                reports_before = reports_response.json()
+                self.log_test("Get Reports Before Cleanup", True, f"Found {len(reports_before)} supervisor reports before cleanup")
+            else:
+                self.log_test("Get Reports Before Cleanup", False, f"Failed: {reports_response.status_code} - {reports_response.text}")
+                return
+                
+            # Get current users
+            users_response = self.session.get(f"{BASE_URL}/users")
+            if users_response.status_code == 200:
+                users_before = users_response.json()
+                user_ids = {user['id'] for user in users_before}
+                self.log_test("Get Users Before Cleanup", True, f"Found {len(users_before)} users in system")
+                
+                # Check for orphaned reports
+                orphaned_before = [r for r in reports_before if r.get('user_id') not in user_ids]
+                valid_before = [r for r in reports_before if r.get('user_id') in user_ids]
+                
+                self.log_test("Orphaned Reports Analysis", True, f"Before cleanup - Valid reports: {len(valid_before)}, Orphaned reports: {len(orphaned_before)}")
+                
+                if orphaned_before:
+                    for i, report in enumerate(orphaned_before[:3], 1):  # Show first 3 orphaned reports
+                        self.log_test(f"Orphaned Report {i}", True, f"ID: {report.get('id')}, User ID: {report.get('user_id')} (user not found)")
+                        
+            else:
+                self.log_test("Get Users Before Cleanup", False, f"Failed: {users_response.status_code} - {users_response.text}")
+                return
+                
+            # Step 2: Call the cleanup endpoint
+            print("\n2. Calling cleanup endpoint...")
+            
+            cleanup_response = self.session.post(f"{BASE_URL}/admin/cleanup-orphaned-reports")
+            
+            if cleanup_response.status_code == 200:
+                cleanup_result = cleanup_response.json()
+                self.log_test("Cleanup Endpoint Call", True, f"Cleanup completed successfully")
+                
+                # Parse and display results
+                results = cleanup_result.get('results', {})
+                total_deleted = 0
+                
+                for collection_name, stats in results.items():
+                    total_reports = stats.get('total_reports', 0)
+                    orphaned_found = stats.get('orphaned_found', 0)
+                    deleted = stats.get('deleted', 0)
+                    total_deleted += deleted
+                    
+                    self.log_test(f"Cleanup - {collection_name}", True, f"Total: {total_reports}, Orphaned: {orphaned_found}, Deleted: {deleted}")
+                    
+                self.log_test("Total Cleanup Results", True, f"Total orphaned reports deleted across all collections: {total_deleted}")
+                
+            else:
+                self.log_test("Cleanup Endpoint Call", False, f"Failed: {cleanup_response.status_code} - {cleanup_response.text}")
+                return
+                
+            # Step 3: Verify results after cleanup
+            print("\n3. Verifying results after cleanup...")
+            
+            # Get supervisor reports after cleanup
+            reports_after_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+            if reports_after_response.status_code == 200:
+                reports_after = reports_after_response.json()
+                self.log_test("Get Reports After Cleanup", True, f"Found {len(reports_after)} supervisor reports after cleanup")
+                
+                # Verify all remaining reports have valid user_ids
+                orphaned_after = [r for r in reports_after if r.get('user_id') not in user_ids]
+                valid_after = [r for r in reports_after if r.get('user_id') in user_ids]
+                
+                self.log_test("Post-Cleanup Validation", True, f"After cleanup - Valid reports: {len(valid_after)}, Orphaned reports: {len(orphaned_after)}")
+                
+                if len(orphaned_after) == 0:
+                    self.log_test("Cleanup Success Verification", True, "✅ All remaining supervisor reports have valid user_ids")
+                else:
+                    self.log_test("Cleanup Success Verification", False, f"❌ Still found {len(orphaned_after)} orphaned reports after cleanup")
+                    for report in orphaned_after[:3]:  # Show remaining orphaned reports
+                        self.log_test("Remaining Orphaned Report", False, f"ID: {report.get('id')}, User ID: {report.get('user_id')}")
+                        
+                # Show the difference
+                reports_deleted = len(reports_before) - len(reports_after)
+                self.log_test("Reports Count Difference", True, f"Reports before: {len(reports_before)}, After: {len(reports_after)}, Deleted: {reports_deleted}")
+                
+            else:
+                self.log_test("Get Reports After Cleanup", False, f"Failed: {reports_after_response.status_code} - {reports_after_response.text}")
+                
+            # Step 4: Test other report collections as well
+            print("\n4. Checking other report collections...")
+            
+            other_collections = [
+                ("activities", "/reports/activities"),
+                ("social-specialist", "/reports/social-specialist"),
+                ("quality", "/reports/quality"),
+                ("vice-principal", "/reports/vice-principal")
+            ]
+            
+            for collection_name, endpoint in other_collections:
+                collection_response = self.session.get(f"{BASE_URL}{endpoint}")
+                if collection_response.status_code == 200:
+                    collection_reports = collection_response.json()
+                    orphaned_in_collection = [r for r in collection_reports if r.get('user_id') not in user_ids]
+                    
+                    if len(orphaned_in_collection) == 0:
+                        self.log_test(f"Cleanup Verification - {collection_name}", True, f"✅ All {len(collection_reports)} {collection_name} reports have valid user_ids")
+                    else:
+                        self.log_test(f"Cleanup Verification - {collection_name}", False, f"❌ Found {len(orphaned_in_collection)} orphaned {collection_name} reports")
+                else:
+                    self.log_test(f"Check {collection_name} Reports", False, f"Failed: {collection_response.status_code}")
+                    
+        except Exception as e:
+            self.log_test("Cleanup Orphaned Reports Test", False, f"Exception: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
