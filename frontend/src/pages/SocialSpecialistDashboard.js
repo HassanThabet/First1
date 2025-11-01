@@ -148,6 +148,76 @@ const SocialSpecialistDashboard = () => {
     }
   };
 
+  // Get merged reports based on period
+  const getMergedReports = () => {
+    let filtered = [...allReports];
+    const today = new Date();
+
+    if (mergedPeriod === "weekly") {
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4);
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      filtered = allReports.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    } else if (mergedPeriod === "monthly") {
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      filtered = allReports.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate.getMonth() === currentMonth && 
+               reportDate.getFullYear() === currentYear;
+      });
+    } else if (mergedPeriod === "custom" && mergedStartDate && mergedEndDate) {
+      const startDate = new Date(mergedStartDate);
+      const endDate = new Date(mergedEndDate);
+      endDate.setHours(23, 59, 59, 999);
+      
+      filtered = allReports.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate >= startDate && reportDate <= endDate;
+      });
+    }
+
+    return filtered;
+  };
+
+  // Get merged statistics
+  const getMergedStatistics = () => {
+    const mergedReports = getMergedReports();
+    
+    const totalPsychological = mergedReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademic = mergedReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioral = mergedReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalCases = totalPsychological + totalAcademic + totalBehavioral;
+    
+    const totalSessions = mergedReports.reduce((sum, r) => sum + (r.sessions_count || 0), 0);
+    const totalFamilies = mergedReports.reduce((sum, r) => sum + (r.families_contacted || 0), 0);
+    const totalReferrals = mergedReports.reduce((sum, r) => sum + (r.referrals_count || 0), 0);
+    const totalFollowUps = mergedReports.reduce((sum, r) => sum + (r.follow_ups_count || 0), 0);
+    
+    return {
+      totalPsychological,
+      totalAcademic,
+      totalBehavioral,
+      totalCases,
+      totalSessions,
+      totalFamilies,
+      totalReferrals,
+      totalFollowUps,
+      totalReports: mergedReports.length
+    };
+  };
+
   return (
     <DashboardLayout title="لوحة تحكم الأخصائي الاجتماعي">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
