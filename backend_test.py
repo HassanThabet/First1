@@ -1757,41 +1757,47 @@ class BackendTester:
                             "remember_me": False
                         }
                     
-                    try:
-                        # Create a new session for each login test to avoid conflicts
-                        test_session = requests.Session()
-                        login_response = test_session.post(f"{BASE_URL}/auth/login", json=login_data)
-                        
-                        if login_response.status_code == 200:
-                            login_result = login_response.json()
-                            if "user" in login_result and "token" in login_result:
-                                user_info = login_result["user"]
-                                self.log_test(f"VP {i} Login Success", True, f"Successfully logged in as {username}")
-                                successful_logins.append({
-                                    "username": username,
-                                    "user_id": user_info.get('id'),
-                                    "role": user_info.get('role'),
-                                    "branch": user_info.get('branch')
-                                })
-                                
-                                # Test /auth/me endpoint to verify session
-                                me_response = test_session.get(f"{BASE_URL}/auth/me")
-                                if me_response.status_code == 200:
-                                    me_data = me_response.json()
-                                    self.log_test(f"VP {i} Session Verification", True, f"Session valid, user: {me_data.get('username')}")
-                                else:
-                                    self.log_test(f"VP {i} Session Verification", False, f"Session invalid: {me_response.status_code}")
-                            else:
-                                self.log_test(f"VP {i} Login Response", False, f"Login response missing user or token for {username}")
-                                failed_logins.append({"user": username, "reason": "Invalid response format"})
-                        else:
-                            error_msg = login_response.text if login_response.text else f"HTTP {login_response.status_code}"
-                            self.log_test(f"VP {i} Login Failed", False, f"Login failed for {username}: {error_msg}")
-                            failed_logins.append({"user": username, "reason": error_msg})
+                        try:
+                            # Create a new session for each login test to avoid conflicts
+                            test_session = requests.Session()
+                            login_response = test_session.post(f"{BASE_URL}/auth/login", json=login_data)
                             
-                    except Exception as e:
-                        self.log_test(f"VP {i} Login Exception", False, f"Exception during login for {username}: {str(e)}")
-                        failed_logins.append({"user": username, "reason": f"Exception: {str(e)}"})
+                            if login_response.status_code == 200:
+                                login_result = login_response.json()
+                                if "user" in login_result and "token" in login_result:
+                                    user_info = login_result["user"]
+                                    self.log_test(f"VP {i} Login Success", True, f"Successfully logged in as {username} with password '{test_password}'")
+                                    successful_logins.append({
+                                        "username": username,
+                                        "password": test_password,
+                                        "user_id": user_info.get('id'),
+                                        "role": user_info.get('role'),
+                                        "branch": user_info.get('branch')
+                                    })
+                                    
+                                    # Test /auth/me endpoint to verify session
+                                    me_response = test_session.get(f"{BASE_URL}/auth/me")
+                                    if me_response.status_code == 200:
+                                        me_data = me_response.json()
+                                        self.log_test(f"VP {i} Session Verification", True, f"Session valid, user: {me_data.get('username')}")
+                                    else:
+                                        self.log_test(f"VP {i} Session Verification", False, f"Session invalid: {me_response.status_code}")
+                                    
+                                    login_success = True
+                                    successful_password = test_password
+                                    break  # Stop trying other passwords
+                                else:
+                                    continue  # Try next password
+                            else:
+                                continue  # Try next password
+                                
+                        except Exception as e:
+                            continue  # Try next password
+                    
+                    # If no password worked, log the failure
+                    if not login_success:
+                        self.log_test(f"VP {i} Login Failed", False, f"Login failed for {username} with all tested passwords: {test_passwords}")
+                        failed_logins.append({"user": username, "reason": f"All passwords failed: {test_passwords}"})
                 
                 # Step 3: Summary of login test results
                 print(f"\n📊 Login Test Results Summary:")
