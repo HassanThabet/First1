@@ -6,8 +6,10 @@ import { Button } from "../components/ui/button";
 import { Textarea } from "../components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { toast } from "sonner";
-import { Plus, X } from "lucide-react";
+import { Plus, X, FileDown, Eye } from "lucide-react";
+import * as XLSX from 'xlsx';
 
 const VicePrincipalDashboard = () => {
   const { user } = useContext(AuthContext);
