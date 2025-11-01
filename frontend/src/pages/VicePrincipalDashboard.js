@@ -177,8 +177,9 @@ const VicePrincipalDashboard = () => {
   return (
     <DashboardLayout title="لوحة تحكم الوكيل">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-4 mb-6">
           <TabsTrigger value="create" data-testid="create-report-tab">إنشاء تقرير</TabsTrigger>
+          <TabsTrigger value="merged-stats">الإحصائيات المدمجة</TabsTrigger>
           <TabsTrigger value="supervisor-reports">تقارير المشرفين</TabsTrigger>
           <TabsTrigger value="reports">تقاريري</TabsTrigger>
         </TabsList>
