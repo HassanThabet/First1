@@ -624,10 +624,32 @@ const DirectorDashboard = () => {
                           <SelectItem value="daily">اليوم</SelectItem>
                           <SelectItem value="weekly">هذا الأسبوع</SelectItem>
                           <SelectItem value="monthly">هذا الشهر</SelectItem>
+                          <SelectItem value="custom">فترة مخصصة</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
+
+                  {timeFilter === "custom" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">من تاريخ</label>
+                        <Input 
+                          type="date" 
+                          value={customStartDate}
+                          onChange={(e) => setCustomStartDate(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
+                        <Input 
+                          type="date" 
+                          value={customEndDate}
+                          onChange={(e) => setCustomEndDate(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {reportTypeFilter !== "all" && (
                     <div>
