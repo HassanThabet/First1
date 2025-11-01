@@ -672,15 +672,35 @@ const ActivitiesDashboard = () => {
                             <p className="text-sm text-gray-700">{activity.target_group}</p>
                           </div>
                           <div className="p-3 bg-gray-50 rounded-lg">
-                            <div className="text-sm font-bold text-gray-800 mb-2">المشرف</div>
-                            <p className="text-sm text-gray-700">{activity.supervisor}</p>
+                            <div className="text-sm font-bold text-gray-800 mb-2">المشرفون على النشاط</div>
+                            {activity.supervisors && activity.supervisors.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {activity.supervisors.map((teacherId, i) => (
+                                  <span key={i} className="inline-block bg-cyan-100 text-cyan-800 px-2 py-1 rounded text-xs">
+                                    {getTeacherName(teacherId)}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-700">{activity.supervisor || '-'}</p>
+                            )}
                           </div>
                         </div>
 
-                        {activity.teacher_cooperation && (
+                        {((activity.cooperating_teachers && activity.cooperating_teachers.length > 0) || activity.teacher_cooperation) && (
                           <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                            <div className="text-sm font-bold text-blue-800 mb-2">تعاون المعلمين</div>
-                            <p className="text-sm text-gray-700">{activity.teacher_cooperation}</p>
+                            <div className="text-sm font-bold text-blue-800 mb-2">المعلمون المتعاونون</div>
+                            {activity.cooperating_teachers && activity.cooperating_teachers.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {activity.cooperating_teachers.map((teacherId, i) => (
+                                  <span key={i} className="inline-block bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
+                                    {getTeacherName(teacherId)}
+                                  </span>
+                                ))}
+                              </div>
+                            ) : (
+                              <p className="text-sm text-gray-700">{activity.teacher_cooperation}</p>
+                            )}
                           </div>
                         )}
 
