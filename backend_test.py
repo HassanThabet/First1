@@ -746,6 +746,248 @@ class BackendTester:
         except Exception as e:
             self.log_test("Get Users", False, f"Exception: {str(e)}")
         
+    def test_director_dashboard_filtering(self):
+        """Test director dashboard filtering functionality"""
+        print("\n=== Testing Director Dashboard Filtering ===")
+        
+        # First, create a director user
+        director_user, password = self.create_test_user("director", "boys")
+        if not director_user:
+            self.log_test("Director Dashboard Setup", False, "Failed to create director test user")
+            return
+            
+        # Login as director user
+        login_result = self.login_as_user(director_user["username"], password)
+        if not login_result:
+            self.log_test("Director Dashboard Setup", False, "Failed to login as director user")
+            return
+            
+        self.log_test("Director User Login", True, f"Logged in as {director_user['username']} with role director")
+        
+        try:
+            # Test 1: Get all users (for employee filtering)
+            users_response = self.session.get(f"{BASE_URL}/users")
+            if users_response.status_code == 200:
+                users = users_response.json()
+                branch_users = [u for u in users if u.get("branch") == "boys"]
+                self.log_test(
+                    "Director - Get Users for Filtering", 
+                    True, 
+                    f"Retrieved {len(branch_users)} users for boys branch filtering"
+                )
+            else:
+                self.log_test(
+                    "Director - Get Users for Filtering", 
+                    False, 
+                    f"Failed: {users_response.status_code} - {users_response.text}"
+                )
+                
+            # Test 2: Get all report types with branch filtering
+            report_endpoints = [
+                ("supervisor", "/reports/supervisor"),
+                ("vice-principal", "/reports/vice-principal"), 
+                ("activities", "/reports/activities"),
+                ("social-specialist", "/reports/social-specialist"),
+                ("quality", "/reports/quality")
+            ]
+            
+            for report_name, endpoint in report_endpoints:
+                # Test without filters
+                response = self.session.get(f"{BASE_URL}{endpoint}")
+                if response.status_code == 200:
+                    reports = response.json()
+                    branch_reports = [r for r in reports if r.get("branch") == "boys"]
+                    self.log_test(
+                        f"Director - Get {report_name} Reports", 
+                        True, 
+                        f"Retrieved {len(branch_reports)} {report_name} reports for boys branch"
+                    )
+                    
+                    # Test with branch filter
+                    branch_response = self.session.get(f"{BASE_URL}{endpoint}?branch=boys")
+                    if branch_response.status_code == 200:
+                        filtered_reports = branch_response.json()
+                        self.log_test(
+                            f"Director - Get {report_name} Reports (Branch Filter)", 
+                            True, 
+                            f"Retrieved {len(filtered_reports)} {report_name} reports with branch filter"
+                        )
+                    else:
+                        self.log_test(
+                            f"Director - Get {report_name} Reports (Branch Filter)", 
+                            False, 
+                            f"Failed: {branch_response.status_code} - {branch_response.text}"
+                        )
+                        
+                    # Test with user_id filter (if we have users)
+                    if branch_users:
+                        test_user_id = branch_users[0].get("id")
+                        if test_user_id:
+                            user_response = self.session.get(f"{BASE_URL}{endpoint}?user_id={test_user_id}")
+                            if user_response.status_code == 200:
+                                user_reports = user_response.json()
+                                self.log_test(
+                                    f"Director - Get {report_name} Reports (User Filter)", 
+                                    True, 
+                                    f"Retrieved {len(user_reports)} {report_name} reports for specific user"
+                                )
+                            else:
+                                self.log_test(
+                                    f"Director - Get {report_name} Reports (User Filter)", 
+                                    False, 
+                                    f"Failed: {user_response.status_code} - {user_response.text}"
+                                )
+                else:
+                    self.log_test(
+                        f"Director - Get {report_name} Reports", 
+                        False, 
+                        f"Failed: {response.status_code} - {response.text}"
+                    )
+                    
+            # Test 3: Test statistics endpoints that director dashboard uses
+            stats_response = self.session.get(f"{BASE_URL}/statistics/teacher-absences?branch=boys")
+            if stats_response.status_code == 200:
+                stats = stats_response.json()
+                self.log_test(
+                    "Director - Teacher Absences Statistics", 
+                    True, 
+                    f"Retrieved teacher absence statistics with {len(stats)} teachers"
+                )
+            else:
+                self.log_test(
+                    "Director - Teacher Absences Statistics", 
+                    False, 
+                    f"Failed: {stats_response.status_code} - {stats_response.text}"
+                )
+                
+            eval_response = self.session.get(f"{BASE_URL}/statistics/teacher-evaluations?branch=boys")
+            if eval_response.status_code == 200:
+                evaluations = eval_response.json()
+                self.log_test(
+                    "Director - Teacher Evaluations Statistics", 
+                    True, 
+                    f"Retrieved teacher evaluation statistics with {len(evaluations)} teachers"
+                )
+            else:
+                self.log_test(
+                    "Director - Teacher Evaluations Statistics", 
+                    False, 
+                    f"Failed: {eval_response.status_code} - {eval_response.text}"
+                )
+                
+        except Exception as e:
+            self.log_test("Director Dashboard Filtering", False, f"Exception: {str(e)}")
+            
+        # Login back as admin for other tests
+        self.test_authentication()
+        
+    def test_report_type_filtering_scenarios(self):
+        """Test specific report type filtering scenarios as requested"""
+        print("\n=== Testing Report Type Filtering Scenarios ===")
+        
+        try:
+            # Test scenario 1: When "جميع التقارير" (all reports) is selected
+            # Should return overall statistics from all report types
+            all_reports_data = {}
+            
+            report_types = [
+                ("supervisor", "/reports/supervisor"),
+                ("vice_principal", "/reports/vice-principal"),
+                ("activities", "/reports/activities"), 
+                ("social_specialist", "/reports/social-specialist"),
+                ("quality", "/reports/quality")
+            ]
+            
+            for report_type, endpoint in report_types:
+                response = self.session.get(f"{BASE_URL}{endpoint}")
+                if response.status_code == 200:
+                    reports = response.json()
+                    all_reports_data[report_type] = reports
+                    self.log_test(
+                        f"All Reports Filter - {report_type}", 
+                        True, 
+                        f"Retrieved {len(reports)} {report_type} reports for overall statistics"
+                    )
+                else:
+                    self.log_test(
+                        f"All Reports Filter - {report_type}", 
+                        False, 
+                        f"Failed to get {report_type} reports: {response.status_code}"
+                    )
+                    
+            # Test scenario 2: When specific report type is selected
+            # Should show employee filter for that type
+            for report_type, endpoint in report_types:
+                # Get users of the corresponding role
+                users_response = self.session.get(f"{BASE_URL}/users")
+                if users_response.status_code == 200:
+                    users = users_response.json()
+                    
+                    # Map report types to user roles
+                    role_mapping = {
+                        "supervisor": "supervisor",
+                        "vice_principal": "vice_principal", 
+                        "activities": "activities",
+                        "social_specialist": "social_specialist",
+                        "quality": "quality"
+                    }
+                    
+                    role = role_mapping.get(report_type)
+                    if role:
+                        role_users = [u for u in users if u.get("role") == role]
+                        self.log_test(
+                            f"Employee Filter - {report_type} Users", 
+                            True, 
+                            f"Found {len(role_users)} {role} users for employee filtering"
+                        )
+                        
+                        # Test filtering by specific employee
+                        if role_users:
+                            test_user = role_users[0]
+                            user_reports_response = self.session.get(f"{BASE_URL}{endpoint}?user_id={test_user['id']}")
+                            if user_reports_response.status_code == 200:
+                                user_reports = user_reports_response.json()
+                                self.log_test(
+                                    f"Specific Employee Filter - {report_type}", 
+                                    True, 
+                                    f"Retrieved {len(user_reports)} reports for specific {role} employee"
+                                )
+                            else:
+                                self.log_test(
+                                    f"Specific Employee Filter - {report_type}", 
+                                    False, 
+                                    f"Failed to filter by employee: {user_reports_response.status_code}"
+                                )
+                                
+            # Test scenario 3: Time filtering (daily, weekly, monthly)
+            # Test with supervisor reports as example
+            supervisor_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+            if supervisor_response.status_code == 200:
+                supervisor_reports = supervisor_response.json()
+                
+                # Test date-based filtering (simulated)
+                today = datetime.now().date().isoformat()
+                current_month = datetime.now().strftime("%Y-%m")
+                
+                # Filter reports by today (daily filter simulation)
+                daily_reports = [r for r in supervisor_reports if r.get("date") == today]
+                self.log_test(
+                    "Time Filter - Daily", 
+                    True, 
+                    f"Daily filter would show {len(daily_reports)} reports for today ({today})"
+                )
+                
+                # Filter reports by current month (monthly filter simulation)  
+                monthly_reports = [r for r in supervisor_reports if r.get("date", "").startswith(current_month)]
+                self.log_test(
+                    "Time Filter - Monthly", 
+                    True, 
+                    f"Monthly filter would show {len(monthly_reports)} reports for current month ({current_month})"
+                )
+                
+        except Exception as e:
+            self.log_test("Report Type Filtering Scenarios", False, f"Exception: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
@@ -766,6 +1008,10 @@ class BackendTester:
         self.test_social_specialist_reports()
         self.test_quality_reports()
         self.test_vice_principal_reports()
+        
+        # Test director dashboard specific functionality
+        self.test_director_dashboard_filtering()
+        self.test_report_type_filtering_scenarios()
         
         # Print summary
         self.print_summary()
