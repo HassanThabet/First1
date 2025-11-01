@@ -276,10 +276,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Excel export for Vice-Principal with date range filtering"
-    - "Activities Dashboard with modal view and filtering"
-    - "Social Specialist Dashboard with modal view and filtering"
-    - "Quality Dashboard with modal view and filtering"
+    - "Arabic PDF Export for Activities Dashboard"
+    - "Arabic PDF Export for Social Specialist Dashboard"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
