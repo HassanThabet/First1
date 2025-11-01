@@ -319,10 +319,10 @@ const SocialSpecialistDashboard = () => {
                   {}
                 ],
                 [
-                  { text: `نفسية: ${stats.totalPsychological}`, alignment: 'center' },
-                  { text: `أكاديمية: ${stats.totalAcademic}`, alignment: 'center' },
-                  { text: `سلوكية: ${stats.totalBehavioral}`, alignment: 'center' },
-                  { text: `جلسات: ${stats.totalSessions}`, alignment: 'center' }
+                  { text: `نفسية: ${stats.totalPsychological || 0}`, alignment: 'center' },
+                  { text: `أكاديمية: ${stats.totalAcademic || 0}`, alignment: 'center' },
+                  { text: `سلوكية: ${stats.totalBehavioral || 0}`, alignment: 'center' },
+                  { text: `جلسات: ${stats.totalSessions || 0}`, alignment: 'center' }
                 ]
               ]
             },
