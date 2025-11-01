@@ -851,7 +851,278 @@ const SupervisorDashboard = () => {
                 التقارير ({reports.length})
               </h3>
 
-              {reports.map((report) => (
+            {/* Reports List - Compact View */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-gray-800">
+                التقارير ({reports.length})
+              </h3>
+              
+              <div className="grid grid-cols-1 gap-3">
+                {reports.map((report) => (
+                  <Card 
+                    key={report.id} 
+                    className="report-card hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => {
+                      setSelectedReport(report);
+                      setShowReportModal(true);
+                    }}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg">
+                              <FileText className="w-6 h-6 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="font-bold text-gray-800">
+                                تقرير {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                              </h4>
+                              <p className="text-sm text-gray-500">
+                                تم الإنشاء: {new Date(report.created_at).toLocaleString("ar-SA")}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-4">
+                          <div className="hidden md:flex items-center gap-3">
+                            <div className="text-center">
+                              <div className="text-xs text-gray-600">الانضباط</div>
+                              <div className="text-lg font-bold text-cyan-600">{report.student_discipline}/10</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-xs text-gray-600">النظافة</div>
+                              <div className="text-lg font-bold text-blue-600">{report.classroom_cleanliness}/10</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-xs text-gray-600">الالتزام</div>
+                              <div className="text-lg font-bold text-purple-600">{report.teacher_attendance_rate}/10</div>
+                            </div>
+                            <div className="text-center">
+                              <div className="text-xs text-gray-600">السلوك</div>
+                              <div className="text-lg font-bold text-green-600">{report.general_behavior}/10</div>
+                            </div>
+                          </div>
+                          
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedReport(report);
+                              setShowReportModal(true);
+                            }}
+                          >
+                            <Eye className="w-4 h-4 ml-1" />
+                            عرض
+                          </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(report);
+                            }}
+                          >
+                            تعديل
+                          </Button>
+                          
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(report.id);
+                            }}
+                          >
+                            حذف
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Report Detail Modal */}
+            <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+              <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">
+                    {selectedReport && `تقرير ${new Date(selectedReport.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                  </DialogTitle>
+                </DialogHeader>
+                
+                {selectedReport && (
+                  <div className="space-y-6 p-4">
+                    {/* Main Statistics */}
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                        <BarChart3 className="w-5 h-5 ml-2 text-cyan-600" />
+                        المؤشرات الرئيسية
+                      </h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
+                          <div className="text-sm text-gray-700 mb-1 font-semibold">انضباط الطلاب</div>
+                          <div className="text-3xl font-bold text-cyan-700">{selectedReport.student_discipline}/10</div>
+                          {selectedReport.student_discipline_notes && (
+                            <div className="text-xs text-gray-600 mt-1">{selectedReport.student_discipline_notes}</div>
+                          )}
+                        </div>
+                        <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                          <div className="text-sm text-gray-700 mb-1 font-semibold">نظافة الفصول</div>
+                          <div className="text-3xl font-bold text-blue-700">{selectedReport.classroom_cleanliness}/10</div>
+                          {selectedReport.classroom_cleanliness_notes && (
+                            <div className="text-xs text-gray-600 mt-1">{selectedReport.classroom_cleanliness_notes}</div>
+                          )}
+                        </div>
+                        <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                          <div className="text-sm text-gray-700 mb-1 font-semibold">التزام المعلمين</div>
+                          <div className="text-3xl font-bold text-purple-700">{selectedReport.teacher_attendance_rate}/10</div>
+                          {selectedReport.teacher_attendance_notes && (
+                            <div className="text-xs text-gray-600 mt-1">{selectedReport.teacher_attendance_notes}</div>
+                          )}
+                        </div>
+                        <div className="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+                          <div className="text-sm text-gray-700 mb-1 font-semibold">السلوك العام</div>
+                          <div className="text-3xl font-bold text-green-700">{selectedReport.general_behavior}/10</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Detailed Information */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Teachers Info */}
+                      {(selectedReport.late_teachers?.length > 0 || selectedReport.absent_teachers?.length > 0 || selectedReport.covering_teachers?.length > 0) && (
+                        <div className="space-y-3">
+                          <h4 className="text-md font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">
+                            بيانات المعلمين
+                          </h4>
+                          
+                          {selectedReport.late_teachers && selectedReport.late_teachers.length > 0 && (
+                            <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                              <div className="text-sm font-bold text-orange-800 mb-2 flex items-center">
+                                <span className="w-2 h-2 bg-orange-500 rounded-full ml-2"></span>
+                                المعلمون المتأخرون ({selectedReport.late_teachers.length})
+                              </div>
+                              <ul className="text-sm text-gray-700 space-y-1">
+                                {selectedReport.late_teachers.map((lt, i) => (
+                                  <li key={i} className="flex items-start">
+                                    <span className="text-orange-600 ml-2">•</span>
+                                    <span><strong>{lt.teacher}</strong> - {lt.subject} - حصة {lt.period}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {selectedReport.absent_teachers && selectedReport.absent_teachers.length > 0 && (
+                            <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                              <div className="text-sm font-bold text-red-800 mb-2 flex items-center">
+                                <span className="w-2 h-2 bg-red-500 rounded-full ml-2"></span>
+                                المعلمون الغائبون ({selectedReport.absent_teachers.length})
+                              </div>
+                              <ul className="text-sm text-gray-700 space-y-1">
+                                {selectedReport.absent_teachers.map((at, i) => (
+                                  <li key={i} className="flex items-start">
+                                    <span className="text-red-600 ml-2">•</span>
+                                    <span><strong>{at.teacher}</strong> - {at.subject} - حصة {at.period}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                          
+                          {selectedReport.covering_teachers && selectedReport.covering_teachers.length > 0 && (
+                            <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                              <div className="text-sm font-bold text-green-800 mb-2 flex items-center">
+                                <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
+                                المعلمون المغطون ({selectedReport.covering_teachers.length})
+                              </div>
+                              <ul className="text-sm text-gray-700 space-y-1">
+                                {selectedReport.covering_teachers.map((ct, i) => (
+                                  <li key={i} className="flex items-start">
+                                    <span className="text-green-600 ml-2">•</span>
+                                    <span><strong>{ct.teacher}</strong> - {ct.subject} - حصة {ct.period}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {/* Other Info */}
+                      <div className="space-y-3">
+                        <h4 className="text-md font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">
+                          معلومات إضافية
+                        </h4>
+                        
+                        {selectedReport.incidents && selectedReport.incidents.length > 0 && (
+                          <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                            <div className="text-sm font-bold text-yellow-800 mb-2 flex items-center">
+                              <span className="w-2 h-2 bg-yellow-500 rounded-full ml-2"></span>
+                              الحوادث والمخالفات ({selectedReport.incidents.length})
+                            </div>
+                            <div className="space-y-2">
+                              {selectedReport.incidents.map((inc, i) => (
+                                <div key={i} className="text-sm bg-white p-2 rounded">
+                                  <p className="font-semibold text-gray-800">{inc.description}</p>
+                                  <p className="text-gray-600 text-xs mt-1">
+                                    <span className="font-semibold">الإجراء:</span> {inc.action}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedReport.student_movement_classes && selectedReport.student_movement_classes.length > 0 && (
+                          <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                            <div className="text-sm font-bold text-purple-800 mb-2">
+                              الصفوف المتابعة للتنقل
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedReport.student_movement_classes.map((cls, i) => (
+                                <span key={i} className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full">
+                                  {cls}
+                                </span>
+                              ))}
+                            </div>
+                            {selectedReport.student_movement_notes && (
+                              <p className="text-xs text-gray-600 mt-2">{selectedReport.student_movement_notes}</p>
+                            )}
+                          </div>
+                        )}
+                        
+                        {selectedReport.absent_students_count > 0 && (
+                          <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <div className="text-sm font-bold text-blue-800">
+                              عدد الطلاب الغائبين
+                            </div>
+                            <div className="text-2xl font-bold text-blue-600 mt-1">
+                              {selectedReport.absent_students_count} طالب
+                            </div>
+                          </div>
+                        )}
+                        
+                        {selectedReport.general_notes && (
+                          <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <div className="text-sm font-bold text-gray-800 mb-2">
+                              ملاحظات عامة
+                            </div>
+                            <p className="text-sm text-gray-700 leading-relaxed">{selectedReport.general_notes}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
                 <Card key={report.id} className="report-card overflow-hidden">
                   <CardHeader className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
                     <CardTitle className="flex items-center justify-between">
