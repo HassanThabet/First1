@@ -308,6 +308,49 @@ async def get_users(current_user: dict = Depends(get_current_user)):
     users = await db.users.find(query, {"_id": 0, "password": 0}).to_list(1000)
     return users
 
+@api_router.post("/admin/cleanup-orphaned-reports")
+async def cleanup_orphaned_reports(current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح - Admin فقط")
+    
+    # Get all user IDs
+    users = await db.users.find({}, {"id": 1}).to_list(1000)
+    user_ids = {user['id'] for user in users}
+    
+    # Collections to check
+    collections_to_clean = [
+        ("supervisor_reports", db.supervisor_reports),
+        ("vice_principal_reports", db.vice_principal_reports),
+        ("activities_reports", db.activities_reports),
+        ("social_specialist_reports", db.social_specialist_reports),
+        ("quality_reports", db.quality_reports)
+    ]
+    
+    results = {}
+    for name, collection in collections_to_clean:
+        # Get all reports
+        reports = await collection.find({}, {"id": 1, "user_id": 1}).to_list(10000)
+        
+        # Find orphaned reports
+        orphaned_ids = [r['id'] for r in reports if r.get('user_id') not in user_ids]
+        
+        if orphaned_ids:
+            # Delete orphaned reports
+            delete_result = await collection.delete_many({'id': {'$in': orphaned_ids}})
+            results[name] = {
+                "total_reports": len(reports),
+                "orphaned_found": len(orphaned_ids),
+                "deleted": delete_result.deleted_count
+            }
+        else:
+            results[name] = {
+                "total_reports": len(reports),
+                "orphaned_found": 0,
+                "deleted": 0
+            }
+    
+    return {"message": "تم تنظيف البيانات بنجاح", "results": results}
+
 @api_router.put("/users/{user_id}")
 async def update_user(user_id: str, user_data: dict, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "admin":
