@@ -441,7 +441,6 @@ const ChairmanDashboard = () => {
           </div>
         </TabsContent>
 
- 
         <TabsContent value="employees">
           <div className="space-y-6">
             {/* Employee Selector */}
