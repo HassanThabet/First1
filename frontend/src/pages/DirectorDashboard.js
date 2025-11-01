@@ -833,233 +833,354 @@ const DirectorDashboard = () => {
                 </div>
               </CardContent>
             </Card>
-          </div>
-        </TabsContent>
 
-        <TabsContent value="detailed">
-          <div className="space-y-6">
-            {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle>فلترة التقارير التفصيلية</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">نوع التقرير</label>
-                    <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">جميع التقارير</SelectItem>
-                        <SelectItem value="supervisor">تقارير المشرفين</SelectItem>
-                        <SelectItem value="activities">تقارير الأنشطة</SelectItem>
-                        <SelectItem value="social">تقارير الأخصائي الاجتماعي</SelectItem>
-                        <SelectItem value="quality">تقارير الجودة</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+            {/* Detailed Reports Section - Based on Filter */}
+            {reportTypeFilter !== "all" && (
+              <>
+                {/* Supervisor Detailed Reports */}
+                {reportTypeFilter === "supervisor" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-blue-700">التفاصيل الكاملة - تقارير المشرفين</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {filterReportsByTime(supervisorReports).map((report) => {
+                          const supervisor = users.find(u => u.id === report.user_id);
+                          return (
+                            <Card key={report.id} className="border-l-4 border-blue-500">
+                              <CardContent className="p-6">
+                                <div className="mb-4 pb-4 border-b">
+                                  <h3 className="text-lg font-bold text-blue-700">المشرف: {supervisor?.username || 'غير معروف'}</h3>
+                                  <p className="text-sm text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                </div>
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
-                    <Select value={timeFilter} onValueChange={setTimeFilter}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">جميع الفترات</SelectItem>
-                        <SelectItem value="daily">اليوم</SelectItem>
-                        <SelectItem value="weekly">هذا الأسبوع</SelectItem>
-                        <SelectItem value="monthly">هذا الشهر</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                  {/* Late Teachers */}
+                                  <div className="bg-orange-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-orange-700 mb-2">المعلمون المتأخرون ({report.late_teachers?.length || 0})</h4>
+                                    {report.late_teachers && report.late_teachers.length > 0 ? (
+                                      <ul className="list-disc list-inside text-sm space-y-1">
+                                        {report.late_teachers.map((teacher, idx) => (
+                                          <li key={idx}>{teacher}</li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">لا يوجد</p>
+                                    )}
+                                  </div>
 
-            {/* Supervisor Reports */}
-            {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-blue-700">تقارير المشرفين</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {filterReportsByTime(supervisorReports).map((report) => {
-                      const supervisor = users.find(u => u.id === report.user_id);
-                      return (
-                        <Card key={report.id} className="border-l-4 border-blue-500 hover:shadow-md transition-shadow cursor-pointer"
-                              onClick={() => { setSelectedReport(report); setReportType("supervisor"); setShowReportModal(true); }}>
-                          <CardContent className="p-4">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <div>
-                                <div className="text-xs text-gray-600">المشرف</div>
-                                <div className="font-semibold text-blue-700">{supervisor?.username || 'غير معروف'}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">التاريخ</div>
-                                <div className="font-semibold">{new Date(report.date).toLocaleDateString('ar-SA')}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">معلمون غائبون</div>
-                                <div className="font-semibold text-red-600">{report.absent_teachers?.length || 0}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">طلاب غائبون</div>
-                                <div className="font-semibold text-orange-600">{report.absent_students_count || 0}</div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                    {filterReportsByTime(supervisorReports).length === 0 && (
-                      <div className="text-center py-8 text-gray-500">لا توجد تقارير للمشرفين</div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                                  {/* Absent Teachers */}
+                                  <div className="bg-red-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-red-700 mb-2">المعلمون الغائبون ({report.absent_teachers?.length || 0})</h4>
+                                    {report.absent_teachers && report.absent_teachers.length > 0 ? (
+                                      <ul className="list-disc list-inside text-sm space-y-1">
+                                        {report.absent_teachers.map((teacher, idx) => (
+                                          <li key={idx}>{teacher}</li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">لا يوجد</p>
+                                    )}
+                                  </div>
 
-            {/* Activities Reports */}
-            {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-purple-700">تقارير الأنشطة</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {filterReportsByTime(activitiesReports).map((report) => {
-                      const activityUser = users.find(u => u.id === report.user_id);
-                      const totalActivities = report.activities?.length || 0;
-                      const totalParticipants = report.activities?.reduce((sum, a) => sum + (a.participants_count || 0), 0) || 0;
-                      return (
-                        <Card key={report.id} className="border-l-4 border-purple-500 hover:shadow-md transition-shadow cursor-pointer"
-                              onClick={() => { setSelectedReport(report); setReportType("activities"); setShowReportModal(true); }}>
-                          <CardContent className="p-4">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <div>
-                                <div className="text-xs text-gray-600">مسؤول الأنشطة</div>
-                                <div className="font-semibold text-purple-700">{activityUser?.username || 'غير معروف'}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">التاريخ</div>
-                                <div className="font-semibold">{new Date(report.date).toLocaleDateString('ar-SA')}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">عدد الأنشطة</div>
-                                <div className="font-semibold text-purple-600">{totalActivities}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">المشاركون</div>
-                                <div className="font-semibold text-indigo-600">{totalParticipants}</div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                    {filterReportsByTime(activitiesReports).length === 0 && (
-                      <div className="text-center py-8 text-gray-500">لا توجد تقارير للأنشطة</div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                                  {/* Covering Teachers */}
+                                  <div className="bg-green-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-green-700 mb-2">المعلمون المغطون ({report.covering_teachers?.length || 0})</h4>
+                                    {report.covering_teachers && report.covering_teachers.length > 0 ? (
+                                      <ul className="list-disc list-inside text-sm space-y-1">
+                                        {report.covering_teachers.map((teacher, idx) => (
+                                          <li key={idx}>{teacher}</li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">لا يوجد</p>
+                                    )}
+                                  </div>
 
-            {/* Social Specialist Reports */}
-            {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-green-700">تقارير الأخصائي الاجتماعي</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {filterReportsByTime(socialReports).map((report) => {
-                      const socialUser = users.find(u => u.id === report.user_id);
-                      const totalCases = (report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0);
-                      return (
-                        <Card key={report.id} className="border-l-4 border-green-500 hover:shadow-md transition-shadow cursor-pointer"
-                              onClick={() => { setSelectedReport(report); setReportType("social"); setShowReportModal(true); }}>
-                          <CardContent className="p-4">
-                            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                              <div>
-                                <div className="text-xs text-gray-600">الأخصائي</div>
-                                <div className="font-semibold text-green-700">{socialUser?.username || 'غير معروف'}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">التاريخ</div>
-                                <div className="font-semibold">{new Date(report.date).toLocaleDateString('ar-SA')}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">إجمالي الحالات</div>
-                                <div className="font-semibold text-rose-600">{totalCases}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">الجلسات</div>
-                                <div className="font-semibold text-emerald-600">{report.sessions_count || 0}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">تواصل مع الأسر</div>
-                                <div className="font-semibold text-teal-600">{report.family_contacts || 0}</div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                    {filterReportsByTime(socialReports).length === 0 && (
-                      <div className="text-center py-8 text-gray-500">لا توجد تقارير للأخصائي الاجتماعي</div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                                  {/* Absent Students */}
+                                  <div className="bg-blue-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-blue-700 mb-2">الطلاب الغائبون</h4>
+                                    <p className="text-2xl font-bold text-blue-700">{report.absent_students_count || 0}</p>
+                                  </div>
 
-            {/* Quality Reports */}
-            {(reportTypeFilter === "all" || reportTypeFilter === "quality") && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-orange-700">تقارير الجودة</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {filterReportsByTime(qualityReports).map((report) => {
-                      const qualityUser = users.find(u => u.id === report.user_id);
-                      return (
-                        <Card key={report.id} className="border-l-4 border-orange-500 hover:shadow-md transition-shadow cursor-pointer"
-                              onClick={() => { setSelectedReport(report); setReportType("quality"); setShowReportModal(true); }}>
-                          <CardContent className="p-4">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                              <div>
-                                <div className="text-xs text-gray-600">مسؤول الجودة</div>
-                                <div className="font-semibold text-orange-700">{qualityUser?.username || 'غير معروف'}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">التاريخ</div>
-                                <div className="font-semibold">{new Date(report.date).toLocaleDateString('ar-SA')}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">المعلم</div>
-                                <div className="font-semibold text-blue-600">{report.teacher_name || '-'}</div>
-                              </div>
-                              <div>
-                                <div className="text-xs text-gray-600">الأداء التدريسي</div>
-                                <div className="font-semibold text-amber-600">{report.teaching_performance_rate || 0}/10</div>
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
-                    {filterReportsByTime(qualityReports).length === 0 && (
-                      <div className="text-center py-8 text-gray-500">لا توجد تقارير للجودة</div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                                  {/* Ratings */}
+                                  <div className="bg-purple-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-purple-700 mb-2">التقييمات</h4>
+                                    <div className="text-sm space-y-1">
+                                      <p>الانضباط: <span className="font-bold">{report.student_discipline || 0}/10</span></p>
+                                      <p>النظافة: <span className="font-bold">{report.classroom_cleanliness || 0}/10</span></p>
+                                      <p>حضور المعلمين: <span className="font-bold">{report.teacher_attendance_rate || 0}%</span></p>
+                                      <p>السلوك العام: <span className="font-bold">{report.general_behavior || 0}/10</span></p>
+                                    </div>
+                                  </div>
+
+                                  {/* Incidents */}
+                                  <div className="bg-yellow-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-yellow-700 mb-2">الحوادث ({report.incidents?.length || 0})</h4>
+                                    {report.incidents && report.incidents.length > 0 ? (
+                                      <ul className="list-disc list-inside text-sm space-y-1">
+                                        {report.incidents.map((incident, idx) => (
+                                          <li key={idx}>{incident}</li>
+                                        ))}
+                                      </ul>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">لا يوجد</p>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Notes */}
+                                {report.notes && (
+                                  <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-gray-700 mb-2">ملاحظات</h4>
+                                    <p className="text-sm whitespace-pre-wrap">{report.notes}</p>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                        {filterReportsByTime(supervisorReports).length === 0 && (
+                          <div className="text-center py-12 text-gray-500">
+                            <p className="text-lg">لا توجد تقارير للمشرفين للفترة المحددة</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Activities Detailed Reports */}
+                {reportTypeFilter === "activities" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-purple-700">التفاصيل الكاملة - تقارير الأنشطة</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {filterReportsByTime(activitiesReports).map((report) => {
+                          const activityUser = users.find(u => u.id === report.user_id);
+                          return (
+                            <Card key={report.id} className="border-l-4 border-purple-500">
+                              <CardContent className="p-6">
+                                <div className="mb-4 pb-4 border-b">
+                                  <h3 className="text-lg font-bold text-purple-700">مسؤول الأنشطة: {activityUser?.username || 'غير معروف'}</h3>
+                                  <p className="text-sm text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                  {report.activities && report.activities.length > 0 ? (
+                                    report.activities.map((activity, idx) => (
+                                      <div key={idx} className="bg-purple-50 p-4 rounded-lg">
+                                        <h4 className="font-semibold text-purple-700 mb-3">النشاط {idx + 1}: {activity.name}</h4>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                                          <div>
+                                            <span className="text-gray-600">التاريخ:</span>
+                                            <span className="font-semibold mr-2">{new Date(activity.date).toLocaleDateString('ar-SA')}</span>
+                                          </div>
+                                          <div>
+                                            <span className="text-gray-600">النوع:</span>
+                                            <span className="font-semibold mr-2">{activity.type || '-'}</span>
+                                          </div>
+                                          <div>
+                                            <span className="text-gray-600">الفئة المستهدفة:</span>
+                                            <span className="font-semibold mr-2">{activity.target_group || '-'}</span>
+                                          </div>
+                                          <div>
+                                            <span className="text-gray-600">المشاركون:</span>
+                                            <span className="font-semibold mr-2">{activity.participants_count || 0}</span>
+                                          </div>
+                                          <div>
+                                            <span className="text-gray-600">التفاعل:</span>
+                                            <span className="font-semibold mr-2">{activity.interaction_rate || 0}/10</span>
+                                          </div>
+                                          <div>
+                                            <span className="text-gray-600">الأثر التعليمي:</span>
+                                            <span className="font-semibold mr-2">{activity.educational_impact || '-'}</span>
+                                          </div>
+                                        </div>
+                                        {activity.notes && (
+                                          <div className="mt-3 pt-3 border-t">
+                                            <p className="text-xs text-gray-600">ملاحظات:</p>
+                                            <p className="text-sm">{activity.notes}</p>
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))
+                                  ) : (
+                                    <p className="text-center text-gray-500">لا توجد أنشطة في هذا التقرير</p>
+                                  )}
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                        {filterReportsByTime(activitiesReports).length === 0 && (
+                          <div className="text-center py-12 text-gray-500">
+                            <p className="text-lg">لا توجد تقارير للأنشطة للفترة المحددة</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Social Specialist Detailed Reports */}
+                {reportTypeFilter === "social" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-green-700">التفاصيل الكاملة - تقارير الأخصائي الاجتماعي</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {filterReportsByTime(socialReports).map((report) => {
+                          const socialUser = users.find(u => u.id === report.user_id);
+                          const totalCases = (report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0);
+                          return (
+                            <Card key={report.id} className="border-l-4 border-green-500">
+                              <CardContent className="p-6">
+                                <div className="mb-4 pb-4 border-b">
+                                  <h3 className="text-lg font-bold text-green-700">الأخصائي: {socialUser?.username || 'غير معروف'}</h3>
+                                  <p className="text-sm text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                  <div className="bg-rose-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-rose-700 mb-2">إجمالي الحالات</h4>
+                                    <p className="text-3xl font-bold text-rose-700">{totalCases}</p>
+                                  </div>
+
+                                  <div className="bg-pink-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-pink-700 mb-2">حالات نفسية</h4>
+                                    <p className="text-3xl font-bold text-pink-700">{report.psychological_cases || 0}</p>
+                                  </div>
+
+                                  <div className="bg-amber-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-amber-700 mb-2">حالات أكاديمية</h4>
+                                    <p className="text-3xl font-bold text-amber-700">{report.academic_cases || 0}</p>
+                                  </div>
+
+                                  <div className="bg-red-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-red-700 mb-2">حالات سلوكية</h4>
+                                    <p className="text-3xl font-bold text-red-700">{report.behavioral_cases || 0}</p>
+                                  </div>
+
+                                  <div className="bg-emerald-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-emerald-700 mb-2">الجلسات</h4>
+                                    <p className="text-3xl font-bold text-emerald-700">{report.sessions_count || 0}</p>
+                                  </div>
+
+                                  <div className="bg-teal-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-teal-700 mb-2">التواصل مع الأسر</h4>
+                                    <p className="text-3xl font-bold text-teal-700">{report.family_contacts || 0}</p>
+                                  </div>
+
+                                  <div className="bg-cyan-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-cyan-700 mb-2">التحويلات الخارجية</h4>
+                                    <p className="text-3xl font-bold text-cyan-700">{report.referrals_out || 0}</p>
+                                  </div>
+
+                                  <div className="bg-blue-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-blue-700 mb-2">المتابعات</h4>
+                                    <p className="text-3xl font-bold text-blue-700">{report.follow_ups || 0}</p>
+                                  </div>
+                                </div>
+
+                                {report.notes && (
+                                  <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-gray-700 mb-2">ملاحظات</h4>
+                                    <p className="text-sm whitespace-pre-wrap">{report.notes}</p>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                        {filterReportsByTime(socialReports).length === 0 && (
+                          <div className="text-center py-12 text-gray-500">
+                            <p className="text-lg">لا توجد تقارير للأخصائي الاجتماعي للفترة المحددة</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Quality Detailed Reports */}
+                {reportTypeFilter === "quality" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-orange-700">التفاصيل الكاملة - تقارير الجودة</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {filterReportsByTime(qualityReports).map((report) => {
+                          const qualityUser = users.find(u => u.id === report.user_id);
+                          return (
+                            <Card key={report.id} className="border-l-4 border-orange-500">
+                              <CardContent className="p-6">
+                                <div className="mb-4 pb-4 border-b">
+                                  <h3 className="text-lg font-bold text-orange-700">مسؤول الجودة: {qualityUser?.username || 'غير معروف'}</h3>
+                                  <p className="text-sm text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div className="bg-blue-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-blue-700 mb-2">المعلم</h4>
+                                    <p className="text-lg font-bold text-blue-700">{report.teacher_name || '-'}</p>
+                                  </div>
+
+                                  <div className="bg-green-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-green-700 mb-2">المادة</h4>
+                                    <p className="text-lg font-bold text-green-700">{report.subject || '-'}</p>
+                                  </div>
+
+                                  <div className="bg-amber-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-amber-700 mb-2">الأداء التدريسي</h4>
+                                    <p className="text-3xl font-bold text-amber-700">{report.teaching_performance_rate || 0}/10</p>
+                                  </div>
+
+                                  <div className="bg-purple-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-purple-700 mb-2">التقييم العام</h4>
+                                    <p className="text-lg font-bold text-purple-700">{report.overall_evaluation || '-'}</p>
+                                  </div>
+                                </div>
+
+                                {report.strengths && (
+                                  <div className="mt-4 bg-green-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-green-700 mb-2">نقاط القوة</h4>
+                                    <p className="text-sm whitespace-pre-wrap">{report.strengths}</p>
+                                  </div>
+                                )}
+
+                                {report.areas_for_improvement && (
+                                  <div className="mt-4 bg-orange-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-orange-700 mb-2">مجالات التحسين</h4>
+                                    <p className="text-sm whitespace-pre-wrap">{report.areas_for_improvement}</p>
+                                  </div>
+                                )}
+
+                                {report.notes && (
+                                  <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-gray-700 mb-2">ملاحظات إضافية</h4>
+                                    <p className="text-sm whitespace-pre-wrap">{report.notes}</p>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                        {filterReportsByTime(qualityReports).length === 0 && (
+                          <div className="text-center py-12 text-gray-500">
+                            <p className="text-lg">لا توجد تقارير للجودة للفترة المحددة</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
             )}
           </div>
         </TabsContent>
