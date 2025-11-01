@@ -1,26 +1,26 @@
 <analysis>
-The AI engineer successfully built a comprehensive school management system, مدارس الفجر الجديد الأهلية, starting from an MVP. The initial phase involved setting up FastAPI backend with MongoDB and a React frontend, adhering to Arabic RTL, responsive design, and specific role-based dashboards. Key achievements include establishing backend models and CRUD operations, implementing login, and creating initial dashboard structures. Subsequent work focused on enhancing report functionalities, particularly for Supervisor, Vice-Principal, Director, Chairman, Activities, and Social Specialist roles. This included developing detailed report views using modals, adding advanced filtering (daily, weekly, monthly, branch-specific), and implementing Excel export with comprehensive data and date range capabilities. Recent efforts involved enabling multi-select teacher fields in Activities, calculating total student cases in Social Specialist, integrating summarized report views, and implementing PDF export. The trajectory concluded with debugging an issue related to Arabic text rendering in PDF exports using .
+The AI engineer successfully developed the مدارس الفجر الجديد الأهلية system from an MVP, focusing on role-based dashboards, Arabic RTL, and comprehensive reporting. Initial work involved setting up the FastAPI backend and React frontend, implementing core CRUD and authentication. A significant part of the trajectory focused on enhancing report functionalities across various roles (Supervisor, Vice-Principal, Director, Chairman, Activities, Social Specialist), adding advanced filtering, and Excel/PDF export.
+
+A major challenge was fixing Arabic text rendering in PDF exports, leading to a switch from  to  and careful font embedding. Debugging included resolving Malformed table row errors due to  data. Subsequent efforts integrated more detailed statistics and flexible filtering options into the Director and Chairman dashboards, including custom date ranges. Later, the engineer addressed issues with Vice-Principal not seeing supervisor reports (initially due to data assignment, then a 403 Forbidden error for ), and allowing supervisors to delete their own reports. The trajectory concluded with the AI fixing the 403 error for Vice-Principals accessing .
 </analysis>
 
 <product_requirements>
-The مدارس الفجر الجديد الأهلية system requires distinct dashboards for Admin, Chairman, Director, Vice-Principal, Supervisor, Activities, Educational Supervision, and Social Specialist roles, supporting two branches (Boys/Girls) for all except Admin. Core features include username/password authentication without JWT, full Arabic UI with RTL, responsive design, and professional branding. Users must create, view, edit, and delete their reports, which should feature graphical statistics. Data export to Excel and PDF formats is mandatory.
-
-Role-specific requirements: Supervisor for daily reports, Vice-Principal for tasks and merged supervisor reports. Activities for activity reports with multi-select teacher fields. Social Specialist for student case reports including total case counts. Educational Supervision for teacher performance. Quality for academic/program reports. Director views all reports with staff-specific filtering and aggregated statistics. Chairman views Director's summaries, all staff reports with branch/agent-specific filtering, and teacher evaluations. Admin manages accounts (auto-assigning Chairman to 'both' branches), teachers, classes, and subjects. The system needs comprehensive, filterable (daily/weekly/monthly/date range/branch/agent) Excel and PDF exports containing all report details.
+The مدارس الفجر الجديد الأهلية system provides distinct dashboards for Admin, Chairman, Director, Vice-Principal, Supervisor, Activities, Educational Supervision, and Social Specialist roles, supporting Boys/Girls branches. It requires username/password authentication, a full Arabic UI with RTL, responsive design, and professional branding. Users must create, view, edit, and delete their reports, which should include graphical statistics and be exportable to Excel and PDF. Role-specific needs include Supervisor daily reports, Vice-Principal merged supervisor reports, Activities multi-select teacher fields, and Social Specialist student case counts. Director and Chairman dashboards require aggregated statistics and staff-specific filtering across all report types, with the ability to view all details. Admin manages accounts, auto-assigns Chairman to 'both' branches, and handles teachers/classes/subjects. Comprehensive, filterable (daily/weekly/monthly/date range/branch/agent) exports are essential. Recent updates expanded Director/Chairman views to include Activity, Social, Quality, and Educational Supervision statistics, added a combined report type and employee filter, and introduced custom date range filtering.
 </product_requirements>
 
 <key_technical_concepts>
-- **FastAPI:** Backend API and business logic.
-- **React:** Frontend UI development.
-- **MongoDB:** NoSQL database.
-- **Pydantic:** Data validation for FastAPI models.
-- **Shadcn UI & Tailwind CSS:** Frontend UI components and styling.
-- **RTL Support:** Right-to-Left language direction.
-- **Python-docx & pandas:** For Excel/PDF report generation (initially).
-- **jspdf & jspdf-autotable:** Frontend PDF generation.
+-   **FastAPI:** Backend API and business logic.
+-   **React:** Frontend UI development.
+-   **MongoDB:** NoSQL database.
+-   **Pydantic:** Data validation.
+-   **Shadcn UI & Tailwind CSS:** Frontend styling and components.
+-   **RTL Support:** Right-to-Left language direction.
+-   **pdfmake:** Frontend PDF generation with Arabic font support (replaced ).
+-   **Cairo Font:** Used for Arabic text in PDFs.
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a React frontend, FastAPI backend, and MongoDB database.
+The application utilizes a React frontend, a FastAPI backend, and a MongoDB database.
 
 **Directory Structure:**
 
@@ -28,85 +28,68 @@ The application uses a React frontend, FastAPI backend, and MongoDB database.
 **Key Files and Their Importance/Changes:**
 
 -   :
-    -   **Importance:** Defines FastAPI routes, database interactions, and Pydantic models.
-    -   **Changes:** Confirmed models like , ,  exist and are flexible () for dynamic data. Also confirmed  model supports both for the  field.
+    -   **Importance:** Defines FastAPI routes, database interactions, Pydantic models, and user authentication/authorization.
+    -   **Changes:**
+        -   Modified delete endpoints (, , , ) to allow users to delete their own reports, in addition to admin.
+        -   Added a new  endpoint for admin to delete reports whose  no longer corresponds to an existing user.
+        -   Modified  endpoint to include  in the allowed roles, enabling them to fetch user data for their dashboards.
 -   :
-    -   **Importance:** Vice-Principal's main interface.
-    -   **Changes:** Enhanced Excel export to include full Supervisor report details and support date range filtering. Added Integrated Statistics tab with merged supervisor report data and charting.
+    -   **Importance:** Centralized configuration for  with custom Arabic fonts.
+    -   **Changes:** New file created to configure  with 'Cairo-Regular' font and .
+-   :
+    -   **Importance:** Contains the Base64 encoded 'Cairo-Regular.ttf' font data for .
+    -   **Changes:** New file created to embed the Arabic font necessary for correct rendering.
 -   :
     -   **Importance:** Activities report management.
-    -   **Changes:** Major overhaul to fetch teachers and implement multi-select dropdowns for Supervisor of Activity and Teacher Cooperation. Updated form submission, edit functionality, and modal view to accommodate these changes. Added Integrated Reports tab with weekly/monthly filtering and PDF export functionality.
+    -   **Changes:**
+        -   Replaced  with  for PDF export functionality.
+        -   Updated  to use  and configured .
+        -   Modified PDF content generation to handle potentially  teacher names and statistics gracefully by defaulting to empty strings.
+        -   Removed  and  dependencies.
 -   :
     -   **Importance:** Social specialist report management.
-    -   **Changes:** Implemented calculation and display of Total Student Cases by summing psychological, academic, and behavioral cases in both the report form and detailed modal view. Added Integrated Reports tab with weekly/monthly filtering and PDF export functionality.
+    -   **Changes:** Mirrored changes from  to replace  with , update PDF export logic, and handle  data in the generated PDF.
 -   :
-    -   **Importance:** User and system management.
-    -   **Changes:** Modified user creation form to auto-assign both branches to the Chairman role and hide the branch selection dropdown when Chairman is selected. Corrected default branch reset to boys.
+    -   **Importance:** Vice-Principal's main interface, including merged supervisor reports.
+    -   **Changes:**
+        -   Added  functionality using .
+        -   Updated  to filter supervisor reports based on supervisors  the current Vice-Principal.
+        -   Modified PDF export to include Supervisor names and handle supervisor reports correctly.
+        -   Added code to fetch  to display supervisor names.
 -   :
-    -   **Importance:** Director's overview.
-    -   **Changes:** Developed to show aggregated statistics (daily/weekly/monthly absentees, covered teachers) and the ability to view reports by selecting a specific Vice-Principal or branch, with full details in modals.
+    -   **Importance:** Director's overview with aggregated statistics and reports.
+    -   **Changes:**
+        -   Enhanced  to fetch and summarize Activities, Social Specialist, Quality, and Educational Supervision reports.
+        -   Added a  state to allow filtering reports by type (supervisor, activities, social, quality, all).
+        -   Implemented  functionality for Director's dashboard.
+        -   Integrated a custom date range filter (, ) into the  function and added corresponding UI input fields.
+        -   Refactored UI to display all detailed reports and filtering options within the main Overall Statistics (overview) tab, removing a separate Detailed Reports tab.
+        -   Consolidated filters to include report type and employee selection (with all options).
+        -   Cleaned up redundant  usage.
 -   :
     -   **Importance:** Chairman's high-level oversight.
-    -   **Changes:** Developed similarly to Director's dashboard, with aggregated statistics and filtering by Vice-Principal or branch, but with the ability to view reports from both boys' and girls' branches.
--   , :
-    -   **Importance:** Placeholder dashboards for specific roles.
-    -   **Changes:** Implemented basic report viewing with modal functionality.
+    -   **Changes:** Mirrored enhancements from , including fetching and summarizing various report types, adding report type and employee filtering, , and custom date range filtering. Also refactored UI similarly to Director's dashboard, removing the separate Detailed Reports tab and integrating filters into the overview. Cleaned up redundant  usage.
 </code_architecture>
 
 <pending_tasks>
-- Fix Arabic text rendering issue in PDF exports.
-- Implement remember me functionality for authentication.
-- Implement automatic archiving of old reports.
-- Implement Chairman's detailed teacher evaluations and their PDF/Excel export.
-- Implement full Admin functionalities for managing teachers, classes, and subjects.
+-   Implement remember me functionality for authentication.
+-   Implement automatic archiving of old reports.
+-   Implement Chairman's detailed teacher evaluations and their PDF/Excel export.
+-   Implement full Admin functionalities for managing teachers, classes, and subjects.
 </pending_tasks>
 
 <current_work>
-The AI engineer was actively working on implementing PDF export functionality for the Integrated Reports tabs within the Activities Dashboard and Social Specialist Dashboard. The goal was to provide a formatted, academic-style PDF with the same filtering options (weekly, monthly) as the Excel export.
+The AI engineer was actively debugging an issue where the Vice-Principal dashboard failed to load data, reporting a Failed to load data error. Upon investigation, the backend logs revealed a  error when the Vice-Principal tried to access the  endpoint. This endpoint, which is used to fetch user details (e.g., supervisor names for reports), was found to be restricted to , , and  roles only in . The Vice-Principal role was not included in the allowed  list.
 
-Current state:
-1.  **Libraries Installed**:  and  were installed in the frontend (yarn add v1.22.22
-[1/4] Resolving packages...
-[2/4] Fetching packages...
-[3/4] Linking dependencies...
-[4/4] Building fresh packages...
-success Saved lockfile.
-success Saved 23 new dependencies.
-info Direct dependencies
-├─ jspdf-autotable@5.0.2
-└─ jspdf@3.0.3
-info All dependencies
-├─ @babel/runtime@7.28.4
-├─ @types/pako@2.0.4
-├─ @types/raf@3.4.3
-├─ @types/trusted-types@2.0.7
-├─ base64-arraybuffer@1.0.2
-├─ canvg@3.0.11
-├─ core-js@3.46.0
-├─ css-line-break@2.1.0
-├─ dompurify@3.3.0
-├─ fast-png@6.4.0
-├─ fflate@0.8.2
-├─ html2canvas@1.4.1
-├─ iobuffer@5.4.0
-├─ jspdf-autotable@5.0.2
-├─ jspdf@3.0.3
-├─ pako@2.1.0
-├─ performance-now@2.1.0
-├─ raf@3.4.1
-├─ regenerator-runtime@0.13.11
-├─ rgbcolor@1.0.1
-├─ stackblur-canvas@2.7.0
-├─ svg-pathdata@6.0.3
-└─ text-segmentation@1.0.3
-Done in 7.04s.).
-2.  **PDF Export Functionality Added**:
-    *   In , a  function was added to generate PDF reports with Arabic support. A تصدير PDF (Export PDF) button was integrated into the Integrated Reports tab.
-    *   The same changes were mirrored in .
-3.  **Issue Encountered**: Upon testing, clicking the PDF export button resulted in an error, indicating a problem with Arabic text rendering within .
-4.  **Attempted Fix**: The AI identified the core problem as 's default lack of Arabic support. It attempted a fix by simplifying the Arabic text handling within the PDF export function in  and was in the process of applying the same fix to  when the trajectory ended.
+The AI engineer identified this as the root cause of the data loading failure for the Vice-Principal. The immediate action taken was to modify the  file to add  to the  list for the  endpoint.
+
+**Specifically, the change involves:**
+**File:** 
+**Change:** Modifying the  decorator to include  in the  list for  dependency.
+
+Immediately before this summary request, the AI engineer had successfully edited the  file to incorporate this fix and was in the process of restarting the backend service to apply the changes. This should resolve the 403 Forbidden error and allow the Vice-Principal dashboard to fetch user data correctly.
 </current_work>
 
 <optional_next_step>
-Debug and fix the Arabic text rendering issue in the PDF export functionality for Activities and Social Specialist dashboards.
+Restart the backend service to apply the  changes and verify the Vice-Principal dashboard loads data correctly.
 </optional_next_step>
