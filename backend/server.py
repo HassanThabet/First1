@@ -614,8 +614,12 @@ async def update_activities_report(report_id: str, report_data: dict, current_us
 
 @api_router.delete("/reports/activities/{report_id}")
 async def delete_activities_report(report_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["admin", "activities"]:
-        raise HTTPException(status_code=403, detail="غير مصرح")
+    report = await db.activities_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح لك بحذف هذا التقرير")
     
     await db.activities_reports.delete_one({"id": report_id})
     return {"message": "تم حذف التقرير بنجاح"}
