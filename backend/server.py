@@ -565,16 +565,20 @@ async def delete_vice_principal_report(report_id: str, current_user: dict = Depe
 
 # Activities Reports
 @api_router.post("/reports/activities", response_model=ActivitiesReport)
-async def create_activities_report(report_data: ActivitiesReport, current_user: dict = Depends(get_current_user)):
+async def create_activities_report(report_data: dict, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "activities":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    report_data.user_id = current_user["id"]
-    report_data.branch = current_user["branch"]
+    # Add required fields
+    report_data["id"] = str(uuid.uuid4())
+    report_data["user_id"] = current_user["id"]
+    report_data["branch"] = current_user["branch"]
+    report_data["created_at"] = datetime.now(timezone.utc).isoformat()
     
-    doc = report_data.model_dump()
-    await db.activities_reports.insert_one(doc)
-    return report_data
+    await db.activities_reports.insert_one(report_data)
+    
+    report_obj = ActivitiesReport(**report_data)
+    return report_obj
 
 @api_router.get("/reports/activities", response_model=List[ActivitiesReport])
 async def get_activities_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
