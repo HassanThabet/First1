@@ -130,17 +130,6 @@ const ChairmanDashboard = () => {
       reports = reports.filter(r => r.branch === selectedBranch);
     }
     
-    // Filter by selected Vice Principal if chosen
-    if (selectedVPForStats !== "all") {
-      // Get all supervisors under this VP
-      const supervisorsUnderVP = users.filter(u => 
-        u.role === "supervisor" && 
-        u.assigned_to === selectedVPForStats
-      );
-      const supervisorIds = supervisorsUnderVP.map(s => s.id);
-      reports = reports.filter(r => supervisorIds.includes(r.user_id));
-    }
-    
     // Apply time filter
     const today = new Date();
     if (timeFilter === "daily") {
