@@ -677,16 +677,22 @@ async def delete_educational_supervision_report(report_id: str, current_user: di
 
 # Social Specialist Reports
 @api_router.post("/reports/social-specialist", response_model=SocialSpecialistReport)
-async def create_social_specialist_report(report_data: SocialSpecialistReport, current_user: dict = Depends(get_current_user)):
+async def create_social_specialist_report(report_data: dict, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "social_specialist":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    report_data.user_id = current_user["id"]
-    report_data.branch = current_user["branch"]
+    # Add required fields
+    report_data["id"] = str(uuid.uuid4())
+    report_data["user_id"] = current_user["id"]
+    report_data["branch"] = current_user["branch"]
+    if "date" not in report_data:
+        report_data["date"] = datetime.now(timezone.utc).date().isoformat()
+    report_data["created_at"] = datetime.now(timezone.utc).isoformat()
     
-    doc = report_data.model_dump()
-    await db.social_specialist_reports.insert_one(doc)
-    return report_data
+    await db.social_specialist_reports.insert_one(report_data)
+    
+    report_obj = SocialSpecialistReport(**report_data)
+    return report_obj
 
 @api_router.get("/reports/social-specialist", response_model=List[SocialSpecialistReport])
 async def get_social_specialist_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
