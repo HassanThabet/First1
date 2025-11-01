@@ -251,6 +251,173 @@ const ActivitiesDashboard = () => {
     };
   };
 
+  // Export to PDF
+  const exportToPDF = () => {
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const mergedReports = getMergedReports();
+    const stats = getMergedStatistics();
+    const allActivities = mergedReports.flatMap(r => r.activities);
+
+    // Title
+    doc.setFontSize(20);
+    doc.setFont(undefined, 'bold');
+    const title = 'تقرير الأنشطة المدمج';
+    doc.text(title, 105, 20, { align: 'center' });
+
+    // Subtitle with period
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'normal');
+    let periodText = '';
+    if (mergedPeriod === 'weekly') {
+      periodText = 'هذا الأسبوع (السبت - الأربعاء)';
+    } else if (mergedPeriod === 'monthly') {
+      periodText = 'هذا الشهر';
+    } else if (mergedPeriod === 'custom' && mergedStartDate && mergedEndDate) {
+      periodText = `من ${mergedStartDate} إلى ${mergedEndDate}`;
+    }
+    doc.text(periodText, 105, 28, { align: 'center' });
+
+    // School name
+    doc.setFontSize(10);
+    doc.text('مدارس الفجر الجديد الأهلية', 105, 35, { align: 'center' });
+    
+    // Date
+    const currentDate = new Date().toLocaleDateString('ar-SA');
+    doc.text(`تاريخ التقرير: ${currentDate}`, 105, 41, { align: 'center' });
+
+    // Statistics Summary Box
+    doc.setFillColor(230, 247, 255);
+    doc.rect(15, 48, 180, 35, 'F');
+    doc.setDrawColor(100, 181, 246);
+    doc.rect(15, 48, 180, 35, 'S');
+
+    doc.setFontSize(11);
+    doc.setFont(undefined, 'bold');
+    doc.text('الإحصائيات الإجمالية', 105, 55, { align: 'center' });
+    
+    doc.setFont(undefined, 'normal');
+    doc.setFontSize(10);
+    doc.text(`إجمالي الأنشطة: ${stats.totalActivities}`, 170, 62, { align: 'right' });
+    doc.text(`إجمالي المشاركين: ${stats.totalParticipants}`, 170, 68, { align: 'right' });
+    doc.text(`متوسط التفاعل: ${stats.avgInteraction}/10`, 170, 74, { align: 'right' });
+    doc.text(`عدد التقارير: ${stats.totalReports}`, 170, 80, { align: 'right' });
+
+    // Activities by Type Table
+    let yPos = 90;
+    if (Object.keys(stats.typeCount).length > 0) {
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.text('توزيع الأنشطة حسب النوع', 105, yPos, { align: 'center' });
+      
+      const typeData = Object.entries(stats.typeCount).map(([type, count]) => [type, count]);
+      
+      doc.autoTable({
+        startY: yPos + 5,
+        head: [['العدد', 'نوع النشاط']],
+        body: typeData.map(([type, count]) => [count, type]),
+        styles: {
+          font: 'helvetica',
+          fontSize: 10,
+          halign: 'center'
+        },
+        headStyles: {
+          fillColor: [33, 150, 243],
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        margin: { left: 15, right: 15 }
+      });
+      
+      yPos = doc.lastAutoTable.finalY + 10;
+    }
+
+    // Detailed Activities Table
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.text('تفاصيل جميع الأنشطة', 105, yPos, { align: 'center' });
+
+    const activitiesData = allActivities.map((activity, index) => {
+      const supervisors = activity.supervisors && activity.supervisors.length > 0 
+        ? activity.supervisors.map(id => getTeacherName(id)).join(', ')
+        : activity.supervisor || '-';
+      
+      const cooperating = activity.cooperating_teachers && activity.cooperating_teachers.length > 0
+        ? activity.cooperating_teachers.map(id => getTeacherName(id)).join(', ')
+        : activity.teacher_cooperation || '-';
+
+      return [
+        index + 1,
+        activity.name,
+        new Date(activity.date).toLocaleDateString('ar-SA'),
+        activity.type,
+        activity.participants_count,
+        `${activity.interaction_rate}/10`,
+        supervisors,
+        activity.target_group || '-'
+      ];
+    });
+
+    doc.autoTable({
+      startY: yPos + 5,
+      head: [['#', 'اسم النشاط', 'التاريخ', 'النوع', 'المشاركون', 'التفاعل', 'المشرفون', 'الفئة المستهدفة']],
+      body: activitiesData,
+      styles: {
+        font: 'helvetica',
+        fontSize: 8,
+        halign: 'center',
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [0, 150, 136],
+        textColor: 255,
+        fontStyle: 'bold',
+        halign: 'center'
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      },
+      margin: { left: 10, right: 10 },
+      columnStyles: {
+        0: { cellWidth: 10 },
+        1: { cellWidth: 35 },
+        2: { cellWidth: 25 },
+        3: { cellWidth: 20 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 18 },
+        6: { cellWidth: 35 },
+        7: { cellWidth: 35 }
+      }
+    });
+
+    // Footer
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(128);
+      doc.text(`صفحة ${i} من ${pageCount}`, 105, 285, { align: 'center' });
+    }
+
+    // Save PDF
+    let filename = 'تقرير_الأنشطة_المدمج';
+    if (mergedPeriod === 'weekly') {
+      filename += '_أسبوعي';
+    } else if (mergedPeriod === 'monthly') {
+      filename += '_شهري';
+    } else if (mergedPeriod === 'custom' && mergedStartDate && mergedEndDate) {
+      filename += `_${mergedStartDate}_${mergedEndDate}`;
+    }
+    filename += '.pdf';
+
+    doc.save(filename);
+    toast.success('تم تصدير التقرير إلى PDF بنجاح');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
