@@ -99,7 +99,7 @@ const VicePrincipalDashboard = () => {
     };
   };
 
-  // Export to Excel with date range filtering
+  // Export to Excel with comprehensive data and advanced filtering
   const exportToExcel = () => {
     setShowExportDialog(true);
   };
@@ -110,44 +110,88 @@ const VicePrincipalDashboard = () => {
       return;
     }
 
-    // Filter reports by date range if specified
+    // Filter reports based on selected criteria
     let reportsToExport = [...supervisorReports];
+    const today = new Date();
     
-    if (exportStartDate && exportEndDate) {
+    if (exportFilterType === "daily") {
+      // Export today's report only
+      const todayStr = new Date().toISOString().split('T')[0];
+      reportsToExport = supervisorReports.filter(report => report.date === todayStr);
+    } else if (exportFilterType === "weekly") {
+      // Export this week's reports (Saturday to Wednesday)
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4); // 5 days (Sat-Wed)
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      reportsToExport = supervisorReports.filter(report => {
+        const reportDate = new Date(report.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    } else if (exportFilterType === "monthly") {
+      // Export this month's reports
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      reportsToExport = supervisorReports.filter(report => {
+        const reportDate = new Date(report.date);
+        return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
+      });
+    } else if (exportFilterType === "custom" && exportStartDate && exportEndDate) {
+      // Custom date range
       const startDate = new Date(exportStartDate);
       const endDate = new Date(exportEndDate);
+      endDate.setHours(23, 59, 59, 999);
       
       reportsToExport = supervisorReports.filter(report => {
         const reportDate = new Date(report.date);
         return reportDate >= startDate && reportDate <= endDate;
       });
-      
-      if (reportsToExport.length === 0) {
-        toast.error("لا توجد تقارير في النطاق الزمني المحدد");
-        return;
-      }
-    } else if (exportStartDate) {
+    } else if (exportFilterType === "custom" && exportStartDate && !exportEndDate) {
       const startDate = new Date(exportStartDate);
       reportsToExport = supervisorReports.filter(report => {
         const reportDate = new Date(report.date);
         return reportDate >= startDate;
       });
-    } else if (exportEndDate) {
+    } else if (exportFilterType === "custom" && !exportStartDate && exportEndDate) {
       const endDate = new Date(exportEndDate);
+      endDate.setHours(23, 59, 59, 999);
       reportsToExport = supervisorReports.filter(report => {
         const reportDate = new Date(report.date);
         return reportDate <= endDate;
       });
     }
 
-    // Prepare detailed data for Excel with all information
+    if (reportsToExport.length === 0) {
+      toast.error("لا توجد تقارير في الفترة المحددة");
+      return;
+    }
+
+    // Sort reports by date
+    reportsToExport.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Prepare comprehensive data for Excel
     const excelData = [];
     
     reportsToExport.forEach((report, index) => {
-      // Main report row
+      const reportDate = new Date(report.date).toLocaleDateString('ar-SA', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+      
+      // Main report row with all scores
       const mainRow = {
         '#': index + 1,
-        'التاريخ': new Date(report.date).toLocaleDateString('ar-SA'),
+        'التاريخ': reportDate,
+        'اليوم': new Date(report.date).toLocaleDateString('ar-SA', { weekday: 'long' }),
         'انضباط الطلاب': `${report.student_discipline}/10`,
         'نظافة الفصول': `${report.classroom_cleanliness}/10`,
         'التزام المعلمين': `${report.teacher_attendance_rate}/10`,
@@ -155,38 +199,50 @@ const VicePrincipalDashboard = () => {
         'عدد الطلاب الغائبين': report.absent_students_count || 0,
       };
       
-      // Add teacher details
+      // Add detailed teacher information
       if (report.late_teachers && report.late_teachers.length > 0) {
-        mainRow['المعلمون المتأخرون'] = report.late_teachers.map(lt => 
+        const lateTeachersDetails = report.late_teachers.map(lt => 
           `${lt.teacher} (${lt.subject} - حصة ${lt.period})`
-        ).join(' | ');
+        ).join('\n');
+        mainRow['المعلمون المتأخرون'] = lateTeachersDetails;
+        mainRow['عدد المعلمين المتأخرين'] = report.late_teachers.length;
       } else {
         mainRow['المعلمون المتأخرون'] = '-';
+        mainRow['عدد المعلمين المتأخرين'] = 0;
       }
       
       if (report.absent_teachers && report.absent_teachers.length > 0) {
-        mainRow['المعلمون الغائبون'] = report.absent_teachers.map(at => 
+        const absentTeachersDetails = report.absent_teachers.map(at => 
           `${at.teacher} (${at.subject} - حصة ${at.period})`
-        ).join(' | ');
+        ).join('\n');
+        mainRow['المعلمون الغائبون'] = absentTeachersDetails;
+        mainRow['عدد المعلمين الغائبين'] = report.absent_teachers.length;
       } else {
         mainRow['المعلمون الغائبون'] = '-';
+        mainRow['عدد المعلمين الغائبين'] = 0;
       }
       
       if (report.covering_teachers && report.covering_teachers.length > 0) {
-        mainRow['المعلمون المغطون'] = report.covering_teachers.map(ct => 
+        const coveringTeachersDetails = report.covering_teachers.map(ct => 
           `${ct.teacher} (${ct.subject} - حصة ${ct.period})`
-        ).join(' | ');
+        ).join('\n');
+        mainRow['المعلمون الذين غطوا الحصص'] = coveringTeachersDetails;
+        mainRow['عدد المعلمين المغطين'] = report.covering_teachers.length;
       } else {
-        mainRow['المعلمون المغطون'] = '-';
+        mainRow['المعلمون الذين غطوا الحصص'] = '-';
+        mainRow['عدد المعلمين المغطين'] = 0;
       }
       
-      // Add incidents
+      // Add incidents with full details
       if (report.incidents && report.incidents.length > 0) {
-        mainRow['الحوادث والمخالفات'] = report.incidents.map((inc, i) => 
-          `${i + 1}. ${inc.description} (الإجراء: ${inc.action})`
-        ).join(' | ');
+        const incidentsDetails = report.incidents.map((inc, i) => 
+          `${i + 1}. الحادثة: ${inc.description}\n   الإجراء المتخذ: ${inc.action}`
+        ).join('\n\n');
+        mainRow['الحوادث والمخالفات - التفاصيل'] = incidentsDetails;
+        mainRow['عدد الحوادث'] = report.incidents.length;
       } else {
-        mainRow['الحوادث والمخالفات'] = '-';
+        mainRow['الحوادث والمخالفات - التفاصيل'] = '-';
+        mainRow['عدد الحوادث'] = 0;
       }
       
       // Add movement classes
@@ -196,63 +252,128 @@ const VicePrincipalDashboard = () => {
         mainRow['الصفوف المتابعة للتنقل'] = '-';
       }
       
-      // Add notes
-      mainRow['ملاحظات الانضباط'] = report.student_discipline_notes || '-';
-      mainRow['ملاحظات النظافة'] = report.classroom_cleanliness_notes || '-';
-      mainRow['ملاحظات الالتزام'] = report.teacher_attendance_notes || '-';
-      mainRow['ملاحظات التنقل'] = report.student_movement_notes || '-';
+      // Add all notes
+      mainRow['ملاحظات انضباط الطلاب'] = report.student_discipline_notes || '-';
+      mainRow['ملاحظات نظافة الفصول'] = report.classroom_cleanliness_notes || '-';
+      mainRow['ملاحظات التزام المعلمين'] = report.teacher_attendance_notes || '-';
+      mainRow['ملاحظات تنقل الطلاب'] = report.student_movement_notes || '-';
       mainRow['الملاحظات العامة'] = report.general_notes || '-';
       
       excelData.push(mainRow);
     });
 
-    // Create worksheet
+    // Add summary statistics at the end
+    const totalStudentsAbsent = reportsToExport.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
+    const totalLateTeachers = reportsToExport.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
+    const totalAbsentTeachers = reportsToExport.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
+    const totalCoveringTeachers = reportsToExport.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
+    const totalIncidents = reportsToExport.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+    
+    const avgDiscipline = (reportsToExport.reduce((sum, r) => sum + r.student_discipline, 0) / reportsToExport.length).toFixed(1);
+    const avgCleanliness = (reportsToExport.reduce((sum, r) => sum + r.classroom_cleanliness, 0) / reportsToExport.length).toFixed(1);
+    const avgAttendance = (reportsToExport.reduce((sum, r) => sum + r.teacher_attendance_rate, 0) / reportsToExport.length).toFixed(1);
+    const avgBehavior = (reportsToExport.reduce((sum, r) => sum + r.general_behavior, 0) / reportsToExport.length).toFixed(1);
+
+    // Add empty row
+    excelData.push({});
+    
+    // Add summary row
+    excelData.push({
+      '#': '',
+      'التاريخ': '📊 الإحصائيات الإجمالية',
+      'اليوم': '',
+      'انضباط الطلاب': `${avgDiscipline}/10`,
+      'نظافة الفصول': `${avgCleanliness}/10`,
+      'التزام المعلمين': `${avgAttendance}/10`,
+      'السلوك العام': `${avgBehavior}/10`,
+      'عدد الطلاب الغائبين': totalStudentsAbsent,
+      'المعلمون المتأخرون': '',
+      'عدد المعلمين المتأخرين': totalLateTeachers,
+      'المعلمون الغائبون': '',
+      'عدد المعلمين الغائبين': totalAbsentTeachers,
+      'المعلمون الذين غطوا الحصص': '',
+      'عدد المعلمين المغطين': totalCoveringTeachers,
+      'الحوادث والمخالفات - التفاصيل': '',
+      'عدد الحوادث': totalIncidents,
+      'الصفوف المتابعة للتنقل': '',
+      'ملاحظات انضباط الطلاب': '',
+      'ملاحظات نظافة الفصول': '',
+      'ملاحظات التزام المعلمين': '',
+      'ملاحظات تنقل الطلاب': '',
+      'الملاحظات العامة': `إجمالي ${reportsToExport.length} تقرير`
+    });
+
+    // Create worksheet with proper styling
     const worksheet = XLSX.utils.json_to_sheet(excelData);
     
     // Set column widths for better readability
     worksheet['!cols'] = [
-      { wch: 5 },  // #
-      { wch: 15 }, // التاريخ
-      { wch: 12 }, // انضباط الطلاب
-      { wch: 12 }, // نظافة الفصول
-      { wch: 12 }, // التزام المعلمين
-      { wch: 12 }, // السلوك العام
-      { wch: 15 }, // عدد الطلاب الغائبين
-      { wch: 40 }, // المعلمون المتأخرون
-      { wch: 40 }, // المعلمون الغائبون
-      { wch: 40 }, // المعلمون المغطون
-      { wch: 50 }, // الحوادث والمخالفات
-      { wch: 30 }, // الصفوف المتابعة للتنقل
-      { wch: 30 }, // ملاحظات الانضباط
-      { wch: 30 }, // ملاحظات النظافة
-      { wch: 30 }, // ملاحظات الالتزام
-      { wch: 30 }, // ملاحظات التنقل
-      { wch: 40 }  // الملاحظات العامة
+      { wch: 5 },   // #
+      { wch: 25 },  // التاريخ
+      { wch: 10 },  // اليوم
+      { wch: 12 },  // انضباط الطلاب
+      { wch: 12 },  // نظافة الفصول
+      { wch: 12 },  // التزام المعلمين
+      { wch: 12 },  // السلوك العام
+      { wch: 18 },  // عدد الطلاب الغائبين
+      { wch: 50 },  // المعلمون المتأخرون
+      { wch: 20 },  // عدد المعلمين المتأخرين
+      { wch: 50 },  // المعلمون الغائبون
+      { wch: 20 },  // عدد المعلمين الغائبين
+      { wch: 50 },  // المعلمون المغطون
+      { wch: 20 },  // عدد المعلمين المغطين
+      { wch: 60 },  // الحوادث - التفاصيل
+      { wch: 15 },  // عدد الحوادث
+      { wch: 40 },  // الصفوف المتابعة
+      { wch: 35 },  // ملاحظات الانضباط
+      { wch: 35 },  // ملاحظات النظافة
+      { wch: 35 },  // ملاحظات الالتزام
+      { wch: 35 },  // ملاحظات التنقل
+      { wch: 45 }   // الملاحظات العامة
     ];
+
+    // Enable text wrapping for long content
+    const range = XLSX.utils.decode_range(worksheet['!ref']);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+        if (!worksheet[cellAddress]) continue;
+        if (!worksheet[cellAddress].s) worksheet[cellAddress].s = {};
+        worksheet[cellAddress].s.alignment = { wrapText: true, vertical: 'top' };
+      }
+    }
 
     // Create workbook
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'تقارير المشرفين التفصيلية');
 
-    // Generate filename with date range
-    let filename = 'تقارير_المشرفين_تفصيلية';
-    if (exportStartDate && exportEndDate) {
+    // Generate filename with appropriate description
+    let filename = 'تقارير_المشرفين_شاملة';
+    if (exportFilterType === "daily") {
+      filename += `_يوم_${new Date().toLocaleDateString('ar-SA')}`;
+    } else if (exportFilterType === "weekly") {
+      filename += `_أسبوعي`;
+    } else if (exportFilterType === "monthly") {
+      const monthName = new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'long' });
+      filename += `_شهر_${monthName}`;
+    } else if (exportFilterType === "custom" && exportStartDate && exportEndDate) {
       filename += `_من_${exportStartDate}_إلى_${exportEndDate}`;
-    } else if (exportStartDate) {
+    } else if (exportFilterType === "custom" && exportStartDate) {
       filename += `_من_${exportStartDate}`;
-    } else if (exportEndDate) {
+    } else if (exportFilterType === "custom" && exportEndDate) {
       filename += `_حتى_${exportEndDate}`;
     } else {
-      filename += `_${new Date().toISOString().split('T')[0]}`;
+      filename += `_جميع_التقارير`;
     }
     filename += '.xlsx';
 
     // Download
     XLSX.writeFile(workbook, filename);
-    toast.success(`تم تصدير ${reportsToExport.length} تقرير بنجاح`);
+    toast.success(`تم تصدير ${reportsToExport.length} تقرير بنجاح مع كافة التفاصيل`);
     setShowExportDialog(false);
     setExportStartDate("");
     setExportEndDate("");
+    setExportFilterType("all");
   };
 
   const addProblem = () => {
