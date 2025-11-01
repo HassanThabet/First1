@@ -225,6 +225,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Implemented Arabic PDF export using pdfmake with Cairo font. Added comprehensive table with all activity details, statistics summary, and proper RTL layout"
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed 'Malformed table row' error by ensuring all table cells are strings and handling undefined values properly. Added filters to remove undefined teacher names and converted all numeric values to strings."
 
   - task: "Social Specialist Dashboard with modal view and filtering"
     implemented: true
