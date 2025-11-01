@@ -337,9 +337,9 @@ const ActivitiesDashboard = () => {
                   {}
                 ],
                 [
-                  { text: `إجمالي الأنشطة: ${stats.totalActivities}`, alignment: 'center' },
-                  { text: `إجمالي المشاركين: ${stats.totalParticipants}`, alignment: 'center' },
-                  { text: `متوسط التفاعل: ${stats.avgInteraction}/10`, alignment: 'center' }
+                  { text: `إجمالي الأنشطة: ${stats.totalActivities || 0}`, alignment: 'center' },
+                  { text: `إجمالي المشاركين: ${stats.totalParticipants || 0}`, alignment: 'center' },
+                  { text: `متوسط التفاعل: ${stats.avgInteraction || 0}/10`, alignment: 'center' }
                 ]
               ]
             },
