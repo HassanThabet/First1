@@ -19,6 +19,7 @@ const VicePrincipalDashboard = () => {
   const [activeTab, setActiveTab] = useState("create");
   const [supervisorReports, setSupervisorReports] = useState([]);
   const [myReports, setMyReports] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingReport, setEditingReport] = useState(null);
   const [selectedSupervisorReport, setSelectedSupervisorReport] = useState(null);
@@ -45,15 +46,23 @@ const VicePrincipalDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [supervisorRes, myReportsRes] = await Promise.all([
+      const [supervisorRes, myReportsRes, usersRes] = await Promise.all([
         axios.get(`${API}/reports/supervisor`),
-        axios.get(`${API}/reports/vice-principal`)
+        axios.get(`${API}/reports/vice-principal`),
+        axios.get(`${API}/users`)
       ]);
       setSupervisorReports(supervisorRes.data);
       setMyReports(myReportsRes.data);
+      setUsers(usersRes.data);
     } catch (error) {
       toast.error("فشل تحميل البيانات");
     }
+  };
+
+  // Helper function to get user name by ID
+  const getUserName = (userId) => {
+    const foundUser = users.find(u => u.id === userId);
+    return foundUser ? foundUser.username : 'غير معروف';
   };
 
   // Calculate merged statistics from supervisor reports
