@@ -854,7 +854,16 @@ const SocialSpecialistDashboard = () => {
             {/* Period Filter */}
             <Card>
               <CardHeader>
-                <CardTitle>فترة التقرير المدمج</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>فترة التقرير المدمج</CardTitle>
+                  <Button 
+                    onClick={exportToPDF}
+                    className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700"
+                  >
+                    <FileDown className="w-4 h-4 ml-2" />
+                    تصدير PDF
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
