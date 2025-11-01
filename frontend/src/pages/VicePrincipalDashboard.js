@@ -27,6 +27,7 @@ const VicePrincipalDashboard = () => {
   // Export filters
   const [exportStartDate, setExportStartDate] = useState("");
   const [exportEndDate, setExportEndDate] = useState("");
+  const [exportFilterType, setExportFilterType] = useState("all"); // all, daily, weekly, monthly
 
   const [formData, setFormData] = useState({
     problems: [],
