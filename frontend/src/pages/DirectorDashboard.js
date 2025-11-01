@@ -540,7 +540,7 @@ const DirectorDashboard = () => {
                 <CardTitle>التصفية</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">الفرع</label>
                     <Input 
@@ -582,6 +582,17 @@ const DirectorDashboard = () => {
                         <SelectItem value="monthly">هذا الشهر</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">تصدير التقرير</label>
+                    <Button 
+                      onClick={exportToPDF}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <FileDown className="w-4 h-4 ml-2" />
+                      تصدير PDF
+                    </Button>
                   </div>
                 </div>
                 
