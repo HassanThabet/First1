@@ -55,6 +55,10 @@ const SupervisorDashboard = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    filterReports();
+  }, [dateFilter, weekFilter, viewMode, allReports]);
+
   const fetchData = async () => {
     try {
       const [teachersRes, subjectsRes, classroomsRes, reportsRes] = await Promise.all([
@@ -66,10 +70,51 @@ const SupervisorDashboard = () => {
       setTeachers(teachersRes.data);
       setSubjects(subjectsRes.data);
       setClassrooms(classroomsRes.data);
+      setAllReports(reportsRes.data);
       setReports(reportsRes.data);
     } catch (error) {
       toast.error("فشل تحميل البيانات");
     }
+  };
+
+  const filterReports = () => {
+    let filtered = [...allReports];
+
+    if (dateFilter) {
+      filtered = filtered.filter(r => r.date === dateFilter);
+    }
+
+    if (weekFilter) {
+      // Filter by week (Saturday to Wednesday)
+      const weekStart = new Date(weekFilter);
+      const weekEnd = new Date(weekFilter);
+      weekEnd.setDate(weekEnd.getDate() + 4); // 5 days (Sat-Wed)
+      
+      filtered = filtered.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    }
+
+    setReports(filtered);
+  };
+
+  const getWeeklyAverage = () => {
+    if (reports.length === 0) return null;
+    
+    const totals = reports.reduce((acc, report) => ({
+      discipline: acc.discipline + report.student_discipline,
+      cleanliness: acc.cleanliness + report.classroom_cleanliness,
+      attendance: acc.attendance + report.teacher_attendance_rate,
+      behavior: acc.behavior + report.general_behavior
+    }), { discipline: 0, cleanliness: 0, attendance: 0, behavior: 0 });
+
+    return {
+      discipline: (totals.discipline / reports.length).toFixed(1),
+      cleanliness: (totals.cleanliness / reports.length).toFixed(1),
+      attendance: (totals.attendance / reports.length).toFixed(1),
+      behavior: (totals.behavior / reports.length).toFixed(1)
+    };
   };
 
   const addLateTeacher = () => {
