@@ -298,11 +298,11 @@ async def create_user(user_data: UserCreate, current_user: dict = Depends(get_cu
 
 @api_router.get("/users", response_model=List[User])
 async def get_users(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["admin", "chairman", "director"]:
+    if current_user["role"] not in ["admin", "chairman", "director", "vice_principal"]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
     query = {}
-    if current_user["role"] == "director":
+    if current_user["role"] in ["director", "vice_principal"]:
         query["branch"] = current_user["branch"]
     
     users = await db.users.find(query, {"_id": 0, "password": 0}).to_list(1000)
