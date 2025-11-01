@@ -1807,7 +1807,7 @@ class BackendTester:
                 if successful_logins:
                     print(f"\n✅ Successfully logged in VP users:")
                     for login in successful_logins:
-                        print(f"   - {login['username']} (ID: {login['user_id']}, Branch: {login['branch']})")
+                        print(f"   - {login['username']} (Password: '{login['password']}', ID: {login['user_id']}, Branch: {login['branch']})")
                         
                 if failed_logins:
                     print(f"\n❌ Failed login attempts:")
