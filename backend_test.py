@@ -1902,4 +1902,5 @@ class BackendTester:
 
 if __name__ == "__main__":
     tester = BackendTester()
-    tester.run_all_tests()
+    # Run only the VP credential test as requested
+    tester.run_vp_credential_test_only()
