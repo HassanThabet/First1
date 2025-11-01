@@ -349,22 +349,6 @@ const ChairmanDashboard = () => {
                     </div>
                   </div>
                 </div>
-                
-                {selectedVPForStats !== "all" && (
-                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                      <strong>📊 الإحصائيات الحالية:</strong> تعرض بيانات {stats.supervisorCount} مشرف تابع للوكيل المختار
-                    </p>
-                  </div>
-                )}
-                
-                {selectedBranch !== "all" && selectedVPForStats === "all" && (
-                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm text-green-800">
-                      <strong>🏢 الفرع المختار:</strong> {selectedBranch === "boys" ? "البنين" : "البنات"}
-                    </p>
-                  </div>
-                )}
               </CardContent>
             </Card>
 
