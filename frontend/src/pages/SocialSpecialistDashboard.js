@@ -178,33 +178,48 @@ const SocialSpecialistDashboard = () => {
               <CardHeader>
                 <CardTitle>الحالات الطلابية</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label>الحالات النفسية</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.psychological_cases}
-                    onChange={(e) => setFormData({ ...formData, psychological_cases: parseInt(e.target.value) || 0 })}
-                  />
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>الحالات النفسية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.psychological_cases}
+                      onChange={(e) => setFormData({ ...formData, psychological_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div>
+                    <Label>الحالات الأكاديمية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.academic_cases}
+                      onChange={(e) => setFormData({ ...formData, academic_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div>
+                    <Label>الحالات السلوكية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.behavioral_cases}
+                      onChange={(e) => setFormData({ ...formData, behavioral_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <Label>الحالات الأكاديمية</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.academic_cases}
-                    onChange={(e) => setFormData({ ...formData, academic_cases: parseInt(e.target.value) || 0 })}
-                  />
-                </div>
-                <div>
-                  <Label>الحالات السلوكية</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.behavioral_cases}
-                    onChange={(e) => setFormData({ ...formData, behavioral_cases: parseInt(e.target.value) || 0 })}
-                  />
+                
+                {/* Total Cases Display */}
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border-2 border-purple-300">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-purple-800 mb-1">إجمالي عدد الحالات الطلابية</p>
+                      <p className="text-xs text-purple-600">مجموع جميع الحالات (نفسية + أكاديمية + سلوكية)</p>
+                    </div>
+                    <div className="text-4xl font-bold text-purple-700">
+                      {(formData.psychological_cases || 0) + (formData.academic_cases || 0) + (formData.behavioral_cases || 0)}
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
