@@ -270,24 +270,24 @@ const ActivitiesDashboard = () => {
       // Prepare activities table data
       const activitiesData = allActivities.map((activity, index) => {
         const supervisors = activity.supervisors && activity.supervisors.length > 0 
-          ? activity.supervisors.map(id => getTeacherName(id)).join(', ')
+          ? activity.supervisors.map(id => getTeacherName(id)).filter(name => name).join(', ') || '-'
           : activity.supervisor || '-';
 
         const cooperatingTeachers = activity.cooperating_teachers && activity.cooperating_teachers.length > 0
-          ? activity.cooperating_teachers.map(id => getTeacherName(id)).join(', ')
+          ? activity.cooperating_teachers.map(id => getTeacherName(id)).filter(name => name).join(', ') || '-'
           : '-';
 
         return [
-          index + 1,
-          activity.name || '-',
-          new Date(activity.date).toLocaleDateString('ar-SA'),
-          activity.type || '-',
-          supervisors,
-          cooperatingTeachers,
-          activity.target_group || '-',
-          activity.participants_count || 0,
-          `${activity.interaction_rate || 0}/10`,
-          activity.educational_impact || '-'
+          String(index + 1),
+          String(activity.name || '-'),
+          String(new Date(activity.date).toLocaleDateString('ar-SA')),
+          String(activity.type || '-'),
+          String(supervisors),
+          String(cooperatingTeachers),
+          String(activity.target_group || '-'),
+          String(activity.participants_count || 0),
+          String(`${activity.interaction_rate || 0}/10`),
+          String(activity.educational_impact || '-')
         ];
       });
 
