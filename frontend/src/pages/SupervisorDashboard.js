@@ -24,6 +24,7 @@ const SupervisorDashboard = () => {
 
   // Form state
   const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
     student_discipline: 10,
     student_discipline_notes: "",
     classroom_cleanliness: 10,
@@ -41,6 +42,8 @@ const SupervisorDashboard = () => {
     covering_teachers: [],
     absent_students_count: 0
   });
+  
+  const [editingReport, setEditingReport] = useState(null);
 
   useEffect(() => {
     fetchData();
