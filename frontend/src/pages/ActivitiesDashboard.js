@@ -11,7 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, X, Eye, FileText, BarChart3 } from "lucide-react";
+import { Plus, X, Eye, FileText, BarChart3, FileDown } from "lucide-react";
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const ActivitiesDashboard = () => {
   const { user } = useContext(AuthContext);
