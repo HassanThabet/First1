@@ -963,10 +963,16 @@ const VicePrincipalDashboard = () => {
               <h3 className="text-xl font-bold text-gray-800">
                 تقارير المشرفين ({supervisorReports.length})
               </h3>
-              <Button onClick={exportToExcel} variant="outline">
-                <FileDown className="w-4 h-4 ml-2" />
-                تصدير الكل
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={exportToPDF} variant="outline" className="text-red-600 border-red-300 hover:bg-red-50">
+                  <FileDown className="w-4 h-4 ml-2" />
+                  PDF
+                </Button>
+                <Button onClick={exportToExcel} variant="outline">
+                  <FileDown className="w-4 h-4 ml-2" />
+                  Excel
+                </Button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3">
