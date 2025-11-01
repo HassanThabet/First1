@@ -28,6 +28,7 @@ const ChairmanDashboard = () => {
   const [selectedVPForStats, setSelectedVPForStats] = useState("all"); // For overview tab
   const [selectedEmployee, setSelectedEmployee] = useState("all");
   const [timeFilter, setTimeFilter] = useState("all");
+  const [reportTypeFilter, setReportTypeFilter] = useState("all"); // all, supervisor, activities, social, quality
   
   // Modal states
   const [selectedReport, setSelectedReport] = useState(null);
