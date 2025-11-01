@@ -231,10 +231,13 @@ const ChairmanDashboard = () => {
                 <CardTitle>التصفية</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">الفرع</label>
-                    <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+                    <Select value={selectedBranch} onValueChange={(value) => {
+                      setSelectedBranch(value);
+                      setSelectedVPForStats("all");
+                    }}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -242,6 +245,28 @@ const ChairmanDashboard = () => {
                         <SelectItem value="all">الفرعين (البنين والبنات)</SelectItem>
                         <SelectItem value="boys">البنين</SelectItem>
                         <SelectItem value="girls">البنات</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">الوكيل</label>
+                    <Select value={selectedVPForStats} onValueChange={setSelectedVPForStats}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الوكلاء</SelectItem>
+                        {users
+                          .filter(u => 
+                            u.role === "vice_principal" && 
+                            (selectedBranch === "all" || u.branch === selectedBranch)
+                          )
+                          .map(vp => (
+                            <SelectItem key={vp.id} value={vp.id}>
+                              {vp.username} - {vp.branch === "boys" ? "البنين" : "البنات"}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -261,6 +286,22 @@ const ChairmanDashboard = () => {
                     </Select>
                   </div>
                 </div>
+                
+                {selectedVPForStats !== "all" && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">
+                      <strong>📊 الإحصائيات الحالية:</strong> تعرض بيانات {stats.supervisorCount} مشرف تابع للوكيل المختار
+                    </p>
+                  </div>
+                )}
+                
+                {selectedBranch !== "all" && selectedVPForStats === "all" && (
+                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      <strong>🏢 الفرع المختار:</strong> {selectedBranch === "boys" ? "البنين" : "البنات"}
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
