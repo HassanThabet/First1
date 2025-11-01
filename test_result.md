@@ -315,8 +315,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Arabic PDF Export for Activities Dashboard"
-    - "Arabic PDF Export for Social Specialist Dashboard"
+    - "Enhanced Director Dashboard with comprehensive statistics"
+    - "PDF Export for Director Dashboard"
+    - "PDF Export for Vice-Principal Dashboard"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
