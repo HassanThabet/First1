@@ -28,11 +28,11 @@ const DirectorDashboard = () => {
   
   // Filter states
   const [selectedEmployee, setSelectedEmployee] = useState("all");
-  const [selectedVPForStats, setSelectedVPForStats] = useState("all"); // For overview tab
   const [timeFilter, setTimeFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
-  const [reportTypeFilter, setReportTypeFilter] = useState("all"); // all, supervisor, activities, social, quality, educational
+  const [reportTypeFilter, setReportTypeFilter] = useState("all"); // all, vice_principal, supervisor, activities, social, quality
+  const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all"); // For specific employee within type
   
   // Modal states
   const [selectedReport, setSelectedReport] = useState(null);
