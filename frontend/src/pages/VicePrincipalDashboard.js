@@ -64,10 +64,16 @@ const VicePrincipalDashboard = () => {
         mySupervisorIds.includes(r.user_id)
       );
       
+      console.log("Vice Principal ID:", user.id);
+      console.log("Vice Principal Branch:", user.branch);
+      console.log("My Supervisors:", mySupervisors);
+      console.log("Filtered Supervisor Reports:", filteredSupervisorReports);
+      
       setSupervisorReports(filteredSupervisorReports);
       setMyReports(myReportsRes.data);
       setUsers(allUsers);
     } catch (error) {
+      console.error("Error fetching data:", error);
       toast.error("فشل تحميل البيانات");
     }
   };
