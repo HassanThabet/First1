@@ -207,11 +207,14 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Users Management API endpoints working correctly. Successfully tested GET /api/users (retrieved 23 users), verified admin user exists in system. All operations functional with proper authentication and authorization."
+      - working: true
+        agent: "main"
+        comment: "🔧 FIXED: Added vice_principal to roles_allowed for GET /api/users endpoint. Previously only admin, chairman, and director could access this endpoint, causing 403 Forbidden error for Vice-Principal dashboard. Backend restarted and ready for testing."
 
   - task: "Admin Cleanup Orphaned Reports API endpoint"
     implemented: true
