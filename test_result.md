@@ -257,3 +257,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Completed Phase 1: Enhanced Vice-Principal Excel export with full details and date range filtering. Completed Phase 2 (partial): Implemented modal view and filtering for Activities, Social Specialist, and Quality dashboards. Still need to implement Educational Supervision, Director, and Chairman dashboards. Ready for testing of completed components."
+  - agent: "main"
+    message: "Completed Director and Chairman dashboards with comprehensive statistics and employee report viewing. Added advanced filtering: branch (for Chairman), VP selection (to see their supervisors' reports), and time filters (daily/weekly/monthly). All statistics update dynamically based on selected filters."
