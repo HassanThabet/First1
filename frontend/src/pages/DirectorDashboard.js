@@ -72,13 +72,21 @@ const DirectorDashboard = () => {
     }
   };
 
-  // Helper function to filter reports by time
+  // Helper function to filter reports by time and employee
   const filterReportsByTime = (reports) => {
+    let filtered = reports;
+    
+    // Filter by specific employee if selected
+    if (selectedSpecificEmployee !== "all") {
+      filtered = filtered.filter(r => r.user_id === selectedSpecificEmployee);
+    }
+    
+    // Filter by time
     const today = new Date();
     
     if (timeFilter === "daily") {
       const todayStr = today.toISOString().split('T')[0];
-      return reports.filter(r => r.date === todayStr);
+      return filtered.filter(r => r.date === todayStr);
     } else if (timeFilter === "weekly") {
       const currentDay = today.getDay();
       const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
@@ -89,20 +97,20 @@ const DirectorDashboard = () => {
       weekEnd.setDate(weekStart.getDate() + 4);
       weekEnd.setHours(23, 59, 59, 999);
       
-      return reports.filter(r => {
+      return filtered.filter(r => {
         const reportDate = new Date(r.date);
         return reportDate >= weekStart && reportDate <= weekEnd;
       });
     } else if (timeFilter === "monthly") {
       const currentMonth = today.getMonth();
       const currentYear = today.getFullYear();
-      return reports.filter(r => {
+      return filtered.filter(r => {
         const reportDate = new Date(r.date);
         return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
       });
     }
     
-    return reports;
+    return filtered;
   };
 
   // Calculate overall statistics
