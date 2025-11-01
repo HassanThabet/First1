@@ -237,18 +237,18 @@ const SocialSpecialistDashboard = () => {
 
       // Prepare reports data
       const reportsData = mergedReports.map((report, index) => {
-        const total = report.psychological_cases + report.academic_cases + report.behavioral_cases;
+        const total = (report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0);
         return [
-          index + 1,
-          new Date(report.date).toLocaleDateString('ar-SA'),
-          total,
-          report.psychological_cases,
-          report.academic_cases,
-          report.behavioral_cases,
-          report.sessions_count,
-          report.family_contacts,
-          report.referrals_out,
-          report.follow_ups
+          String(index + 1),
+          String(new Date(report.date).toLocaleDateString('ar-SA')),
+          String(total),
+          String(report.psychological_cases || 0),
+          String(report.academic_cases || 0),
+          String(report.behavioral_cases || 0),
+          String(report.sessions_count || 0),
+          String(report.family_contacts || 0),
+          String(report.referrals_out || 0),
+          String(report.follow_ups || 0)
         ];
       });
 
