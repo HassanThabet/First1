@@ -267,13 +267,23 @@ const DirectorDashboard = () => {
         periodText = 'تقرير أسبوعي';
       } else if (timeFilter === 'monthly') {
         periodText = 'تقرير شهري';
+      } else if (timeFilter === 'custom' && customStartDate && customEndDate) {
+        periodText = `من ${customStartDate} إلى ${customEndDate}`;
       }
 
-      // Prepare VP text
-      let vpText = 'جميع الوكلاء';
-      if (selectedVPForStats !== 'all') {
-        const vp = users.find(u => u.id === selectedVPForStats);
-        vpText = vp ? vp.username : 'غير محدد';
+      // Prepare report type text
+      let reportTypeText = 'جميع التقارير';
+      if (reportTypeFilter === 'vice_principal') reportTypeText = 'الوكلاء';
+      else if (reportTypeFilter === 'supervisor') reportTypeText = 'المشرفين';
+      else if (reportTypeFilter === 'activities') reportTypeText = 'الأنشطة';
+      else if (reportTypeFilter === 'social') reportTypeText = 'الأخصائي الاجتماعي';
+      else if (reportTypeFilter === 'quality') reportTypeText = 'الجودة';
+
+      // Prepare employee text
+      let employeeText = 'الجميع';
+      if (selectedSpecificEmployee !== 'all') {
+        const emp = users.find(u => u.id === selectedSpecificEmployee);
+        employeeText = emp ? emp.username : 'غير محدد';
       }
 
       const docDefinition = {
