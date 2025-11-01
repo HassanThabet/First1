@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { toast } from "sonner";
-import { Eye, BarChart3, Users as UsersIcon, TrendingUp } from "lucide-react";
+import { Eye, BarChart3, Users as UsersIcon, TrendingUp, FileDown } from "lucide-react";
+import pdfMake from '../utils/pdfConfig';
 
 const DirectorDashboard = () => {
   const { user } = useContext(AuthContext);
