@@ -93,6 +93,77 @@ const VicePrincipalDashboard = () => {
     };
   };
 
+  // Export to Excel
+  const exportToExcel = () => {
+    if (supervisorReports.length === 0) {
+      toast.error("لا توجد تقارير للتصدير");
+      return;
+    }
+
+    // Prepare data for Excel
+    const excelData = supervisorReports.map(report => ({
+      'التاريخ': new Date(report.date).toLocaleDateString('ar-SA'),
+      'انضباط الطلاب': `${report.student_discipline}/10`,
+      'نظافة الفصول': `${report.classroom_cleanliness}/10`,
+      'التزام المعلمين': `${report.teacher_attendance_rate}/10`,
+      'السلوك العام': `${report.general_behavior}/10`,
+      'عدد الطلاب الغائبين': report.absent_students_count || 0,
+      'عدد المعلمين المتأخرين': report.late_teachers?.length || 0,
+      'عدد المعلمين الغائبين': report.absent_teachers?.length || 0,
+      'عدد المعلمين المغطين': report.covering_teachers?.length || 0,
+      'عدد الحوادث': report.incidents?.length || 0,
+      'الملاحظات العامة': report.general_notes || '-'
+    }));
+
+    // Add summary row
+    const stats = getMergedStatistics();
+    if (stats) {
+      excelData.push({
+        'التاريخ': 'المتوسط العام',
+        'انضباط الطلاب': `${stats.averages.discipline}/10`,
+        'نظافة الفصول': `${stats.averages.cleanliness}/10`,
+        'التزام المعلمين': `${stats.averages.attendance}/10`,
+        'السلوك العام': `${stats.averages.behavior}/10`,
+        'عدد الطلاب الغائبين': stats.totals.absentStudents,
+        'عدد المعلمين المتأخرين': stats.totals.lateTeachers,
+        'عدد المعلمين الغائبين': stats.totals.absentTeachers,
+        'عدد المعلمين المغطين': stats.totals.coveringTeachers,
+        'عدد الحوادث': stats.totals.incidents,
+        'الملاحظات العامة': `إجمالي ${stats.totals.reports} تقرير`
+      });
+    }
+
+    // Create worksheet
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    
+    // Set column widths
+    worksheet['!cols'] = [
+      { wch: 15 }, // التاريخ
+      { wch: 15 }, // انضباط الطلاب
+      { wch: 15 }, // نظافة الفصول
+      { wch: 15 }, // التزام المعلمين
+      { wch: 15 }, // السلوك العام
+      { wch: 20 }, // عدد الطلاب الغائبين
+      { wch: 20 }, // عدد المعلمين المتأخرين
+      { wch: 20 }, // عدد المعلمين الغائبين
+      { wch: 20 }, // عدد المعلمين المغطين
+      { wch: 15 }, // عدد الحوادث
+      { wch: 30 }  // الملاحظات العامة
+    ];
+
+    // Create workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'تقارير المشرفين');
+
+    // Generate filename with date
+    const today = new Date().toLocaleDateString('ar-SA').replace(/\//g, '-');
+    const filename = `تقارير_المشرفين_${today}.xlsx`;
+
+    // Download
+    XLSX.writeFile(workbook, filename);
+    toast.success("تم تصدير التقارير بنجاح");
+  };
+
   const addProblem = () => {
     setFormData({
       ...formData,
