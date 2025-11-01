@@ -733,6 +733,7 @@ const SupervisorDashboard = () => {
                         <SelectItem value="all">جميع التقارير</SelectItem>
                         <SelectItem value="daily">يومي</SelectItem>
                         <SelectItem value="weekly">أسبوعي</SelectItem>
+                        <SelectItem value="monthly">شهري</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -759,12 +760,24 @@ const SupervisorDashboard = () => {
                     </div>
                   )}
                   
+                  {viewMode === "monthly" && (
+                    <div>
+                      <Label>اختر الشهر</Label>
+                      <Input
+                        type="month"
+                        value={monthFilter}
+                        onChange={(e) => setMonthFilter(e.target.value)}
+                      />
+                    </div>
+                  )}
+                  
                   <div className="flex items-end">
                     <Button
                       variant="outline"
                       onClick={() => {
                         setDateFilter("");
                         setWeekFilter("");
+                        setMonthFilter("");
                         setViewMode("all");
                       }}
                     >
