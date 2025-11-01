@@ -296,7 +296,15 @@ const AdminDashboard = () => {
                       )}
                       <div>
                         <Label>الدور</Label>
-                        <Select value={userForm.role} onValueChange={(value) => setUserForm({ ...userForm, role: value })}>
+                        <Select value={userForm.role} onValueChange={(value) => {
+                          // When selecting chairman, automatically set branch to "both"
+                          if (value === "chairman") {
+                            setUserForm({ ...userForm, role: value, branch: "both" });
+                          } else {
+                            // For other roles, keep the current branch or reset to "boys"
+                            setUserForm({ ...userForm, role: value, branch: userForm.branch === "both" ? "boys" : userForm.branch });
+                          }
+                        }}>
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -312,18 +320,27 @@ const AdminDashboard = () => {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div>
-                        <Label>الفرع</Label>
-                        <Select value={userForm.branch} onValueChange={(value) => setUserForm({ ...userForm, branch: value })}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="boys">البنين</SelectItem>
-                            <SelectItem value="girls">البنات</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                      {userForm.role !== "chairman" && (
+                        <div>
+                          <Label>الفرع</Label>
+                          <Select value={userForm.branch} onValueChange={(value) => setUserForm({ ...userForm, branch: value })}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="boys">البنين</SelectItem>
+                              <SelectItem value="girls">البنات</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
+                      {userForm.role === "chairman" && (
+                        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                          <p className="text-sm text-blue-800">
+                            <strong>ℹ️ ملاحظة:</strong> رئيس مجلس الإدارة له صلاحية الوصول لكلا الفرعين (البنين والبنات) تلقائياً
+                          </p>
+                        </div>
+                      )}
                       {userForm.role === "supervisor" && (
                         <div>
                           <Label>الوكيل المسؤول</Label>
