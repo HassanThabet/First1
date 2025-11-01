@@ -41,6 +41,52 @@ const VicePrincipalDashboard = () => {
     }
   };
 
+  // Calculate merged statistics from supervisor reports
+  const getMergedStatistics = () => {
+    if (supervisorReports.length === 0) return null;
+
+    const totals = supervisorReports.reduce((acc, report) => ({
+      discipline: acc.discipline + report.student_discipline,
+      cleanliness: acc.cleanliness + report.classroom_cleanliness,
+      attendance: acc.attendance + report.teacher_attendance_rate,
+      behavior: acc.behavior + report.general_behavior,
+      absentStudents: acc.absentStudents + (report.absent_students_count || 0),
+      lateTeachers: acc.lateTeachers + (report.late_teachers?.length || 0),
+      absentTeachers: acc.absentTeachers + (report.absent_teachers?.length || 0),
+      coveringTeachers: acc.coveringTeachers + (report.covering_teachers?.length || 0),
+      incidents: acc.incidents + (report.incidents?.length || 0)
+    }), {
+      discipline: 0,
+      cleanliness: 0,
+      attendance: 0,
+      behavior: 0,
+      absentStudents: 0,
+      lateTeachers: 0,
+      absentTeachers: 0,
+      coveringTeachers: 0,
+      incidents: 0
+    });
+
+    const count = supervisorReports.length;
+
+    return {
+      averages: {
+        discipline: (totals.discipline / count).toFixed(1),
+        cleanliness: (totals.cleanliness / count).toFixed(1),
+        attendance: (totals.attendance / count).toFixed(1),
+        behavior: (totals.behavior / count).toFixed(1)
+      },
+      totals: {
+        absentStudents: totals.absentStudents,
+        lateTeachers: totals.lateTeachers,
+        absentTeachers: totals.absentTeachers,
+        coveringTeachers: totals.coveringTeachers,
+        incidents: totals.incidents,
+        reports: count
+      }
+    };
+  };
+
   const addProblem = () => {
     setFormData({
       ...formData,
