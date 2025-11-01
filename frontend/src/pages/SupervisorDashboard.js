@@ -60,7 +60,7 @@ const SupervisorDashboard = () => {
 
   useEffect(() => {
     filterReports();
-  }, [dateFilter, weekFilter, viewMode, allReports]);
+  }, [dateFilter, weekFilter, monthFilter, viewMode, allReports]);
 
   const fetchData = async () => {
     try {
