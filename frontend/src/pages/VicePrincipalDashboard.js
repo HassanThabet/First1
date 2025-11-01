@@ -51,9 +51,22 @@ const VicePrincipalDashboard = () => {
         axios.get(`${API}/reports/vice-principal`),
         axios.get(`${API}/users`)
       ]);
-      setSupervisorReports(supervisorRes.data);
+      
+      // Filter supervisor reports to only show reports from supervisors assigned to this VP
+      const allUsers = usersRes.data;
+      const mySupervisors = allUsers.filter(u => 
+        u.role === "supervisor" && 
+        u.assigned_to === user.id &&
+        u.branch === user.branch
+      );
+      const mySupervisorIds = mySupervisors.map(s => s.id);
+      const filteredSupervisorReports = supervisorRes.data.filter(r => 
+        mySupervisorIds.includes(r.user_id)
+      );
+      
+      setSupervisorReports(filteredSupervisorReports);
       setMyReports(myReportsRes.data);
-      setUsers(usersRes.data);
+      setUsers(allUsers);
     } catch (error) {
       toast.error("فشل تحميل البيانات");
     }
