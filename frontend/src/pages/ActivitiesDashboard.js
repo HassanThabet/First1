@@ -125,6 +125,46 @@ const ActivitiesDashboard = () => {
     setActivities(updated);
   };
 
+  // Add supervisor to activity
+  const addSupervisor = (activityIndex, teacherId) => {
+    if (!teacherId) return;
+    const updated = [...activities];
+    if (!updated[activityIndex].supervisors.includes(teacherId)) {
+      updated[activityIndex].supervisors = [...updated[activityIndex].supervisors, teacherId];
+      setActivities(updated);
+    }
+  };
+
+  // Remove supervisor from activity
+  const removeSupervisor = (activityIndex, teacherId) => {
+    const updated = [...activities];
+    updated[activityIndex].supervisors = updated[activityIndex].supervisors.filter(id => id !== teacherId);
+    setActivities(updated);
+  };
+
+  // Add cooperating teacher to activity
+  const addCooperatingTeacher = (activityIndex, teacherId) => {
+    if (!teacherId) return;
+    const updated = [...activities];
+    if (!updated[activityIndex].cooperating_teachers.includes(teacherId)) {
+      updated[activityIndex].cooperating_teachers = [...updated[activityIndex].cooperating_teachers, teacherId];
+      setActivities(updated);
+    }
+  };
+
+  // Remove cooperating teacher from activity
+  const removeCooperatingTeacher = (activityIndex, teacherId) => {
+    const updated = [...activities];
+    updated[activityIndex].cooperating_teachers = updated[activityIndex].cooperating_teachers.filter(id => id !== teacherId);
+    setActivities(updated);
+  };
+
+  // Get teacher name by ID
+  const getTeacherName = (teacherId) => {
+    const teacher = teachers.find(t => t.id === teacherId);
+    return teacher ? teacher.name : teacherId;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
