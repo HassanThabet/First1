@@ -371,8 +371,18 @@ const VicePrincipalDashboard = () => {
               {/* Summary Card */}
               <Card className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
                 <CardHeader>
-                  <CardTitle className="text-2xl">
-                    إحصائيات مدمجة من {supervisorReports.length} تقرير
+                  <CardTitle className="flex items-center justify-between">
+                    <span className="text-2xl">
+                      إحصائيات مدمجة من {supervisorReports.length} تقرير
+                    </span>
+                    <Button
+                      onClick={exportToExcel}
+                      variant="secondary"
+                      className="bg-white text-cyan-700 hover:bg-cyan-50"
+                    >
+                      <FileDown className="w-4 h-4 ml-2" />
+                      تصدير إلى Excel
+                    </Button>
                   </CardTitle>
                 </CardHeader>
               </Card>
