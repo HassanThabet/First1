@@ -75,7 +75,23 @@ const ChairmanDashboard = () => {
 
   // Calculate overall statistics
   const getOverallStatistics = () => {
-    let reports = getFilteredReports();
+    let reports = [...supervisorReports];
+    
+    // Filter by branch first
+    if (selectedBranch !== "all") {
+      reports = reports.filter(r => r.branch === selectedBranch);
+    }
+    
+    // Filter by selected Vice Principal if chosen
+    if (selectedVPForStats !== "all") {
+      // Get all supervisors under this VP
+      const supervisorsUnderVP = users.filter(u => 
+        u.role === "supervisor" && 
+        u.assigned_to === selectedVPForStats
+      );
+      const supervisorIds = supervisorsUnderVP.map(s => s.id);
+      reports = reports.filter(r => supervisorIds.includes(r.user_id));
+    }
     
     // Apply time filter
     const today = new Date();
@@ -121,6 +137,15 @@ const ChairmanDashboard = () => {
     const avgBehavior = reports.length > 0 ?
       (reports.reduce((sum, r) => sum + r.general_behavior, 0) / reports.length).toFixed(1) : 0;
 
+    // Get supervisor count for the selected VP
+    let supervisorCount = 0;
+    if (selectedVPForStats !== "all") {
+      supervisorCount = users.filter(u => 
+        u.role === "supervisor" && 
+        u.assigned_to === selectedVPForStats
+      ).length;
+    }
+
     return {
       totalLateTeachers,
       totalAbsentTeachers,
@@ -131,7 +156,8 @@ const ChairmanDashboard = () => {
       avgCleanliness,
       avgAttendance,
       avgBehavior,
-      totalReports: reports.length
+      totalReports: reports.length,
+      supervisorCount
     };
   };
 
