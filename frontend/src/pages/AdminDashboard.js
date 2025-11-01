@@ -89,7 +89,7 @@ const AdminDashboard = () => {
       }
       setDialogOpen(false);
       setEditingItem(null);
-      setUserForm({ username: "", password: "", role: "supervisor", branch: "both", assigned_to: "" });
+      setUserForm({ username: "", password: "", role: "supervisor", branch: "boys", assigned_to: "" });
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.detail || "فشل العملية");
