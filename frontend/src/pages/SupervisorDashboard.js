@@ -614,8 +614,40 @@ const SupervisorDashboard = () => {
               data-testid="submit-report-button"
               className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-bold py-3"
             >
-              {loading ? "جاري الإرسال..." : "إرسال التقرير"}
+              {loading ? "جاري الإرسال..." : editingReport ? "تحديث التقرير" : "إرسال التقرير"}
             </Button>
+            
+            {editingReport && (
+              <Button
+                type="button"
+                onClick={() => {
+                  setEditingReport(null);
+                  setFormData({
+                    date: new Date().toISOString().split('T')[0],
+                    student_discipline: 10,
+                    student_discipline_notes: "",
+                    classroom_cleanliness: 10,
+                    classroom_cleanliness_notes: "",
+                    teacher_attendance_rate: 10,
+                    late_teachers: [],
+                    teacher_attendance_notes: "",
+                    student_movement: "",
+                    student_movement_classes: [],
+                    student_movement_notes: "",
+                    general_behavior: 10,
+                    general_notes: "",
+                    incidents: [],
+                    absent_teachers: [],
+                    covering_teachers: [],
+                    absent_students_count: 0
+                  });
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                إلغاء التعديل
+              </Button>
+            )}
           </form>
         </TabsContent>
 
