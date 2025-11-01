@@ -204,6 +204,21 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Implemented full CRUD operations, modal detail view with case statistics, and filtering options"
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed PDF export with Arabic support using pdfmake library. Replaced jsPDF with pdfmake and added Cairo font for proper RTL rendering"
+
+  - task: "Arabic PDF Export for Social Specialist Dashboard"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/SocialSpecialistDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented Arabic PDF export using pdfmake with Cairo font. Added comprehensive tables for cases distribution, actions summary, and detailed reports with proper RTL layout"
 
   - task: "Quality Dashboard with modal view and filtering"
     implemented: true
