@@ -75,15 +75,22 @@ const ChairmanDashboard = () => {
     return supervisorReports.filter(r => r.branch === selectedBranch);
   };
 
-  // Helper function to filter reports by time
+  // Helper function to filter reports by time and employee
   const filterReportsByTime = (reports) => {
-    const today = new Date();
+    let filtered = reports;
     
     // Filter by branch first
-    let filtered = reports;
     if (selectedBranch !== "all") {
       filtered = filtered.filter(r => r.branch === selectedBranch);
     }
+    
+    // Filter by specific employee if selected
+    if (selectedSpecificEmployee !== "all") {
+      filtered = filtered.filter(r => r.user_id === selectedSpecificEmployee);
+    }
+    
+    // Filter by time
+    const today = new Date();
     
     if (timeFilter === "daily") {
       const todayStr = today.toISOString().split('T')[0];
