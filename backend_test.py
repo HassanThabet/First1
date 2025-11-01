@@ -1189,6 +1189,69 @@ class BackendTester:
         except Exception as e:
             self.log_test("Debug - Users Check", False, f"Exception: {str(e)}")
 
+    def check_existing_vp_supervisor_data(self):
+        """Check existing VP and supervisor data in the system"""
+        print("\n=== Checking Existing VP and Supervisor Data ===")
+        
+        try:
+            # Get all users
+            users_response = self.session.get(f"{BASE_URL}/users")
+            if users_response.status_code == 200:
+                all_users = users_response.json()
+                
+                # Find all VPs
+                vps = [u for u in all_users if u.get("role") == "vice_principal"]
+                self.log_test("Existing VPs", True, f"Found {len(vps)} Vice-Principals in system")
+                
+                for i, vp in enumerate(vps, 1):
+                    self.log_test(f"VP {i}", True, f"ID: {vp.get('id')}, Username: {vp.get('username')}, Branch: {vp.get('branch')}")
+                    
+                    # Find supervisors assigned to this VP
+                    assigned_supervisors = [u for u in all_users if u.get("assigned_to") == vp.get("id")]
+                    self.log_test(f"VP {i} Assigned Supervisors", True, f"Found {len(assigned_supervisors)} supervisors assigned")
+                    
+                    for j, supervisor in enumerate(assigned_supervisors, 1):
+                        self.log_test(f"VP {i} Supervisor {j}", True, f"ID: {supervisor.get('id')}, Username: {supervisor.get('username')}, Branch: {supervisor.get('branch')}")
+                        
+                    # Check supervisor reports for this VP
+                    if assigned_supervisors:
+                        supervisor_ids = [s.get("id") for s in assigned_supervisors]
+                        
+                        # Get all supervisor reports
+                        reports_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+                        if reports_response.status_code == 200:
+                            all_reports = reports_response.json()
+                            vp_reports = [r for r in all_reports if r.get("user_id") in supervisor_ids]
+                            self.log_test(f"VP {i} Supervisor Reports", True, f"Found {len(vp_reports)} reports from assigned supervisors")
+                            
+                            for k, report in enumerate(vp_reports[:3], 1):  # Show first 3 reports
+                                self.log_test(f"VP {i} Report {k}", True, f"ID: {report.get('id')}, Date: {report.get('date')}, User: {report.get('user_id')}")
+                        else:
+                            self.log_test(f"VP {i} Supervisor Reports", False, f"Failed to get reports: {reports_response.status_code}")
+                    else:
+                        self.log_test(f"VP {i} Issue", False, "No supervisors assigned to this VP - THIS COULD BE THE ISSUE!")
+                        
+                # Find all supervisors
+                supervisors = [u for u in all_users if u.get("role") == "supervisor"]
+                self.log_test("Existing Supervisors", True, f"Found {len(supervisors)} Supervisors in system")
+                
+                # Check how many supervisors are assigned vs unassigned
+                assigned_supervisors = [s for s in supervisors if s.get("assigned_to")]
+                unassigned_supervisors = [s for s in supervisors if not s.get("assigned_to")]
+                
+                self.log_test("Supervisor Assignment Status", True, f"Assigned: {len(assigned_supervisors)}, Unassigned: {len(unassigned_supervisors)}")
+                
+                if unassigned_supervisors:
+                    self.log_test("Unassigned Supervisors Issue", False, f"{len(unassigned_supervisors)} supervisors are not assigned to any VP!")
+                    for supervisor in unassigned_supervisors[:5]:  # Show first 5
+                        self.log_test("Unassigned Supervisor", False, f"ID: {supervisor.get('id')}, Username: {supervisor.get('username')}, Branch: {supervisor.get('branch')}")
+                        
+            else:
+                self.log_test("Get Users", False, f"Failed: {users_response.status_code} - {users_response.text}")
+                
+        except Exception as e:
+            self.log_test("Check Existing Data", False, f"Exception: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
@@ -1201,6 +1264,9 @@ class BackendTester:
             print("❌ Authentication failed - cannot proceed with other tests")
             return
             
+        # Check existing VP and supervisor data first
+        self.check_existing_vp_supervisor_data()
+        
         # Test Vice-Principal dashboard issue specifically
         self.test_vice_principal_dashboard_issue()
         
