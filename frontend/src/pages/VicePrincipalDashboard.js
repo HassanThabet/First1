@@ -288,6 +288,172 @@ const VicePrincipalDashboard = () => {
           </form>
         </TabsContent>
 
+        <TabsContent value="merged-stats">
+          {getMergedStatistics() ? (
+            <div className="space-y-6">
+              {/* Summary Card */}
+              <Card className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white">
+                <CardHeader>
+                  <CardTitle className="text-2xl">
+                    إحصائيات مدمجة من {supervisorReports.length} تقرير
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+
+              {/* Average Scores */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>المتوسطات العامة</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">انضباط الطلاب</div>
+                      <div className="text-4xl font-bold text-cyan-700">
+                        {getMergedStatistics().averages.discipline}/10
+                      </div>
+                    </div>
+                    <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">نظافة الفصول</div>
+                      <div className="text-4xl font-bold text-blue-700">
+                        {getMergedStatistics().averages.cleanliness}/10
+                      </div>
+                    </div>
+                    <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">التزام المعلمين</div>
+                      <div className="text-4xl font-bold text-purple-700">
+                        {getMergedStatistics().averages.attendance}/10
+                      </div>
+                    </div>
+                    <div className="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">السلوك العام</div>
+                      <div className="text-4xl font-bold text-green-700">
+                        {getMergedStatistics().averages.behavior}/10
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Detailed Statistics */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>الإحصائيات التفصيلية</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                      <div className="text-sm text-gray-600 mb-1">إجمالي الطلاب الغائبين</div>
+                      <div className="text-3xl font-bold text-blue-600">
+                        {getMergedStatistics().totals.absentStudents}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-orange-50 rounded-lg border-2 border-orange-200">
+                      <div className="text-sm text-gray-600 mb-1">إجمالي المعلمين المتأخرين</div>
+                      <div className="text-3xl font-bold text-orange-600">
+                        {getMergedStatistics().totals.lateTeachers}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-red-50 rounded-lg border-2 border-red-200">
+                      <div className="text-sm text-gray-600 mb-1">إجمالي المعلمين الغائبين</div>
+                      <div className="text-3xl font-bold text-red-600">
+                        {getMergedStatistics().totals.absentTeachers}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-green-50 rounded-lg border-2 border-green-200">
+                      <div className="text-sm text-gray-600 mb-1">إجمالي المعلمين المغطين</div>
+                      <div className="text-3xl font-bold text-green-600">
+                        {getMergedStatistics().totals.coveringTeachers}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-yellow-50 rounded-lg border-2 border-yellow-200">
+                      <div className="text-sm text-gray-600 mb-1">إجمالي الحوادث والمخالفات</div>
+                      <div className="text-3xl font-bold text-yellow-600">
+                        {getMergedStatistics().totals.incidents}
+                      </div>
+                    </div>
+                    <div className="p-4 bg-purple-50 rounded-lg border-2 border-purple-200">
+                      <div className="text-sm text-gray-600 mb-1">عدد التقارير المدمجة</div>
+                      <div className="text-3xl font-bold text-purple-600">
+                        {getMergedStatistics().totals.reports}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>الرسم البياني للمتوسطات</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-64 flex items-center justify-center">
+                    <div className="w-full max-w-2xl">
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm font-semibold">انضباط الطلاب</span>
+                            <span className="text-sm font-bold text-cyan-600">{getMergedStatistics().averages.discipline}/10</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-4">
+                            <div
+                              className="bg-gradient-to-r from-cyan-500 to-cyan-600 h-4 rounded-full transition-all"
+                              style={{ width: `${getMergedStatistics().averages.discipline * 10}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm font-semibold">نظافة الفصول</span>
+                            <span className="text-sm font-bold text-blue-600">{getMergedStatistics().averages.cleanliness}/10</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-4">
+                            <div
+                              className="bg-gradient-to-r from-blue-500 to-blue-600 h-4 rounded-full transition-all"
+                              style={{ width: `${getMergedStatistics().averages.cleanliness * 10}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm font-semibold">التزام المعلمين</span>
+                            <span className="text-sm font-bold text-purple-600">{getMergedStatistics().averages.attendance}/10</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-4">
+                            <div
+                              className="bg-gradient-to-r from-purple-500 to-purple-600 h-4 rounded-full transition-all"
+                              style={{ width: `${getMergedStatistics().averages.attendance * 10}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-2">
+                            <span className="text-sm font-semibold">السلوك العام</span>
+                            <span className="text-sm font-bold text-green-600">{getMergedStatistics().averages.behavior}/10</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-4">
+                            <div
+                              className="bg-gradient-to-r from-green-500 to-green-600 h-4 rounded-full transition-all"
+                              style={{ width: `${getMergedStatistics().averages.behavior * 10}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            <Card>
+              <CardContent className="text-center py-12">
+                <p className="text-gray-600">لا توجد تقارير من المشرفين حتى الآن</p>
+              </CardContent>
+            </Card>
+          )}
+        </TabsContent>
+
         <TabsContent value="supervisor-reports">
           <div className="space-y-4">
             {supervisorReports.map((report) => (
