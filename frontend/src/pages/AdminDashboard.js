@@ -262,7 +262,7 @@ const AdminDashboard = () => {
                   <DialogTrigger asChild>
                     <Button onClick={() => {
                       setEditingItem(null);
-                      setUserForm({ username: "", password: "", role: "supervisor", branch: "boys", assigned_to: "" });
+                      setUserForm({ username: "", password: "", role: "supervisor", branch: "both", assigned_to: "" });
                     }} data-testid="add-user-button">
                       <Plus className="w-4 h-4 ml-2" />
                       إضافة مستخدم
