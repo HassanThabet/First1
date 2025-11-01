@@ -261,6 +261,263 @@ const DirectorDashboard = () => {
     quality: "الجودة"
   };
 
+  // Export to PDF
+  const exportToPDF = () => {
+    try {
+      const stats = getOverallStatistics();
+      
+      // Prepare period text
+      let periodText = 'جميع الفترات';
+      if (timeFilter === 'daily') {
+        periodText = 'تقرير يومي - ' + new Date().toLocaleDateString('ar-SA');
+      } else if (timeFilter === 'weekly') {
+        periodText = 'تقرير أسبوعي';
+      } else if (timeFilter === 'monthly') {
+        periodText = 'تقرير شهري';
+      }
+
+      // Prepare VP text
+      let vpText = 'جميع الوكلاء';
+      if (selectedVPForStats !== 'all') {
+        const vp = users.find(u => u.id === selectedVPForStats);
+        vpText = vp ? vp.username : 'غير محدد';
+      }
+
+      const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'portrait',
+        defaultStyle: {
+          font: 'Cairo',
+          alignment: 'right'
+        },
+        content: [
+          // Header
+          {
+            text: 'مدارس الفجر الجديد الأهلية',
+            style: 'header',
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            text: 'تقرير المدير - الإحصائيات الإجمالية',
+            style: 'subheader',
+            alignment: 'center',
+            margin: [0, 0, 0, 5]
+          },
+          {
+            text: `الفرع: ${user.branch === 'boys' ? 'البنين' : 'البنات'}`,
+            alignment: 'center',
+            fontSize: 12,
+            margin: [0, 0, 0, 3]
+          },
+          {
+            text: `الوكيل: ${vpText}`,
+            alignment: 'center',
+            fontSize: 12,
+            margin: [0, 0, 0, 3]
+          },
+          {
+            text: periodText,
+            alignment: 'center',
+            fontSize: 12,
+            margin: [0, 0, 0, 5]
+          },
+          {
+            text: `تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`,
+            alignment: 'center',
+            fontSize: 10,
+            margin: [0, 0, 0, 15]
+          },
+          
+          // Overall Summary
+          {
+            text: 'ملخص عام',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  { text: `إجمالي التقارير: ${stats.totalAllReports}`, alignment: 'center', fillColor: '#E3F2FD' },
+                  { text: `تقارير المشرفين: ${stats.supervisorReportsCount}`, alignment: 'center', fillColor: '#E3F2FD' }
+                ],
+                [
+                  { text: `تقارير الأنشطة: ${stats.activitiesReportsCount}`, alignment: 'center', fillColor: '#F3E5F5' },
+                  { text: `تقارير الأخصائي: ${stats.socialReportsCount}`, alignment: 'center', fillColor: '#F3E5F5' }
+                ],
+                [
+                  { text: `تقارير الجودة: ${stats.qualityReportsCount}`, alignment: 'center', fillColor: '#E8F5E9', colSpan: 2 },
+                  {}
+                ]
+              ]
+            },
+            layout: 'lightHorizontalLines',
+            margin: [0, 0, 0, 15]
+          },
+
+          // Supervisor Statistics
+          {
+            text: 'إحصائيات المشرفين',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  { text: 'المقياس', style: 'tableHeader', alignment: 'center' },
+                  { text: 'القيمة', style: 'tableHeader', alignment: 'center' }
+                ],
+                [{ text: 'المعلمون المتأخرون', alignment: 'right' }, { text: String(stats.totalLateTeachers), alignment: 'center' }],
+                [{ text: 'المعلمون الغائبون', alignment: 'right' }, { text: String(stats.totalAbsentTeachers), alignment: 'center' }],
+                [{ text: 'المعلمون المغطون', alignment: 'right' }, { text: String(stats.totalCoveringTeachers), alignment: 'center' }],
+                [{ text: 'الحوادث', alignment: 'right' }, { text: String(stats.totalIncidents), alignment: 'center' }],
+                [{ text: 'الطلاب الغائبون', alignment: 'right' }, { text: String(stats.totalAbsentStudents), alignment: 'center' }],
+                [{ text: 'متوسط الانضباط', alignment: 'right' }, { text: String(stats.avgDiscipline) + '/10', alignment: 'center' }],
+                [{ text: 'متوسط النظافة', alignment: 'right' }, { text: String(stats.avgCleanliness) + '/10', alignment: 'center' }],
+                [{ text: 'متوسط الحضور', alignment: 'right' }, { text: String(stats.avgAttendance) + '%', alignment: 'center' }],
+                [{ text: 'متوسط السلوك العام', alignment: 'right' }, { text: String(stats.avgBehavior) + '/10', alignment: 'center' }]
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#2196F3' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            },
+            margin: [0, 0, 0, 15]
+          },
+
+          // Activities Statistics
+          {
+            text: 'إحصائيات الأنشطة',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  { text: 'المقياس', style: 'tableHeader', alignment: 'center' },
+                  { text: 'القيمة', style: 'tableHeader', alignment: 'center' }
+                ],
+                [{ text: 'إجمالي الأنشطة', alignment: 'right' }, { text: String(stats.totalActivities), alignment: 'center' }],
+                [{ text: 'إجمالي المشاركين', alignment: 'right' }, { text: String(stats.totalActivitiesParticipants), alignment: 'center' }],
+                [{ text: 'متوسط التفاعل', alignment: 'right' }, { text: String(stats.avgActivitiesInteraction) + '/10', alignment: 'center' }]
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#9C27B0' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            },
+            margin: [0, 0, 0, 15]
+          },
+
+          // Social Specialist Statistics
+          {
+            text: 'إحصائيات الأخصائي الاجتماعي',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  { text: 'المقياس', style: 'tableHeader', alignment: 'center' },
+                  { text: 'القيمة', style: 'tableHeader', alignment: 'center' }
+                ],
+                [{ text: 'إجمالي حالات الطلاب', alignment: 'right' }, { text: String(stats.totalStudentCases), alignment: 'center' }],
+                [{ text: 'حالات نفسية', alignment: 'right' }, { text: String(stats.totalPsychologicalCases), alignment: 'center' }],
+                [{ text: 'حالات أكاديمية', alignment: 'right' }, { text: String(stats.totalAcademicCases), alignment: 'center' }],
+                [{ text: 'حالات سلوكية', alignment: 'right' }, { text: String(stats.totalBehavioralCases), alignment: 'center' }],
+                [{ text: 'الجلسات', alignment: 'right' }, { text: String(stats.totalSessions), alignment: 'center' }],
+                [{ text: 'التواصل مع الأسر', alignment: 'right' }, { text: String(stats.totalFamilyContacts), alignment: 'center' }]
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#4CAF50' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            },
+            margin: [0, 0, 0, 15]
+          },
+
+          // Quality Statistics
+          {
+            text: 'إحصائيات الجودة',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              widths: ['*', '*'],
+              body: [
+                [
+                  { text: 'المقياس', style: 'tableHeader', alignment: 'center' },
+                  { text: 'القيمة', style: 'tableHeader', alignment: 'center' }
+                ],
+                [{ text: 'إجمالي الزيارات', alignment: 'right' }, { text: String(stats.totalQualityVisits), alignment: 'center' }],
+                [{ text: 'متوسط الأداء التدريسي', alignment: 'right' }, { text: String(stats.avgQualityTeachingRate) + '/10', alignment: 'center' }]
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#FF9800' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            }
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            color: '#1565C0'
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            color: '#1565C0'
+          },
+          sectionHeader: {
+            fontSize: 14,
+            bold: true,
+            color: '#1565C0'
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 10,
+            color: 'white'
+          }
+        },
+        footer: function(currentPage, pageCount) {
+          return {
+            text: `صفحة ${currentPage} من ${pageCount}`,
+            alignment: 'center',
+            fontSize: 9,
+            margin: [0, 10, 0, 0]
+          };
+        }
+      };
+
+      let filename = `تقرير_المدير_${user.branch === 'boys' ? 'بنين' : 'بنات'}`;
+      if (timeFilter === 'daily') filename += '_يومي';
+      else if (timeFilter === 'weekly') filename += '_أسبوعي';
+      else if (timeFilter === 'monthly') filename += '_شهري';
+      filename += '.pdf';
+
+      pdfMake.createPdf(docDefinition).download(filename);
+      toast.success('تم تصدير PDF بنجاح');
+    } catch (error) {
+      console.error('PDF Export Error:', error);
+      toast.error('فشل تصدير PDF');
+    }
+  };
+
   return (
     <DashboardLayout title="لوحة تحكم المدير">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
