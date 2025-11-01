@@ -342,9 +342,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Director Dashboard with comprehensive statistics"
-    - "PDF Export for Director Dashboard"
-    - "PDF Export for Vice-Principal Dashboard"
+    - "Detailed Reports Tab for Director Dashboard"
+    - "Detailed Reports Tab for Chairman Dashboard"
+    - "Vice-Principal PDF with Supervisor Names"
+    - "Report Type Filtering with Employee Names"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
