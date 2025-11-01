@@ -540,76 +540,97 @@ const DirectorDashboard = () => {
                 <CardTitle>التصفية</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">الفرع</label>
-                    <Input 
-                      value={user.branch === "boys" ? "البنين" : "البنات"} 
-                      disabled 
-                      className="bg-gray-100"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-2">الوكيل</label>
-                    <Select value={selectedVPForStats} onValueChange={setSelectedVPForStats}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">جميع الوكلاء</SelectItem>
-                        {users
-                          .filter(u => u.role === "vice_principal" && u.branch === user.branch)
-                          .map(vp => (
-                            <SelectItem key={vp.id} value={vp.id}>
-                              {vp.username}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">الفرع</label>
+                      <Input 
+                        value={user.branch === "boys" ? "البنين" : "البنات"} 
+                        disabled 
+                        className="bg-gray-100"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">نوع التقرير</label>
+                      <Select value={reportTypeFilter} onValueChange={(value) => {
+                        setReportTypeFilter(value);
+                        setSelectedSpecificEmployee("all");
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">جميع التقارير</SelectItem>
+                          <SelectItem value="vice_principal">الوكلاء</SelectItem>
+                          <SelectItem value="supervisor">المشرفين</SelectItem>
+                          <SelectItem value="activities">الأنشطة</SelectItem>
+                          <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
+                          <SelectItem value="quality">الجودة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {reportTypeFilter !== "all" && (
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          {reportTypeFilter === "vice_principal" && "اختر الوكيل"}
+                          {reportTypeFilter === "supervisor" && "اختر المشرف"}
+                          {reportTypeFilter === "activities" && "اختر مسؤول الأنشطة"}
+                          {reportTypeFilter === "social" && "اختر الأخصائي"}
+                          {reportTypeFilter === "quality" && "اختر مسؤول الجودة"}
+                        </label>
+                        <Select value={selectedSpecificEmployee} onValueChange={setSelectedSpecificEmployee}>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">
+                              {reportTypeFilter === "vice_principal" && "جميع الوكلاء"}
+                              {reportTypeFilter === "supervisor" && "جميع المشرفين"}
+                              {reportTypeFilter === "activities" && "جميع مسؤولي الأنشطة"}
+                              {reportTypeFilter === "social" && "جميع الأخصائيين"}
+                              {reportTypeFilter === "quality" && "جميع مسؤولي الجودة"}
                             </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
+                            {users
+                              .filter(u => u.role === reportTypeFilter && u.branch === user.branch)
+                              .map(emp => (
+                                <SelectItem key={emp.id} value={emp.id}>
+                                  {emp.username}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
+                      <Select value={timeFilter} onValueChange={setTimeFilter}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">جميع الفترات</SelectItem>
+                          <SelectItem value="daily">اليوم</SelectItem>
+                          <SelectItem value="weekly">هذا الأسبوع</SelectItem>
+                          <SelectItem value="monthly">هذا الشهر</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">نوع التقرير</label>
-                    <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">جميع التقارير</SelectItem>
-                        <SelectItem value="supervisor">المشرفين</SelectItem>
-                        <SelectItem value="activities">الأنشطة</SelectItem>
-                        <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
-                        <SelectItem value="quality">الجودة</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
-                    <Select value={timeFilter} onValueChange={setTimeFilter}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">جميع الفترات</SelectItem>
-                        <SelectItem value="daily">اليوم</SelectItem>
-                        <SelectItem value="weekly">هذا الأسبوع</SelectItem>
-                        <SelectItem value="monthly">هذا الشهر</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">تصدير التقرير</label>
-                    <Button 
-                      onClick={exportToPDF}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      <FileDown className="w-4 h-4 ml-2" />
-                      تصدير PDF
-                    </Button>
-                  </div>
+                  {reportTypeFilter !== "all" && (
+                    <div>
+                      <Button 
+                        onClick={exportToPDF}
+                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        <FileDown className="w-4 h-4 ml-2" />
+                        تصدير PDF
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 
                 {selectedVPForStats !== "all" && stats.supervisorCount > 0 && (
