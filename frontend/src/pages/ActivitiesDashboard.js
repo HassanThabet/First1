@@ -170,6 +170,85 @@ const ActivitiesDashboard = () => {
     return teacher ? teacher.name : teacherId;
   };
 
+  // Get merged reports based on period
+  const getMergedReports = () => {
+    let filtered = [...allReports];
+    const today = new Date();
+
+    if (mergedPeriod === "weekly") {
+      // Current week (Saturday to Wednesday)
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4); // 5 days (Sat-Wed)
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      filtered = allReports.filter(report => {
+        return report.activities.some(activity => {
+          const activityDate = new Date(activity.date);
+          return activityDate >= weekStart && activityDate <= weekEnd;
+        });
+      });
+    } else if (mergedPeriod === "monthly") {
+      // Current month
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      filtered = allReports.filter(report => {
+        return report.activities.some(activity => {
+          const activityDate = new Date(activity.date);
+          return activityDate.getMonth() === currentMonth && 
+                 activityDate.getFullYear() === currentYear;
+        });
+      });
+    } else if (mergedPeriod === "custom" && mergedStartDate && mergedEndDate) {
+      // Custom date range
+      const startDate = new Date(mergedStartDate);
+      const endDate = new Date(mergedEndDate);
+      endDate.setHours(23, 59, 59, 999);
+      
+      filtered = allReports.filter(report => {
+        return report.activities.some(activity => {
+          const activityDate = new Date(activity.date);
+          return activityDate >= startDate && activityDate <= endDate;
+        });
+      });
+    }
+
+    return filtered;
+  };
+
+  // Get merged statistics
+  const getMergedStatistics = () => {
+    const mergedReports = getMergedReports();
+    const allActivities = mergedReports.flatMap(r => r.activities);
+    
+    const totalActivities = allActivities.length;
+    const totalParticipants = allActivities.reduce((sum, a) => sum + (a.participants_count || 0), 0);
+    const avgInteraction = totalActivities > 0 ? 
+      (allActivities.reduce((sum, a) => sum + (a.interaction_rate || 0), 0) / totalActivities).toFixed(1) : 0;
+    
+    // Count by type
+    const typeCount = {};
+    allActivities.forEach(a => {
+      if (a.type) {
+        typeCount[a.type] = (typeCount[a.type] || 0) + 1;
+      }
+    });
+    
+    return {
+      totalActivities,
+      totalParticipants,
+      avgInteraction,
+      typeCount,
+      totalReports: mergedReports.length
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
