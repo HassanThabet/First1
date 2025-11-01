@@ -314,7 +314,13 @@ const DirectorDashboard = () => {
             margin: [0, 0, 0, 3]
           },
           {
-            text: `الوكيل: ${vpText}`,
+            text: `نوع التقرير: ${reportTypeText}`,
+            alignment: 'center',
+            fontSize: 12,
+            margin: [0, 0, 0, 3]
+          },
+          {
+            text: `الموظف: ${employeeText}`,
             alignment: 'center',
             fontSize: 12,
             margin: [0, 0, 0, 3]
