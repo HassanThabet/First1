@@ -20,7 +20,13 @@ const SupervisorDashboard = () => {
   const [subjects, setSubjects] = useState([]);
   const [classrooms, setClassrooms] = useState([]);
   const [reports, setReports] = useState([]);
+  const [allReports, setAllReports] = useState([]);
   const [loading, setLoading] = useState(false);
+  
+  // Filters
+  const [dateFilter, setDateFilter] = useState("");
+  const [weekFilter, setWeekFilter] = useState("");
+  const [viewMode, setViewMode] = useState("all"); // all, daily, weekly
 
   // Form state
   const [formData, setFormData] = useState({
