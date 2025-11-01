@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { toast } from "sonner";
-import { Plus, X, Eye, FileText } from "lucide-react";
+import { Plus, X, Eye, FileText, BarChart3 } from "lucide-react";
 
 const ActivitiesDashboard = () => {
   const { user } = useContext(AuthContext);
