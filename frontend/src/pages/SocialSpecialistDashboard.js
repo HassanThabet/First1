@@ -27,6 +27,11 @@ const SocialSpecialistDashboard = () => {
   const [viewMode, setViewMode] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
+  
+  // Merged reports filters
+  const [mergedPeriod, setMergedPeriod] = useState("weekly");
+  const [mergedStartDate, setMergedStartDate] = useState("");
+  const [mergedEndDate, setMergedEndDate] = useState("");
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
