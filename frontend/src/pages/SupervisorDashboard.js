@@ -243,6 +243,23 @@ const SupervisorDashboard = () => {
 
         <TabsContent value="create">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Date Selection */}
+            <Card>
+              <CardHeader>
+                <CardTitle>تاريخ التقرير</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Label>اختر التاريخ</Label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  required
+                  data-testid="report-date-input"
+                />
+              </CardContent>
+            </Card>
+
             {/* Student Discipline */}
             <Card>
               <CardHeader>
