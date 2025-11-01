@@ -682,9 +682,27 @@ const SupervisorDashboard = () => {
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span>تقرير {new Date(report.date).toLocaleDateString("ar-SA")}</span>
-                      <span className="text-sm font-normal text-gray-500">
-                        {new Date(report.created_at).toLocaleString("ar-SA")}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-normal text-gray-500">
+                          {new Date(report.created_at).toLocaleString("ar-SA")}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(report)}
+                          data-testid={`edit-report-${report.id}`}
+                        >
+                          تعديل
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(report.id)}
+                          data-testid={`delete-report-${report.id}`}
+                        >
+                          حذف
+                        </Button>
+                      </div>
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -706,12 +724,69 @@ const SupervisorDashboard = () => {
                         <div className="text-2xl font-bold text-cyan-600">{report.general_behavior}/10</div>
                       </div>
                     </div>
-                    {report.general_notes && (
-                      <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm font-semibold text-gray-700 mb-1">ملاحظات عامة:</div>
-                        <p className="text-gray-600">{report.general_notes}</p>
-                      </div>
-                    )}
+                    
+                    {/* Additional Details */}
+                    <div className="mt-4 space-y-3">
+                      {report.late_teachers && report.late_teachers.length > 0 && (
+                        <div className="p-3 bg-orange-50 rounded-lg">
+                          <div className="text-sm font-semibold text-gray-700 mb-1">المعلمون المتأخرون:</div>
+                          <ul className="text-sm text-gray-600 list-disc list-inside">
+                            {report.late_teachers.map((lt, i) => (
+                              <li key={i}>{lt.teacher} - {lt.subject} - حصة {lt.period}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {report.absent_teachers && report.absent_teachers.length > 0 && (
+                        <div className="p-3 bg-red-50 rounded-lg">
+                          <div className="text-sm font-semibold text-gray-700 mb-1">المعلمون الغائبون:</div>
+                          <ul className="text-sm text-gray-600 list-disc list-inside">
+                            {report.absent_teachers.map((at, i) => (
+                              <li key={i}>{at.teacher} - {at.subject} - حصة {at.period}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {report.covering_teachers && report.covering_teachers.length > 0 && (
+                        <div className="p-3 bg-green-50 rounded-lg">
+                          <div className="text-sm font-semibold text-gray-700 mb-1">المعلمون المغطون:</div>
+                          <ul className="text-sm text-gray-600 list-disc list-inside">
+                            {report.covering_teachers.map((ct, i) => (
+                              <li key={i}>{ct.teacher} - {ct.subject} - حصة {ct.period}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {report.incidents && report.incidents.length > 0 && (
+                        <div className="p-3 bg-yellow-50 rounded-lg">
+                          <div className="text-sm font-semibold text-gray-700 mb-2">الحوادث والمخالفات:</div>
+                          {report.incidents.map((inc, i) => (
+                            <div key={i} className="mb-2 text-sm">
+                              <p className="font-medium text-gray-800">{inc.description}</p>
+                              <p className="text-gray-600">الإجراء: {inc.action}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {report.absent_students_count > 0 && (
+                        <div className="p-3 bg-blue-50 rounded-lg">
+                          <div className="text-sm text-gray-700">
+                            <span className="font-semibold">عدد الطلاب الغائبين:</span> {report.absent_students_count}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {report.general_notes && (
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <div className="text-sm font-semibold text-gray-700 mb-1">ملاحظات عامة:</div>
+                          <p className="text-gray-600">{report.general_notes}</p>
+                        </div>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               ))}
