@@ -250,104 +250,186 @@ const ActivitiesDashboard = () => {
     };
   };
 
-  // Export to PDF - Simplified version for Arabic support
+  // Export to PDF using pdfmake with Arabic support
   const exportToPDF = () => {
     try {
-      const doc = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4'
-      });
-
       const mergedReports = getMergedReports();
       const stats = getMergedStatistics();
       const allActivities = mergedReports.flatMap(r => r.activities);
 
-      // Title
-      doc.setFontSize(20);
-      doc.text('Activities Merged Report', 105, 20, { align: 'center' });
-
-      // Period
-      doc.setFontSize(12);
+      // Prepare period text
       let periodText = '';
       if (mergedPeriod === 'weekly') {
-        periodText = 'Weekly Report';
+        periodText = 'تقرير أسبوعي';
       } else if (mergedPeriod === 'monthly') {
-        periodText = 'Monthly Report';
+        periodText = 'تقرير شهري';
       } else if (mergedPeriod === 'custom' && mergedStartDate && mergedEndDate) {
-        periodText = `From ${mergedStartDate} to ${mergedEndDate}`;
+        periodText = `من ${mergedStartDate} إلى ${mergedEndDate}`;
       }
-      doc.text(periodText, 105, 28, { align: 'center' });
 
-      // School name
-      doc.setFontSize(10);
-      doc.text('Al-Fajr Al-Jadeed Private Schools', 105, 35, { align: 'center' });
-      doc.text(`Report Date: ${new Date().toLocaleDateString()}`, 105, 41, { align: 'center' });
-
-      // Statistics Summary
-      doc.setFillColor(230, 247, 255);
-      doc.rect(15, 48, 180, 30, 'F');
-      doc.setDrawColor(100, 181, 246);
-      doc.rect(15, 48, 180, 30, 'S');
-
-      doc.setFontSize(11);
-      doc.text('Overall Statistics:', 20, 55);
-      doc.setFontSize(10);
-      doc.text(`Total Activities: ${stats.totalActivities}`, 20, 62);
-      doc.text(`Total Participants: ${stats.totalParticipants}`, 20, 68);
-      doc.text(`Average Interaction: ${stats.avgInteraction}/10`, 20, 74);
-
-      // Activities Table
-      let yPos = 85;
+      // Prepare activities table data
       const activitiesData = allActivities.map((activity, index) => {
         const supervisors = activity.supervisors && activity.supervisors.length > 0 
           ? activity.supervisors.map(id => getTeacherName(id)).join(', ')
           : activity.supervisor || '-';
 
+        const cooperatingTeachers = activity.cooperating_teachers && activity.cooperating_teachers.length > 0
+          ? activity.cooperating_teachers.map(id => getTeacherName(id)).join(', ')
+          : '-';
+
         return [
           index + 1,
           activity.name || '-',
-          new Date(activity.date).toLocaleDateString('en-GB'),
+          new Date(activity.date).toLocaleDateString('ar-SA'),
           activity.type || '-',
+          supervisors,
+          cooperatingTeachers,
+          activity.target_group || '-',
           activity.participants_count || 0,
-          `${activity.interaction_rate || 0}/10`
+          `${activity.interaction_rate || 0}/10`,
+          activity.educational_impact || '-'
         ];
       });
 
-      doc.autoTable({
-        startY: yPos,
-        head: [['#', 'Activity', 'Date', 'Type', 'Participants', 'Rate']],
-        body: activitiesData,
-        styles: {
-          fontSize: 9,
-          cellPadding: 2
+      // Define PDF document
+      const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        defaultStyle: {
+          font: 'Cairo',
+          alignment: 'right'
         },
-        headStyles: {
-          fillColor: [0, 150, 136],
-          textColor: 255
+        content: [
+          // Header
+          {
+            text: 'مدارس الفجر الجديد الأهلية',
+            style: 'header',
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            text: 'تقرير الأنشطة المدمج',
+            style: 'subheader',
+            alignment: 'center',
+            margin: [0, 0, 0, 5]
+          },
+          {
+            text: periodText,
+            alignment: 'center',
+            fontSize: 12,
+            margin: [0, 0, 0, 5]
+          },
+          {
+            text: `تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`,
+            alignment: 'center',
+            fontSize: 10,
+            margin: [0, 0, 0, 15]
+          },
+          
+          // Statistics Box
+          {
+            table: {
+              widths: ['*', '*', '*'],
+              body: [
+                [
+                  { text: 'إجمالي الإحصائيات', colSpan: 3, style: 'tableHeader', alignment: 'center' },
+                  {},
+                  {}
+                ],
+                [
+                  { text: `إجمالي الأنشطة: ${stats.totalActivities}`, alignment: 'center' },
+                  { text: `إجمالي المشاركين: ${stats.totalParticipants}`, alignment: 'center' },
+                  { text: `متوسط التفاعل: ${stats.avgInteraction}/10`, alignment: 'center' }
+                ]
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#4DB6AC' : '#E0F2F1';
+              }
+            },
+            margin: [0, 0, 0, 15]
+          },
+
+          // Activities Table
+          {
+            text: 'تفاصيل الأنشطة',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              headerRows: 1,
+              widths: [20, 'auto', 50, 'auto', 'auto', 'auto', 'auto', 40, 40, 'auto'],
+              body: [
+                [
+                  { text: '#', style: 'tableHeader' },
+                  { text: 'النشاط', style: 'tableHeader' },
+                  { text: 'التاريخ', style: 'tableHeader' },
+                  { text: 'النوع', style: 'tableHeader' },
+                  { text: 'المشرفون', style: 'tableHeader' },
+                  { text: 'المعلمون المتعاونون', style: 'tableHeader' },
+                  { text: 'الفئة المستهدفة', style: 'tableHeader' },
+                  { text: 'المشاركون', style: 'tableHeader' },
+                  { text: 'التفاعل', style: 'tableHeader' },
+                  { text: 'الأثر التعليمي', style: 'tableHeader' }
+                ],
+                ...activitiesData
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#4DB6AC' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            }
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            color: '#00796B'
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            color: '#00796B'
+          },
+          sectionHeader: {
+            fontSize: 14,
+            bold: true,
+            color: '#00796B'
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 10,
+            color: 'white',
+            alignment: 'center'
+          }
+        },
+        footer: function(currentPage, pageCount) {
+          return {
+            text: `صفحة ${currentPage} من ${pageCount}`,
+            alignment: 'center',
+            fontSize: 9,
+            margin: [0, 10, 0, 0]
+          };
         }
-      });
+      };
 
-      // Footer
-      const pageCount = doc.internal.getNumberOfPages();
-      for (let i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setFontSize(8);
-        doc.text(`Page ${i} of ${pageCount}`, 105, 285, { align: 'center' });
-      }
-
-      // Save
-      let filename = 'Activities_Merged_Report';
-      if (mergedPeriod === 'weekly') filename += '_Weekly';
-      else if (mergedPeriod === 'monthly') filename += '_Monthly';
+      // Generate filename
+      let filename = 'تقرير_الأنشطة_المدمج';
+      if (mergedPeriod === 'weekly') filename += '_أسبوعي';
+      else if (mergedPeriod === 'monthly') filename += '_شهري';
       else if (mergedStartDate && mergedEndDate) filename += `_${mergedStartDate}_${mergedEndDate}`;
       filename += '.pdf';
 
-      doc.save(filename);
-      toast.success('PDF exported successfully');
+      // Create and download PDF
+      pdfMake.createPdf(docDefinition).download(filename);
+      toast.success('تم تصدير PDF بنجاح');
     } catch (error) {
       console.error('PDF Export Error:', error);
-      toast.error('Failed to export PDF. Please try again.');
+      toast.error('فشل تصدير PDF');
     }
   };
 
