@@ -255,6 +255,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Implemented Arabic PDF export using pdfmake with Cairo font. Added comprehensive tables for cases distribution, actions summary, and detailed reports with proper RTL layout"
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed 'Malformed table row' error by ensuring all table cells are strings and handling undefined/null values properly. Added default values (0) for all numeric fields."
 
   - task: "Quality Dashboard with modal view and filtering"
     implemented: true
