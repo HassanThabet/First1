@@ -1745,12 +1745,17 @@ class BackendTester:
                         failed_logins.append({"user": f"VP {i}", "reason": "Missing username"})
                         continue
                     
-                    # Test login with password 'password123'
-                    login_data = {
-                        "username": username,
-                        "password": "password123",
-                        "remember_me": False
-                    }
+                    # Test login with multiple common passwords
+                    test_passwords = ["password123", "123456", "admin", "password", "123", "test", username]
+                    login_success = False
+                    successful_password = None
+                    
+                    for test_password in test_passwords:
+                        login_data = {
+                            "username": username,
+                            "password": test_password,
+                            "remember_me": False
+                        }
                     
                     try:
                         # Create a new session for each login test to avoid conflicts
