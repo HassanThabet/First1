@@ -432,7 +432,7 @@ async def delete_classroom(classroom_id: str, current_user: dict = Depends(get_c
 
 # Supervisor Reports
 @api_router.post("/reports/supervisor", response_model=SupervisorReport)
-async def create_supervisor_report(report_data: SupervisorReport, current_user: dict = Depends(get_current_user)):
+async def create_supervisor_report(report_data: dict, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "supervisor":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
@@ -445,13 +445,18 @@ async def create_supervisor_report(report_data: SupervisorReport, current_user: 
     if existing:
         raise HTTPException(status_code=400, detail="لقد قمت بإرسال تقرير اليوم بالفعل")
     
-    report_data.user_id = current_user["id"]
-    report_data.branch = current_user["branch"]
-    report_data.date = today
+    # Add required fields
+    report_data["id"] = str(uuid.uuid4())
+    report_data["user_id"] = current_user["id"]
+    report_data["branch"] = current_user["branch"]
+    report_data["date"] = today
+    report_data["created_at"] = datetime.now(timezone.utc).isoformat()
     
-    doc = report_data.model_dump()
-    await db.supervisor_reports.insert_one(doc)
-    return report_data
+    await db.supervisor_reports.insert_one(report_data)
+    
+    # Return the created report
+    report_obj = SupervisorReport(**report_data)
+    return report_obj
 
 @api_router.get("/reports/supervisor", response_model=List[SupervisorReport])
 async def get_supervisor_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
