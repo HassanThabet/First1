@@ -12,8 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { toast } from "sonner";
 import { Eye, FileText, BarChart3, FileDown } from "lucide-react";
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import pdfMake from '../utils/pdfConfig';
 
 const SocialSpecialistDashboard = () => {
   const { user } = useContext(AuthContext);
