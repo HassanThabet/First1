@@ -115,27 +115,11 @@ const DirectorDashboard = () => {
 
   // Calculate overall statistics
   const getOverallStatistics = () => {
-    let filteredSupervisorReports = [...supervisorReports];
-    let filteredActivitiesReports = [...activitiesReports];
-    let filteredSocialReports = [...socialReports];
-    let filteredQualityReports = [...qualityReports];
-    
-    // Filter by selected Vice Principal if chosen
-    if (selectedVPForStats !== "all") {
-      const supervisorsUnderVP = users.filter(u => 
-        u.role === "supervisor" && 
-        u.assigned_to === selectedVPForStats &&
-        u.branch === user.branch
-      );
-      const supervisorIds = supervisorsUnderVP.map(s => s.id);
-      filteredSupervisorReports = filteredSupervisorReports.filter(r => supervisorIds.includes(r.user_id));
-    }
-    
     // Apply time filter to all report types
-    filteredSupervisorReports = filterReportsByTime(filteredSupervisorReports);
-    filteredActivitiesReports = filterReportsByTime(filteredActivitiesReports);
-    filteredSocialReports = filterReportsByTime(filteredSocialReports);
-    filteredQualityReports = filterReportsByTime(filteredQualityReports);
+    let filteredSupervisorReports = filterReportsByTime([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTime([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTime([...socialReports]);
+    let filteredQualityReports = filterReportsByTime([...qualityReports]);
 
     // Supervisor statistics
     const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
