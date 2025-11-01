@@ -436,20 +436,13 @@ async def create_supervisor_report(report_data: dict, current_user: dict = Depen
     if current_user["role"] != "supervisor":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    # Check if already submitted today
-    today = datetime.now(timezone.utc).date().isoformat()
-    existing = await db.supervisor_reports.find_one({
-        "user_id": current_user["id"],
-        "date": today
-    })
-    if existing:
-        raise HTTPException(status_code=400, detail="لقد قمت بإرسال تقرير اليوم بالفعل")
-    
     # Add required fields
     report_data["id"] = str(uuid.uuid4())
     report_data["user_id"] = current_user["id"]
     report_data["branch"] = current_user["branch"]
-    report_data["date"] = today
+    # Date should come from frontend
+    if "date" not in report_data:
+        report_data["date"] = datetime.now(timezone.utc).date().isoformat()
     report_data["created_at"] = datetime.now(timezone.utc).isoformat()
     
     await db.supervisor_reports.insert_one(report_data)
