@@ -704,10 +704,103 @@ const SupervisorDashboard = () => {
 
         <TabsContent value="reports">
           <div className="space-y-6">
+            {/* Filters */}
+            <Card>
+              <CardHeader>
+                <CardTitle>تصفية التقارير</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label>عرض</Label>
+                    <Select value={viewMode} onValueChange={setViewMode}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع التقارير</SelectItem>
+                        <SelectItem value="daily">يومي</SelectItem>
+                        <SelectItem value="weekly">أسبوعي</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {viewMode === "daily" && (
+                    <div>
+                      <Label>اختر اليوم</Label>
+                      <Input
+                        type="date"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                      />
+                    </div>
+                  )}
+                  
+                  {viewMode === "weekly" && (
+                    <div>
+                      <Label>بداية الأسبوع (السبت)</Label>
+                      <Input
+                        type="date"
+                        value={weekFilter}
+                        onChange={(e) => setWeekFilter(e.target.value)}
+                      />
+                    </div>
+                  )}
+                  
+                  <div className="flex items-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setDateFilter("");
+                        setWeekFilter("");
+                        setViewMode("all");
+                      }}
+                    >
+                      إعادة تعيين
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Weekly Average */}
+            {viewMode === "weekly" && reports.length > 0 && (
+              <Card className="bg-gradient-to-r from-cyan-50 to-blue-50">
+                <CardHeader>
+                  <CardTitle>المتوسط الأسبوعي</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {getWeeklyAverage() && (
+                      <>
+                        <div className="text-center p-4 bg-white rounded-lg">
+                          <div className="text-sm text-gray-600 mb-1">انضباط الطلاب</div>
+                          <div className="text-3xl font-bold text-cyan-600">{getWeeklyAverage().discipline}/10</div>
+                        </div>
+                        <div className="text-center p-4 bg-white rounded-lg">
+                          <div className="text-sm text-gray-600 mb-1">نظافة الفصول</div>
+                          <div className="text-3xl font-bold text-cyan-600">{getWeeklyAverage().cleanliness}/10</div>
+                        </div>
+                        <div className="text-center p-4 bg-white rounded-lg">
+                          <div className="text-sm text-gray-600 mb-1">التزام المعلمين</div>
+                          <div className="text-3xl font-bold text-cyan-600">{getWeeklyAverage().attendance}/10</div>
+                        </div>
+                        <div className="text-center p-4 bg-white rounded-lg">
+                          <div className="text-sm text-gray-600 mb-1">السلوك العام</div>
+                          <div className="text-3xl font-bold text-cyan-600">{getWeeklyAverage().behavior}/10</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Chart */}
             {reports.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>الإحصائيات الأسبوعية</CardTitle>
+                  <CardTitle>الإحصائيات</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -726,6 +819,12 @@ const SupervisorDashboard = () => {
                 </CardContent>
               </Card>
             )}
+
+            {/* Reports List */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-gray-800">
+                التقارير ({reports.length})
+              </h3>
 
             <div className="grid gap-4">
               {reports.map((report) => (
