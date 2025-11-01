@@ -207,7 +207,7 @@ backend:
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
@@ -215,6 +215,9 @@ backend:
       - working: true
         agent: "main"
         comment: "🔧 FIXED: Added vice_principal to roles_allowed for GET /api/users endpoint. Previously only admin, chairman, and director could access this endpoint, causing 403 Forbidden error for Vice-Principal dashboard. Backend restarted and ready for testing."
+      - working: true
+        agent: "testing"
+        comment: "✅ VP CREDENTIALS TESTED: Found 5 Vice-Principal users in database. Successfully tested login credentials: 4/5 VPs can login with password '123456' (ماجد, خالد, فاطمة, مريم). 1 test user (test_vice_principal_boys_4c8a5d1a) has different password. Authentication logic working correctly - password verification via bcrypt hash comparison."
 
   - task: "Admin Cleanup Orphaned Reports API endpoint"
     implemented: true
