@@ -184,7 +184,6 @@ const DirectorDashboard = () => {
       avgAttendance,
       avgBehavior,
       supervisorReportsCount: filteredSupervisorReports.length,
-      supervisorCount,
       
       // Activities stats
       totalActivities,
