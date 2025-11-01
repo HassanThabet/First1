@@ -829,6 +829,193 @@ const ActivitiesDashboard = () => {
             </DialogContent>
           </Dialog>
         </TabsContent>
+
+        <TabsContent value="merged">
+          <div className="space-y-6">
+            {/* Period Filter */}
+            <Card>
+              <CardHeader>
+                <CardTitle>فترة التقرير المدمج</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>الفترة</Label>
+                    <Select value={mergedPeriod} onValueChange={setMergedPeriod}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="weekly">هذا الأسبوع (السبت - الأربعاء)</SelectItem>
+                        <SelectItem value="monthly">هذا الشهر</SelectItem>
+                        <SelectItem value="custom">نطاق مخصص</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {mergedPeriod === "custom" && (
+                    <>
+                      <div>
+                        <Label>من تاريخ</Label>
+                        <Input
+                          type="date"
+                          value={mergedStartDate}
+                          onChange={(e) => setMergedStartDate(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label>إلى تاريخ</Label>
+                        <Input
+                          type="date"
+                          value={mergedEndDate}
+                          onChange={(e) => setMergedEndDate(e.target.value)}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Merged Statistics */}
+            {(() => {
+              const stats = getMergedStatistics();
+              const mergedReports = getMergedReports();
+              
+              return (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الأنشطة</div>
+                        <div className="text-4xl font-bold text-cyan-700">{stats.totalActivities}</div>
+                        <p className="text-xs text-gray-600 mt-2">نشاط مسجل</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي المشاركين</div>
+                        <div className="text-4xl font-bold text-blue-700">{stats.totalParticipants}</div>
+                        <p className="text-xs text-gray-600 mt-2">طالب مشارك</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط التفاعل</div>
+                        <div className="text-4xl font-bold text-green-700">{stats.avgInteraction}/10</div>
+                        <p className="text-xs text-gray-600 mt-2">معدل عام</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">عدد التقارير</div>
+                        <div className="text-4xl font-bold text-purple-700">{stats.totalReports}</div>
+                        <p className="text-xs text-gray-600 mt-2">تقرير</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Activities by Type */}
+                  {Object.keys(stats.typeCount).length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>توزيع الأنشطة حسب النوع</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {Object.entries(stats.typeCount).map(([type, count]) => (
+                            <div key={type} className="p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg border">
+                              <div className="text-sm font-bold text-gray-800">{type}</div>
+                              <div className="text-2xl font-bold text-gray-700 mt-1">{count}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* All Activities List */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>جميع الأنشطة المدمجة ({stats.totalActivities})</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {mergedReports.flatMap(report => 
+                          report.activities.map((activity, idx) => (
+                            <div key={`${report.id}-${idx}`} className="p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <h4 className="font-bold text-gray-800 text-lg">{activity.name}</h4>
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 text-sm">
+                                    <div>
+                                      <span className="text-gray-600">التاريخ:</span>
+                                      <span className="font-semibold text-gray-800 mr-1">
+                                        {new Date(activity.date).toLocaleDateString("ar-SA")}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">النوع:</span>
+                                      <span className="font-semibold text-gray-800 mr-1">{activity.type}</span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">المشاركون:</span>
+                                      <span className="font-semibold text-gray-800 mr-1">{activity.participants_count}</span>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-600">التفاعل:</span>
+                                      <span className="font-semibold text-green-700 mr-1">{activity.interaction_rate}/10</span>
+                                    </div>
+                                  </div>
+                                  
+                                  {activity.supervisors && activity.supervisors.length > 0 && (
+                                    <div className="mt-2">
+                                      <span className="text-xs text-gray-600">المشرفون: </span>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {activity.supervisors.map((teacherId, i) => (
+                                          <span key={i} className="inline-block bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded text-xs">
+                                            {getTeacherName(teacherId)}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                  
+                                  {activity.cooperating_teachers && activity.cooperating_teachers.length > 0 && (
+                                    <div className="mt-2">
+                                      <span className="text-xs text-gray-600">المعلمون المتعاونون: </span>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {activity.cooperating_teachers.map((teacherId, i) => (
+                                          <span key={i} className="inline-block bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs">
+                                            {getTeacherName(teacherId)}
+                                          </span>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                  
+                                  {activity.target_group && (
+                                    <div className="mt-2 text-sm">
+                                      <span className="text-gray-600">الفئة المستهدفة: </span>
+                                      <span className="text-gray-800">{activity.target_group}</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              );
+            })()}
+          </div>
+        </TabsContent>
       </Tabs>
     </DashboardLayout>
   );
