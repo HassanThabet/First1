@@ -743,52 +743,139 @@ const VicePrincipalDashboard = () => {
 
         <TabsContent value="reports">
           <div className="space-y-4">
-            {myReports.map((report) => (
-              <Card key={report.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>
-                      تقرير من {new Date(report.week_start).toLocaleDateString("ar-SA")} 
-                      إلى {new Date(report.week_end).toLocaleDateString("ar-SA")}
-                    </span>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(report)}>
-                        تعديل
-                      </Button>
-                      <Button variant="destructive" size="sm" onClick={() => handleDelete(report.id)}>
-                        حذف
-                      </Button>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">
+              تقاريري ({myReports.length})
+            </h3>
+            
+            <div className="grid grid-cols-1 gap-3">
+              {myReports.map((report) => (
+                <Card 
+                  key={report.id}
+                  className="report-card hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setSelectedMyReport(report);
+                    setShowMyReportModal(true);
+                  }}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-800">
+                          تقرير من {new Date(report.week_start).toLocaleDateString("ar-SA")} 
+                          إلى {new Date(report.week_end).toLocaleDateString("ar-SA")}
+                        </h4>
+                        <p className="text-sm text-gray-500">
+                          عدد المشاكل: {report.problems.length} | عدد الاقتراحات: {report.suggestions.length}
+                        </p>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedMyReport(report);
+                            setShowMyReportModal(true);
+                          }}
+                        >
+                          <Eye className="w-4 h-4 ml-1" />
+                          عرض
+                        </Button>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEdit(report);
+                          }}
+                        >
+                          تعديل
+                        </Button>
+                        
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDelete(report.id);
+                          }}
+                        >
+                          حذف
+                        </Button>
+                      </div>
                     </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {report.problems.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold mb-2">المشاكل:</h4>
-                        {report.problems.map((problem, i) => (
-                          <div key={i} className="bg-gray-50 p-3 rounded-lg mb-2">
-                            <p className="font-medium">{problem.description}</p>
-                            <p className="text-sm text-gray-600 mt-1">الإجراءات: {problem.actions}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* My Report Modal */}
+          <Dialog open={showMyReportModal} onOpenChange={setShowMyReportModal}>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-2xl">
+                  {selectedMyReport && (
+                    `تقرير من ${new Date(selectedMyReport.week_start).toLocaleDateString("ar-SA")} 
+                    إلى ${new Date(selectedMyReport.week_end).toLocaleDateString("ar-SA")}`
+                  )}
+                </DialogTitle>
+              </DialogHeader>
+              
+              {selectedMyReport && (
+                <div className="space-y-6 p-4">
+                  {selectedMyReport.problems.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">
+                        المشاكل ({selectedMyReport.problems.length})
+                      </h4>
+                      <div className="space-y-3">
+                        {selectedMyReport.problems.map((problem, i) => (
+                          <div key={i} className="p-4 bg-red-50 rounded-lg border border-red-200">
+                            <div className="flex items-start gap-2">
+                              <div className="flex-shrink-0 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                {i + 1}
+                              </div>
+                              <div className="flex-1">
+                                <p className="font-semibold text-gray-800 mb-2">{problem.description}</p>
+                                <div className="bg-white p-2 rounded">
+                                  <p className="text-sm text-gray-600">
+                                    <span className="font-semibold text-gray-800">الإجراءات المتخذة:</span> {problem.actions}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
-                    )}
-                    {report.suggestions.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold mb-2">الاقتراحات:</h4>
-                        <ul className="list-disc list-inside space-y-1">
-                          {report.suggestions.map((suggestion, i) => (
-                            <li key={i}>{suggestion}</li>
-                          ))}
-                        </ul>
+                    </div>
+                  )}
+                  
+                  {selectedMyReport.suggestions.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">
+                        الاقتراحات ({selectedMyReport.suggestions.length})
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedMyReport.suggestions.map((suggestion, i) => (
+                          <div key={i} className="p-3 bg-green-50 rounded-lg border border-green-200">
+                            <div className="flex items-start gap-2">
+                              <div className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                {i + 1}
+                              </div>
+                              <p className="flex-1 text-gray-800">{suggestion}</p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
       </Tabs>
     </DashboardLayout>
