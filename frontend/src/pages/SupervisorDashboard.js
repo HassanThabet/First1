@@ -83,12 +83,11 @@ const SupervisorDashboard = () => {
   const filterReports = () => {
     let filtered = [...allReports];
 
-    if (dateFilter) {
+    if (viewMode === "daily" && dateFilter) {
       filtered = filtered.filter(r => r.date === dateFilter);
     }
 
-    if (weekFilter) {
-      // Filter by week (Saturday to Wednesday)
+    if (viewMode === "weekly" && weekFilter) {
       const weekStart = new Date(weekFilter);
       const weekEnd = new Date(weekFilter);
       weekEnd.setDate(weekEnd.getDate() + 4); // 5 days (Sat-Wed)
@@ -96,6 +95,15 @@ const SupervisorDashboard = () => {
       filtered = filtered.filter(r => {
         const reportDate = new Date(r.date);
         return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    }
+
+    if (viewMode === "monthly" && monthFilter) {
+      const [year, month] = monthFilter.split('-');
+      filtered = filtered.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate.getFullYear() === parseInt(year) && 
+               reportDate.getMonth() === parseInt(month) - 1;
       });
     }
 
