@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, Response, Cookie
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +7,11 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional, Dict, Any
 import uuid
-from datetime import datetime, timezone
-
+from datetime import datetime, timezone, timedelta
+import bcrypt
+import secrets
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -25,46 +27,891 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Models
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    role: str  # admin, chairman, director, vice_principal, supervisor, activities, educational_supervision, social_specialist, quality
+    branch: str  # boys, girls, both
+    assigned_to: Optional[str] = None  # For supervisors assigned to vice principals
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
+class UserLogin(BaseModel):
+    username: str
+    password: str
+    remember_me: bool = False
+
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    username: str
+    role: str
+    branch: str
+    assigned_to: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class Session(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    token: str
+    expires_at: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
+class Teacher(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    subject: str
+    branch: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+class Subject(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+class ClassRoom(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    section: str
+    branch: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class SupervisorReport(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    branch: str
+    date: str
+    student_discipline: int
+    student_discipline_notes: Optional[str] = None
+    classroom_cleanliness: int
+    classroom_cleanliness_notes: Optional[str] = None
+    teacher_attendance_rate: int
+    late_teachers: List[Dict[str, Any]] = []
+    teacher_attendance_notes: Optional[str] = None
+    student_movement: Optional[str] = None
+    student_movement_classes: List[str] = []
+    student_movement_notes: Optional[str] = None
+    general_behavior: int
+    general_notes: Optional[str] = None
+    incidents: List[Dict[str, str]] = []
+    absent_teachers: List[Dict[str, Any]] = []
+    covering_teachers: List[Dict[str, Any]] = []
+    absent_students_count: int = 0
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+
+class VicePrincipalReport(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    branch: str
+    week_start: str
+    week_end: str
+    problems: List[Dict[str, str]] = []
+    suggestions: List[str] = []
+    supervisor_reports: List[str] = []  # IDs of supervisor reports
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+
+class ActivitiesReport(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    branch: str
+    activities: List[Dict[str, Any]] = []
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+
+class EducationalSupervisionReport(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    branch: str
+    date: str
+    teacher_evaluations: List[Dict[str, Any]] = []
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+
+class SocialSpecialistReport(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    branch: str
+    date: str
+    psychological_cases: int = 0
+    academic_cases: int = 0
+    behavioral_cases: int = 0
+    sessions_count: int = 0
+    families_contacted: int = 0
+    referrals_count: int = 0
+    follow_ups_count: int = 0
+    guidance_programs: Optional[str] = None
+    challenges: Optional[str] = None
+    recommendations: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+
+class QualityReport(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    branch: str
+    date: str
+    academic_performance: Dict[str, str] = {}
+    educational_supervision: Dict[str, str] = {}
+    discipline_behavior: Dict[str, str] = {}
+    activities_programs: Dict[str, str] = {}
+    social_specialist: Dict[str, str] = {}
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+
+class DirectorReport(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    branch: str
+    week_start: str
+    week_end: str
+    summary: Optional[str] = None
+    actions_taken: Optional[str] = None
+    recommendations: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: Optional[str] = None
+
+# Helper functions
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def verify_password(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode('utf-8'), hashed.encode('utf-8'))
+
+def generate_token() -> str:
+    return secrets.token_urlsafe(32)
+
+async def get_current_user(token: Optional[str] = Cookie(None)):
+    if not token:
+        raise HTTPException(status_code=401, detail="غير مصرح")
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    session = await db.sessions.find_one({"token": token})
+    if not session:
+        raise HTTPException(status_code=401, detail="جلسة غير صالحة")
     
-    return status_checks
+    expires_at = datetime.fromisoformat(session["expires_at"])
+    if expires_at < datetime.now(timezone.utc):
+        await db.sessions.delete_one({"token": token})
+        raise HTTPException(status_code=401, detail="انتهت صلاحية الجلسة")
+    
+    user = await db.users.find_one({"id": session["user_id"]}, {"_id": 0, "password": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="مستخدم غير موجود")
+    
+    return user
+
+# Initialize admin user
+@app.on_event("startup")
+async def create_admin():
+    admin = await db.users.find_one({"username": "مدارس الفجر الجديد الأهلية"})
+    if not admin:
+        admin_data = {
+            "id": str(uuid.uuid4()),
+            "username": "مدارس الفجر الجديد الأهلية",
+            "password": hash_password("2002002Hh"),
+            "role": "admin",
+            "branch": "both",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(admin_data)
+        logger.info("تم إنشاء حساب المدير الرئيسي")
+
+# Authentication endpoints
+@api_router.post("/auth/login")
+async def login(user_data: UserLogin, response: Response):
+    user = await db.users.find_one({"username": user_data.username})
+    if not user or not verify_password(user_data.password, user["password"]):
+        raise HTTPException(status_code=401, detail="اسم المستخدم أو كلمة المرور غير صحيحة")
+    
+    token = generate_token()
+    expires_delta = timedelta(days=30) if user_data.remember_me else timedelta(hours=8)
+    expires_at = datetime.now(timezone.utc) + expires_delta
+    
+    session_data = {
+        "id": str(uuid.uuid4()),
+        "user_id": user["id"],
+        "token": token,
+        "expires_at": expires_at.isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.sessions.insert_one(session_data)
+    
+    response.set_cookie(
+        key="token",
+        value=token,
+        max_age=int(expires_delta.total_seconds()),
+        httponly=True,
+        samesite="lax"
+    )
+    
+    user_response = {
+        "id": user["id"],
+        "username": user["username"],
+        "role": user["role"],
+        "branch": user["branch"],
+        "assigned_to": user.get("assigned_to")
+    }
+    
+    return {"user": user_response, "token": token}
+
+@api_router.post("/auth/logout")
+async def logout(response: Response, token: Optional[str] = Cookie(None)):
+    if token:
+        await db.sessions.delete_one({"token": token})
+    response.delete_cookie("token")
+    return {"message": "تم تسجيل الخروج بنجاح"}
+
+@api_router.get("/auth/me")
+async def get_me(user: dict = Depends(get_current_user)):
+    return user
+
+# User management (Admin only)
+@api_router.post("/users", response_model=User)
+async def create_user(user_data: UserCreate, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    existing = await db.users.find_one({"username": user_data.username})
+    if existing:
+        raise HTTPException(status_code=400, detail="اسم المستخدم موجود بالفعل")
+    
+    user_dict = user_data.model_dump()
+    user_dict["password"] = hash_password(user_data.password)
+    user_obj = User(**{k: v for k, v in user_dict.items() if k != 'password'})
+    
+    doc = user_obj.model_dump()
+    doc["password"] = user_dict["password"]
+    await db.users.insert_one(doc)
+    
+    return user_obj
+
+@api_router.get("/users", response_model=List[User])
+async def get_users(current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "chairman", "director"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = {}
+    if current_user["role"] == "director":
+        query["branch"] = current_user["branch"]
+    
+    users = await db.users.find(query, {"_id": 0, "password": 0}).to_list(1000)
+    return users
+
+@api_router.put("/users/{user_id}")
+async def update_user(user_id: str, user_data: dict, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    if "password" in user_data:
+        user_data["password"] = hash_password(user_data["password"])
+    
+    await db.users.update_one({"id": user_id}, {"$set": user_data})
+    return {"message": "تم تحديث المستخدم بنجاح"}
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.users.delete_one({"id": user_id})
+    return {"message": "تم حذف المستخدم بنجاح"}
+
+# Teachers Management
+@api_router.post("/teachers", response_model=Teacher)
+async def create_teacher(teacher_data: Teacher, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    doc = teacher_data.model_dump()
+    await db.teachers.insert_one(doc)
+    return teacher_data
+
+@api_router.get("/teachers", response_model=List[Teacher])
+async def get_teachers(branch: Optional[str] = None, subject: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    if branch:
+        query["branch"] = branch
+    if subject:
+        query["subject"] = subject
+    
+    teachers = await db.teachers.find(query, {"_id": 0}).to_list(1000)
+    return teachers
+
+@api_router.put("/teachers/{teacher_id}")
+async def update_teacher(teacher_id: str, teacher_data: dict, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.teachers.update_one({"id": teacher_id}, {"$set": teacher_data})
+    return {"message": "تم تحديث المعلم بنجاح"}
+
+@api_router.delete("/teachers/{teacher_id}")
+async def delete_teacher(teacher_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.teachers.delete_one({"id": teacher_id})
+    return {"message": "تم حذف المعلم بنجاح"}
+
+# Subjects Management
+@api_router.post("/subjects", response_model=Subject)
+async def create_subject(subject_data: Subject, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    doc = subject_data.model_dump()
+    await db.subjects.insert_one(doc)
+    return subject_data
+
+@api_router.get("/subjects", response_model=List[Subject])
+async def get_subjects(current_user: dict = Depends(get_current_user)):
+    subjects = await db.subjects.find({}, {"_id": 0}).to_list(1000)
+    return subjects
+
+@api_router.put("/subjects/{subject_id}")
+async def update_subject(subject_id: str, subject_data: dict, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.subjects.update_one({"id": subject_id}, {"$set": subject_data})
+    return {"message": "تم تحديث المادة بنجاح"}
+
+@api_router.delete("/subjects/{subject_id}")
+async def delete_subject(subject_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.subjects.delete_one({"id": subject_id})
+    return {"message": "تم حذف المادة بنجاح"}
+
+# ClassRooms Management
+@api_router.post("/classrooms", response_model=ClassRoom)
+async def create_classroom(classroom_data: ClassRoom, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    doc = classroom_data.model_dump()
+    await db.classrooms.insert_one(doc)
+    return classroom_data
+
+@api_router.get("/classrooms", response_model=List[ClassRoom])
+async def get_classrooms(branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    if branch:
+        query["branch"] = branch
+    
+    classrooms = await db.classrooms.find(query, {"_id": 0}).to_list(1000)
+    return classrooms
+
+@api_router.put("/classrooms/{classroom_id}")
+async def update_classroom(classroom_id: str, classroom_data: dict, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.classrooms.update_one({"id": classroom_id}, {"$set": classroom_data})
+    return {"message": "تم تحديث الصف بنجاح"}
+
+@api_router.delete("/classrooms/{classroom_id}")
+async def delete_classroom(classroom_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.classrooms.delete_one({"id": classroom_id})
+    return {"message": "تم حذف الصف بنجاح"}
+
+# Supervisor Reports
+@api_router.post("/reports/supervisor", response_model=SupervisorReport)
+async def create_supervisor_report(report_data: SupervisorReport, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "supervisor":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    # Check if already submitted today
+    today = datetime.now(timezone.utc).date().isoformat()
+    existing = await db.supervisor_reports.find_one({
+        "user_id": current_user["id"],
+        "date": today
+    })
+    if existing:
+        raise HTTPException(status_code=400, detail="لقد قمت بإرسال تقرير اليوم بالفعل")
+    
+    report_data.user_id = current_user["id"]
+    report_data.branch = current_user["branch"]
+    report_data.date = today
+    
+    doc = report_data.model_dump()
+    await db.supervisor_reports.insert_one(doc)
+    return report_data
+
+@api_router.get("/reports/supervisor", response_model=List[SupervisorReport])
+async def get_supervisor_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    
+    if current_user["role"] == "supervisor":
+        query["user_id"] = current_user["id"]
+    elif current_user["role"] == "vice_principal":
+        supervisors = await db.users.find({"assigned_to": current_user["id"]}, {"_id": 0}).to_list(100)
+        supervisor_ids = [s["id"] for s in supervisors]
+        query["user_id"] = {"$in": supervisor_ids}
+    elif current_user["role"] in ["director", "quality", "educational_supervision"]:
+        query["branch"] = current_user["branch"]
+    
+    if user_id:
+        query["user_id"] = user_id
+    if branch:
+        query["branch"] = branch
+    
+    reports = await db.supervisor_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return reports
+
+@api_router.get("/reports/supervisor/{report_id}", response_model=SupervisorReport)
+async def get_supervisor_report(report_id: str, current_user: dict = Depends(get_current_user)):
+    report = await db.supervisor_reports.find_one({"id": report_id}, {"_id": 0})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    return report
+
+@api_router.put("/reports/supervisor/{report_id}")
+async def update_supervisor_report(report_id: str, report_data: dict, current_user: dict = Depends(get_current_user)):
+    report = await db.supervisor_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.supervisor_reports.update_one({"id": report_id}, {"$set": report_data})
+    return {"message": "تم تحديث التقرير بنجاح"}
+
+@api_router.delete("/reports/supervisor/{report_id}")
+async def delete_supervisor_report(report_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.supervisor_reports.delete_one({"id": report_id})
+    return {"message": "تم حذف التقرير بنجاح"}
+
+# Vice Principal Reports
+@api_router.post("/reports/vice-principal", response_model=VicePrincipalReport)
+async def create_vice_principal_report(report_data: VicePrincipalReport, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "vice_principal":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data.user_id = current_user["id"]
+    report_data.branch = current_user["branch"]
+    
+    doc = report_data.model_dump()
+    await db.vice_principal_reports.insert_one(doc)
+    return report_data
+
+@api_router.get("/reports/vice-principal", response_model=List[VicePrincipalReport])
+async def get_vice_principal_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    
+    if current_user["role"] == "vice_principal":
+        query["user_id"] = current_user["id"]
+    elif current_user["role"] in ["director", "quality"]:
+        query["branch"] = current_user["branch"]
+    
+    if user_id:
+        query["user_id"] = user_id
+    if branch:
+        query["branch"] = branch
+    
+    reports = await db.vice_principal_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return reports
+
+@api_router.put("/reports/vice-principal/{report_id}")
+async def update_vice_principal_report(report_id: str, report_data: dict, current_user: dict = Depends(get_current_user)):
+    report = await db.vice_principal_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.vice_principal_reports.update_one({"id": report_id}, {"$set": report_data})
+    return {"message": "تم تحديث التقرير بنجاح"}
+
+@api_router.delete("/reports/vice-principal/{report_id}")
+async def delete_vice_principal_report(report_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "vice_principal"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.vice_principal_reports.delete_one({"id": report_id})
+    return {"message": "تم حذف التقرير بنجاح"}
+
+# Activities Reports
+@api_router.post("/reports/activities", response_model=ActivitiesReport)
+async def create_activities_report(report_data: ActivitiesReport, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "activities":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data.user_id = current_user["id"]
+    report_data.branch = current_user["branch"]
+    
+    doc = report_data.model_dump()
+    await db.activities_reports.insert_one(doc)
+    return report_data
+
+@api_router.get("/reports/activities", response_model=List[ActivitiesReport])
+async def get_activities_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    
+    if current_user["role"] == "activities":
+        query["user_id"] = current_user["id"]
+    elif current_user["role"] in ["director", "quality"]:
+        query["branch"] = current_user["branch"]
+    
+    if user_id:
+        query["user_id"] = user_id
+    if branch:
+        query["branch"] = branch
+    
+    reports = await db.activities_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return reports
+
+@api_router.put("/reports/activities/{report_id}")
+async def update_activities_report(report_id: str, report_data: dict, current_user: dict = Depends(get_current_user)):
+    report = await db.activities_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.activities_reports.update_one({"id": report_id}, {"$set": report_data})
+    return {"message": "تم تحديث التقرير بنجاح"}
+
+@api_router.delete("/reports/activities/{report_id}")
+async def delete_activities_report(report_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "activities"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.activities_reports.delete_one({"id": report_id})
+    return {"message": "تم حذف التقرير بنجاح"}
+
+# Educational Supervision Reports
+@api_router.post("/reports/educational-supervision", response_model=EducationalSupervisionReport)
+async def create_educational_supervision_report(report_data: EducationalSupervisionReport, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "educational_supervision":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data.user_id = current_user["id"]
+    report_data.branch = current_user["branch"]
+    
+    doc = report_data.model_dump()
+    await db.educational_supervision_reports.insert_one(doc)
+    return report_data
+
+@api_router.get("/reports/educational-supervision", response_model=List[EducationalSupervisionReport])
+async def get_educational_supervision_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    
+    if current_user["role"] == "educational_supervision":
+        query["user_id"] = current_user["id"]
+    elif current_user["role"] in ["director", "quality"]:
+        query["branch"] = current_user["branch"]
+    
+    if user_id:
+        query["user_id"] = user_id
+    if branch:
+        query["branch"] = branch
+    
+    reports = await db.educational_supervision_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return reports
+
+@api_router.put("/reports/educational-supervision/{report_id}")
+async def update_educational_supervision_report(report_id: str, report_data: dict, current_user: dict = Depends(get_current_user)):
+    report = await db.educational_supervision_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.educational_supervision_reports.update_one({"id": report_id}, {"$set": report_data})
+    return {"message": "تم تحديث التقرير بنجاح"}
+
+@api_router.delete("/reports/educational-supervision/{report_id}")
+async def delete_educational_supervision_report(report_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "educational_supervision"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.educational_supervision_reports.delete_one({"id": report_id})
+    return {"message": "تم حذف التقرير بنجاح"}
+
+# Social Specialist Reports
+@api_router.post("/reports/social-specialist", response_model=SocialSpecialistReport)
+async def create_social_specialist_report(report_data: SocialSpecialistReport, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "social_specialist":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data.user_id = current_user["id"]
+    report_data.branch = current_user["branch"]
+    
+    doc = report_data.model_dump()
+    await db.social_specialist_reports.insert_one(doc)
+    return report_data
+
+@api_router.get("/reports/social-specialist", response_model=List[SocialSpecialistReport])
+async def get_social_specialist_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    
+    if current_user["role"] == "social_specialist":
+        query["user_id"] = current_user["id"]
+    elif current_user["role"] in ["director", "quality"]:
+        query["branch"] = current_user["branch"]
+    
+    if user_id:
+        query["user_id"] = user_id
+    if branch:
+        query["branch"] = branch
+    
+    reports = await db.social_specialist_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return reports
+
+@api_router.put("/reports/social-specialist/{report_id}")
+async def update_social_specialist_report(report_id: str, report_data: dict, current_user: dict = Depends(get_current_user)):
+    report = await db.social_specialist_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.social_specialist_reports.update_one({"id": report_id}, {"$set": report_data})
+    return {"message": "تم تحديث التقرير بنجاح"}
+
+@api_router.delete("/reports/social-specialist/{report_id}")
+async def delete_social_specialist_report(report_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "social_specialist"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.social_specialist_reports.delete_one({"id": report_id})
+    return {"message": "تم حذف التقرير بنجاح"}
+
+# Quality Reports
+@api_router.post("/reports/quality", response_model=QualityReport)
+async def create_quality_report(report_data: QualityReport, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "quality":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data.user_id = current_user["id"]
+    report_data.branch = current_user["branch"]
+    
+    doc = report_data.model_dump()
+    await db.quality_reports.insert_one(doc)
+    return report_data
+
+@api_router.get("/reports/quality", response_model=List[QualityReport])
+async def get_quality_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    
+    if current_user["role"] == "quality":
+        query["user_id"] = current_user["id"]
+    elif current_user["role"] == "director":
+        query["branch"] = current_user["branch"]
+    
+    if user_id:
+        query["user_id"] = user_id
+    if branch:
+        query["branch"] = branch
+    
+    reports = await db.quality_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return reports
+
+@api_router.put("/reports/quality/{report_id}")
+async def update_quality_report(report_id: str, report_data: dict, current_user: dict = Depends(get_current_user)):
+    report = await db.quality_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.quality_reports.update_one({"id": report_id}, {"$set": report_data})
+    return {"message": "تم تحديث التقرير بنجاح"}
+
+@api_router.delete("/reports/quality/{report_id}")
+async def delete_quality_report(report_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "quality"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.quality_reports.delete_one({"id": report_id})
+    return {"message": "تم حذف التقرير بنجاح"}
+
+# Director Reports
+@api_router.post("/reports/director", response_model=DirectorReport)
+async def create_director_report(report_data: DirectorReport, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "director":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data.user_id = current_user["id"]
+    report_data.branch = current_user["branch"]
+    
+    doc = report_data.model_dump()
+    await db.director_reports.insert_one(doc)
+    return report_data
+
+@api_router.get("/reports/director", response_model=List[DirectorReport])
+async def get_director_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    
+    if current_user["role"] == "director":
+        query["user_id"] = current_user["id"]
+    
+    if user_id:
+        query["user_id"] = user_id
+    if branch:
+        query["branch"] = branch
+    
+    reports = await db.director_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return reports
+
+@api_router.put("/reports/director/{report_id}")
+async def update_director_report(report_id: str, report_data: dict, current_user: dict = Depends(get_current_user)):
+    report = await db.director_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    report_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    await db.director_reports.update_one({"id": report_id}, {"$set": report_data})
+    return {"message": "تم تحديث التقرير بنجاح"}
+
+@api_router.delete("/reports/director/{report_id}")
+async def delete_director_report(report_id: str, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "director"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    await db.director_reports.delete_one({"id": report_id})
+    return {"message": "تم حذف التقرير بنجاح"}
+
+# Statistics endpoints
+@api_router.get("/statistics/teacher-absences")
+async def get_teacher_absences(branch: Optional[str] = None, start_date: Optional[str] = None, end_date: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    query = {}
+    if branch:
+        query["branch"] = branch
+    if start_date and end_date:
+        query["date"] = {"$gte": start_date, "$lte": end_date}
+    
+    reports = await db.supervisor_reports.find(query, {"_id": 0}).to_list(1000)
+    
+    teacher_stats = {}
+    for report in reports:
+        for absent in report.get("absent_teachers", []):
+            teacher_name = absent.get("teacher")
+            if teacher_name:
+                if teacher_name not in teacher_stats:
+                    teacher_stats[teacher_name] = {"absences": 0, "covered": 0}
+                teacher_stats[teacher_name]["absences"] += 1
+        
+        for covering in report.get("covering_teachers", []):
+            teacher_name = covering.get("teacher")
+            if teacher_name:
+                if teacher_name not in teacher_stats:
+                    teacher_stats[teacher_name] = {"absences": 0, "covered": 0}
+                teacher_stats[teacher_name]["covered"] += 1
+    
+    return teacher_stats
+
+@api_router.get("/statistics/teacher-evaluations")
+async def get_teacher_evaluations(branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "chairman", "director", "educational_supervision"]:
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    query = {}
+    if branch:
+        query["branch"] = branch
+    elif current_user["role"] == "director":
+        query["branch"] = current_user["branch"]
+    
+    # Get educational supervision reports
+    ed_reports = await db.educational_supervision_reports.find(query, {"_id": 0}).to_list(1000)
+    
+    # Get activities reports for teacher cooperation
+    activities_reports = await db.activities_reports.find(query, {"_id": 0}).to_list(1000)
+    
+    # Get supervisor reports for absences and covering
+    supervisor_reports = await db.supervisor_reports.find(query, {"_id": 0}).to_list(1000)
+    
+    teacher_data = {}
+    
+    # Process educational supervision evaluations
+    for report in ed_reports:
+        for eval in report.get("teacher_evaluations", []):
+            teacher = eval.get("teacher")
+            if teacher:
+                if teacher not in teacher_data:
+                    teacher_data[teacher] = {
+                        "evaluations": [],
+                        "absences": 0,
+                        "covered": 0,
+                        "activities_cooperation": 0
+                    }
+                teacher_data[teacher]["evaluations"].append(eval)
+    
+    # Process activities cooperation
+    for report in activities_reports:
+        for activity in report.get("activities", []):
+            for teacher in activity.get("cooperating_teachers", []):
+                if teacher:
+                    if teacher not in teacher_data:
+                        teacher_data[teacher] = {
+                            "evaluations": [],
+                            "absences": 0,
+                            "covered": 0,
+                            "activities_cooperation": 0
+                        }
+                    teacher_data[teacher]["activities_cooperation"] += 1
+    
+    # Process absences and covering
+    for report in supervisor_reports:
+        for absent in report.get("absent_teachers", []):
+            teacher = absent.get("teacher")
+            if teacher:
+                if teacher not in teacher_data:
+                    teacher_data[teacher] = {
+                        "evaluations": [],
+                        "absences": 0,
+                        "covered": 0,
+                        "activities_cooperation": 0
+                    }
+                teacher_data[teacher]["absences"] += 1
+        
+        for covering in report.get("covering_teachers", []):
+            teacher = covering.get("teacher")
+            if teacher:
+                if teacher not in teacher_data:
+                    teacher_data[teacher] = {
+                        "evaluations": [],
+                        "absences": 0,
+                        "covered": 0,
+                        "activities_cooperation": 0
+                    }
+                teacher_data[teacher]["covered"] += 1
+    
+    return teacher_data
 
 # Include the router in the main app
 app.include_router(api_router)
