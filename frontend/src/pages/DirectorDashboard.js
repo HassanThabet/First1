@@ -163,15 +163,6 @@ const DirectorDashboard = () => {
     const avgQualityTeachingRate = filteredQualityReports.length > 0 ?
       (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
 
-    let supervisorCount = 0;
-    if (selectedVPForStats !== "all") {
-      supervisorCount = users.filter(u => 
-        u.role === "supervisor" && 
-        u.assigned_to === selectedVPForStats &&
-        u.branch === user.branch
-      ).length;
-    }
-
     return {
       // Supervisor stats
       totalLateTeachers,
