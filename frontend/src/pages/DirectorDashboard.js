@@ -72,27 +72,13 @@ const DirectorDashboard = () => {
     }
   };
 
-  // Calculate overall statistics
-  const getOverallStatistics = () => {
-    let reports = [...supervisorReports];
-    
-    // Filter by selected Vice Principal if chosen
-    if (selectedVPForStats !== "all") {
-      // Get all supervisors under this VP
-      const supervisorsUnderVP = users.filter(u => 
-        u.role === "supervisor" && 
-        u.assigned_to === selectedVPForStats &&
-        u.branch === user.branch
-      );
-      const supervisorIds = supervisorsUnderVP.map(s => s.id);
-      reports = reports.filter(r => supervisorIds.includes(r.user_id));
-    }
-    
-    // Apply time filter
+  // Helper function to filter reports by time
+  const filterReportsByTime = (reports) => {
     const today = new Date();
+    
     if (timeFilter === "daily") {
       const todayStr = today.toISOString().split('T')[0];
-      reports = reports.filter(r => r.date === todayStr);
+      return reports.filter(r => r.date === todayStr);
     } else if (timeFilter === "weekly") {
       const currentDay = today.getDay();
       const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
@@ -103,36 +89,88 @@ const DirectorDashboard = () => {
       weekEnd.setDate(weekStart.getDate() + 4);
       weekEnd.setHours(23, 59, 59, 999);
       
-      reports = reports.filter(r => {
+      return reports.filter(r => {
         const reportDate = new Date(r.date);
         return reportDate >= weekStart && reportDate <= weekEnd;
       });
     } else if (timeFilter === "monthly") {
       const currentMonth = today.getMonth();
       const currentYear = today.getFullYear();
-      reports = reports.filter(r => {
+      return reports.filter(r => {
         const reportDate = new Date(r.date);
         return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
       });
     }
-
-    // Calculate statistics
-    const totalLateTeachers = reports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
-    const totalAbsentTeachers = reports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
-    const totalCoveringTeachers = reports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
-    const totalIncidents = reports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
-    const totalAbsentStudents = reports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
     
-    const avgDiscipline = reports.length > 0 ? 
-      (reports.reduce((sum, r) => sum + r.student_discipline, 0) / reports.length).toFixed(1) : 0;
-    const avgCleanliness = reports.length > 0 ?
-      (reports.reduce((sum, r) => sum + r.classroom_cleanliness, 0) / reports.length).toFixed(1) : 0;
-    const avgAttendance = reports.length > 0 ?
-      (reports.reduce((sum, r) => sum + r.teacher_attendance_rate, 0) / reports.length).toFixed(1) : 0;
-    const avgBehavior = reports.length > 0 ?
-      (reports.reduce((sum, r) => sum + r.general_behavior, 0) / reports.length).toFixed(1) : 0;
+    return reports;
+  };
 
-    // Get supervisor count for the selected VP
+  // Calculate overall statistics
+  const getOverallStatistics = () => {
+    let filteredSupervisorReports = [...supervisorReports];
+    let filteredActivitiesReports = [...activitiesReports];
+    let filteredSocialReports = [...socialReports];
+    let filteredQualityReports = [...qualityReports];
+    
+    // Filter by selected Vice Principal if chosen
+    if (selectedVPForStats !== "all") {
+      const supervisorsUnderVP = users.filter(u => 
+        u.role === "supervisor" && 
+        u.assigned_to === selectedVPForStats &&
+        u.branch === user.branch
+      );
+      const supervisorIds = supervisorsUnderVP.map(s => s.id);
+      filteredSupervisorReports = filteredSupervisorReports.filter(r => supervisorIds.includes(r.user_id));
+    }
+    
+    // Apply time filter to all report types
+    filteredSupervisorReports = filterReportsByTime(filteredSupervisorReports);
+    filteredActivitiesReports = filterReportsByTime(filteredActivitiesReports);
+    filteredSocialReports = filterReportsByTime(filteredSocialReports);
+    filteredQualityReports = filterReportsByTime(filteredQualityReports);
+
+    // Supervisor statistics
+    const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
+    const totalAbsentTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
+    const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
+    const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+    const totalAbsentStudents = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
+    
+    const avgDiscipline = filteredSupervisorReports.length > 0 ? 
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.student_discipline || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgCleanliness = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.classroom_cleanliness || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgAttendance = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.teacher_attendance_rate || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgBehavior = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.general_behavior || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+
+    // Activities statistics
+    const totalActivities = filteredActivitiesReports.reduce((sum, r) => sum + (r.activities?.length || 0), 0);
+    const totalActivitiesParticipants = filteredActivitiesReports.reduce((sum, r) => {
+      return sum + (r.activities || []).reduce((aSum, a) => aSum + (a.participants_count || 0), 0);
+    }, 0);
+    const avgActivitiesInteraction = filteredActivitiesReports.length > 0 ? 
+      (filteredActivitiesReports.reduce((sum, r) => {
+        const activities = r.activities || [];
+        const avgInteraction = activities.length > 0 ? 
+          activities.reduce((aSum, a) => aSum + (a.interaction_rate || 0), 0) / activities.length : 0;
+        return sum + avgInteraction;
+      }, 0) / filteredActivitiesReports.length).toFixed(1) : 0;
+
+    // Social Specialist statistics
+    const totalPsychologicalCases = filteredSocialReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademicCases = filteredSocialReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioralCases = filteredSocialReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalStudentCases = totalPsychologicalCases + totalAcademicCases + totalBehavioralCases;
+    const totalSessions = filteredSocialReports.reduce((sum, r) => sum + (r.sessions_count || 0), 0);
+    const totalFamilyContacts = filteredSocialReports.reduce((sum, r) => sum + (r.family_contacts || 0), 0);
+
+    // Quality statistics
+    const totalQualityVisits = filteredQualityReports.length;
+    const avgQualityTeachingRate = filteredQualityReports.length > 0 ?
+      (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
+
     let supervisorCount = 0;
     if (selectedVPForStats !== "all") {
       supervisorCount = users.filter(u => 
@@ -143,6 +181,7 @@ const DirectorDashboard = () => {
     }
 
     return {
+      // Supervisor stats
       totalLateTeachers,
       totalAbsentTeachers,
       totalCoveringTeachers,
@@ -152,8 +191,32 @@ const DirectorDashboard = () => {
       avgCleanliness,
       avgAttendance,
       avgBehavior,
-      totalReports: reports.length,
-      supervisorCount
+      supervisorReportsCount: filteredSupervisorReports.length,
+      supervisorCount,
+      
+      // Activities stats
+      totalActivities,
+      totalActivitiesParticipants,
+      avgActivitiesInteraction,
+      activitiesReportsCount: filteredActivitiesReports.length,
+      
+      // Social Specialist stats
+      totalStudentCases,
+      totalPsychologicalCases,
+      totalAcademicCases,
+      totalBehavioralCases,
+      totalSessions,
+      totalFamilyContacts,
+      socialReportsCount: filteredSocialReports.length,
+      
+      // Quality stats
+      totalQualityVisits,
+      avgQualityTeachingRate,
+      qualityReportsCount: filteredQualityReports.length,
+      
+      // Total
+      totalAllReports: filteredSupervisorReports.length + filteredActivitiesReports.length + 
+                       filteredSocialReports.length + filteredQualityReports.length
     };
   };
 
