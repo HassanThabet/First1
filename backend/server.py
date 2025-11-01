@@ -734,16 +734,22 @@ async def delete_social_specialist_report(report_id: str, current_user: dict = D
 
 # Quality Reports
 @api_router.post("/reports/quality", response_model=QualityReport)
-async def create_quality_report(report_data: QualityReport, current_user: dict = Depends(get_current_user)):
+async def create_quality_report(report_data: dict, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "quality":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
-    report_data.user_id = current_user["id"]
-    report_data.branch = current_user["branch"]
+    # Add required fields
+    report_data["id"] = str(uuid.uuid4())
+    report_data["user_id"] = current_user["id"]
+    report_data["branch"] = current_user["branch"]
+    if "date" not in report_data:
+        report_data["date"] = datetime.now(timezone.utc).date().isoformat()
+    report_data["created_at"] = datetime.now(timezone.utc).isoformat()
     
-    doc = report_data.model_dump()
-    await db.quality_reports.insert_one(doc)
-    return report_data
+    await db.quality_reports.insert_one(report_data)
+    
+    report_obj = QualityReport(**report_data)
+    return report_obj
 
 @api_router.get("/reports/quality", response_model=List[QualityReport])
 async def get_quality_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
