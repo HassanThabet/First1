@@ -1022,6 +1022,7 @@ const SupervisorDashboard = () => {
                   </CardContent>
                 </Card>
               ))}
+            </div>
           </div>
         </TabsContent>
       </Tabs>
