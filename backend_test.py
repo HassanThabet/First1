@@ -760,9 +760,12 @@ class BackendTester:
             
         # Test all endpoints
         self.test_teachers_endpoint()
+        self.test_users_endpoint()
+        self.test_supervisor_reports()
         self.test_activities_reports()
         self.test_social_specialist_reports()
         self.test_quality_reports()
+        self.test_vice_principal_reports()
         
         # Print summary
         self.print_summary()
