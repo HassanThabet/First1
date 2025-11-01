@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/
 import { toast } from "sonner";
 import { Plus, X, FileDown, Eye } from "lucide-react";
 import * as XLSX from 'xlsx';
+import pdfMake from '../utils/pdfConfig';
 
 const VicePrincipalDashboard = () => {
   const { user } = useContext(AuthContext);
