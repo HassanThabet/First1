@@ -142,12 +142,21 @@ const SupervisorDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post(`${API}/reports/supervisor`, formData);
-      toast.success("تم إنشاء التقرير بنجاح");
+      if (editingReport) {
+        // Update existing report
+        await axios.put(`${API}/reports/supervisor/${editingReport.id}`, formData);
+        toast.success("تم تحديث التقرير بنجاح");
+        setEditingReport(null);
+      } else {
+        // Create new report
+        await axios.post(`${API}/reports/supervisor`, formData);
+        toast.success("تم إنشاء التقرير بنجاح");
+      }
       fetchData();
       setActiveTab("reports");
       // Reset form
       setFormData({
+        date: new Date().toISOString().split('T')[0],
         student_discipline: 10,
         student_discipline_notes: "",
         classroom_cleanliness: 10,
@@ -169,6 +178,42 @@ const SupervisorDashboard = () => {
       toast.error(error.response?.data?.detail || "فشل إنشاء التقرير");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEdit = (report) => {
+    setEditingReport(report);
+    setFormData({
+      date: report.date,
+      student_discipline: report.student_discipline,
+      student_discipline_notes: report.student_discipline_notes || "",
+      classroom_cleanliness: report.classroom_cleanliness,
+      classroom_cleanliness_notes: report.classroom_cleanliness_notes || "",
+      teacher_attendance_rate: report.teacher_attendance_rate,
+      late_teachers: report.late_teachers || [],
+      teacher_attendance_notes: report.teacher_attendance_notes || "",
+      student_movement: report.student_movement || "",
+      student_movement_classes: report.student_movement_classes || [],
+      student_movement_notes: report.student_movement_notes || "",
+      general_behavior: report.general_behavior,
+      general_notes: report.general_notes || "",
+      incidents: report.incidents || [],
+      absent_teachers: report.absent_teachers || [],
+      covering_teachers: report.covering_teachers || [],
+      absent_students_count: report.absent_students_count || 0
+    });
+    setActiveTab("create");
+  };
+
+  const handleDelete = async (reportId) => {
+    if (window.confirm("هل أنت متأكد من حذف هذا التقرير؟")) {
+      try {
+        await axios.delete(`${API}/reports/supervisor/${reportId}`);
+        toast.success("تم حذف التقرير بنجاح");
+        fetchData();
+      } catch (error) {
+        toast.error("فشل حذف التقرير");
+      }
     }
   };
 
