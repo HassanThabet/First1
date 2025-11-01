@@ -543,96 +543,202 @@ const VicePrincipalDashboard = () => {
 
         <TabsContent value="supervisor-reports">
           <div className="space-y-4">
-            {supervisorReports.map((report) => (
-              <Card key={report.id}>
-                <CardHeader>
-                  <CardTitle>تقرير {new Date(report.date).toLocaleDateString("ar-SA")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-4 gap-4 mb-4">
-                    <div className="stat-card">
-                      <div className="text-sm text-gray-600">انضباط الطلاب</div>
-                      <div className="text-2xl font-bold text-cyan-600">{report.student_discipline}/10</div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800">
+                تقارير المشرفين ({supervisorReports.length})
+              </h3>
+              <Button onClick={exportToExcel} variant="outline">
+                <FileDown className="w-4 h-4 ml-2" />
+                تصدير الكل
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3">
+              {supervisorReports.map((report) => (
+                <Card 
+                  key={report.id}
+                  className="report-card hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setSelectedSupervisorReport(report);
+                    setShowSupervisorModal(true);
+                  }}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-bold text-gray-800">
+                          تقرير {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                        </h4>
+                        <p className="text-sm text-gray-500">
+                          تم الإنشاء: {new Date(report.created_at).toLocaleString("ar-SA")}
+                        </p>
+                      </div>
+                      
+                      <div className="hidden md:flex items-center gap-3">
+                        <div className="text-center">
+                          <div className="text-xs text-gray-600">الانضباط</div>
+                          <div className="text-lg font-bold text-cyan-600">{report.student_discipline}/10</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-xs text-gray-600">النظافة</div>
+                          <div className="text-lg font-bold text-blue-600">{report.classroom_cleanliness}/10</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-xs text-gray-600">الالتزام</div>
+                          <div className="text-lg font-bold text-purple-600">{report.teacher_attendance_rate}/10</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-xs text-gray-600">السلوك</div>
+                          <div className="text-lg font-bold text-green-600">{report.general_behavior}/10</div>
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSupervisorReport(report);
+                          setShowSupervisorModal(true);
+                        }}
+                      >
+                        <Eye className="w-4 h-4 ml-1" />
+                        عرض
+                      </Button>
                     </div>
-                    <div className="stat-card">
-                      <div className="text-sm text-gray-600">نظافة الفصول</div>
-                      <div className="text-2xl font-bold text-cyan-600">{report.classroom_cleanliness}/10</div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="text-sm text-gray-600">التزام المعلمين</div>
-                      <div className="text-2xl font-bold text-cyan-600">{report.teacher_attendance_rate}/10</div>
-                    </div>
-                    <div className="stat-card">
-                      <div className="text-sm text-gray-600">السلوك العام</div>
-                      <div className="text-2xl font-bold text-cyan-600">{report.general_behavior}/10</div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          {/* Supervisor Report Modal */}
+          <Dialog open={showSupervisorModal} onOpenChange={setShowSupervisorModal}>
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-2xl">
+                  {selectedSupervisorReport && `تقرير ${new Date(selectedSupervisorReport.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                </DialogTitle>
+              </DialogHeader>
+              
+              {selectedSupervisorReport && (
+                <div className="space-y-6 p-4">
+                  {/* Main Statistics */}
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-800 mb-4">المؤشرات الرئيسية</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">انضباط الطلاب</div>
+                        <div className="text-3xl font-bold text-cyan-700">{selectedSupervisorReport.student_discipline}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">نظافة الفصول</div>
+                        <div className="text-3xl font-bold text-blue-700">{selectedSupervisorReport.classroom_cleanliness}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">التزام المعلمين</div>
+                        <div className="text-3xl font-bold text-purple-700">{selectedSupervisorReport.teacher_attendance_rate}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">السلوك العام</div>
+                        <div className="text-3xl font-bold text-green-700">{selectedSupervisorReport.general_behavior}/10</div>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="space-y-3">
-                    {report.late_teachers && report.late_teachers.length > 0 && (
-                      <div className="p-3 bg-orange-50 rounded-lg">
-                        <div className="text-sm font-semibold text-gray-700 mb-1">المعلمون المتأخرون:</div>
-                        <ul className="text-sm text-gray-600 list-disc list-inside">
-                          {report.late_teachers.map((lt, i) => (
-                            <li key={i}>{lt.teacher} - {lt.subject} - حصة {lt.period}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {report.absent_teachers && report.absent_teachers.length > 0 && (
-                      <div className="p-3 bg-red-50 rounded-lg">
-                        <div className="text-sm font-semibold text-gray-700 mb-1">المعلمون الغائبون:</div>
-                        <ul className="text-sm text-gray-600 list-disc list-inside">
-                          {report.absent_teachers.map((at, i) => (
-                            <li key={i}>{at.teacher} - {at.subject} - حصة {at.period}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {report.covering_teachers && report.covering_teachers.length > 0 && (
-                      <div className="p-3 bg-green-50 rounded-lg">
-                        <div className="text-sm font-semibold text-gray-700 mb-1">المعلمون المغطون:</div>
-                        <ul className="text-sm text-gray-600 list-disc list-inside">
-                          {report.covering_teachers.map((ct, i) => (
-                            <li key={i}>{ct.teacher} - {ct.subject} - حصة {ct.period}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    {report.incidents && report.incidents.length > 0 && (
-                      <div className="p-3 bg-yellow-50 rounded-lg">
-                        <div className="text-sm font-semibold text-gray-700 mb-2">الحوادث والمخالفات:</div>
-                        {report.incidents.map((inc, i) => (
-                          <div key={i} className="mb-2 text-sm">
-                            <p className="font-medium text-gray-800">{inc.description}</p>
-                            <p className="text-gray-600">الإجراء: {inc.action}</p>
+                  {/* Detailed Information */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Teachers Info */}
+                    {(selectedSupervisorReport.late_teachers?.length > 0 || selectedSupervisorReport.absent_teachers?.length > 0 || selectedSupervisorReport.covering_teachers?.length > 0) && (
+                      <div className="space-y-3">
+                        <h4 className="text-md font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">
+                          بيانات المعلمين
+                        </h4>
+                        
+                        {selectedSupervisorReport.late_teachers && selectedSupervisorReport.late_teachers.length > 0 && (
+                          <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                            <div className="text-sm font-bold text-orange-800 mb-2">
+                              المعلمون المتأخرون ({selectedSupervisorReport.late_teachers.length})
+                            </div>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                              {selectedSupervisorReport.late_teachers.map((lt, i) => (
+                                <li key={i}>• <strong>{lt.teacher}</strong> - {lt.subject} - حصة {lt.period}</li>
+                              ))}
+                            </ul>
                           </div>
-                        ))}
+                        )}
+                        
+                        {selectedSupervisorReport.absent_teachers && selectedSupervisorReport.absent_teachers.length > 0 && (
+                          <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                            <div className="text-sm font-bold text-red-800 mb-2">
+                              المعلمون الغائبون ({selectedSupervisorReport.absent_teachers.length})
+                            </div>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                              {selectedSupervisorReport.absent_teachers.map((at, i) => (
+                                <li key={i}>• <strong>{at.teacher}</strong> - {at.subject} - حصة {at.period}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        
+                        {selectedSupervisorReport.covering_teachers && selectedSupervisorReport.covering_teachers.length > 0 && (
+                          <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                            <div className="text-sm font-bold text-green-800 mb-2">
+                              المعلمون المغطون ({selectedSupervisorReport.covering_teachers.length})
+                            </div>
+                            <ul className="text-sm text-gray-700 space-y-1">
+                              {selectedSupervisorReport.covering_teachers.map((ct, i) => (
+                                <li key={i}>• <strong>{ct.teacher}</strong> - {ct.subject} - حصة {ct.period}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
                       </div>
                     )}
                     
-                    {report.absent_students_count > 0 && (
-                      <div className="p-3 bg-blue-50 rounded-lg">
-                        <div className="text-sm text-gray-700">
-                          <span className="font-semibold">عدد الطلاب الغائبين:</span> {report.absent_students_count}
+                    {/* Other Info */}
+                    <div className="space-y-3">
+                      <h4 className="text-md font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">
+                        معلومات إضافية
+                      </h4>
+                      
+                      {selectedSupervisorReport.incidents && selectedSupervisorReport.incidents.length > 0 && (
+                        <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                          <div className="text-sm font-bold text-yellow-800 mb-2">
+                            الحوادث والمخالفات ({selectedSupervisorReport.incidents.length})
+                          </div>
+                          <div className="space-y-2">
+                            {selectedSupervisorReport.incidents.map((inc, i) => (
+                              <div key={i} className="text-sm bg-white p-2 rounded">
+                                <p className="font-semibold text-gray-800">{inc.description}</p>
+                                <p className="text-gray-600 text-xs mt-1">الإجراء: {inc.action}</p>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    
-                    {report.general_notes && (
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <div className="text-sm font-semibold text-gray-700 mb-1">ملاحظات عامة:</div>
-                        <p className="text-gray-600">{report.general_notes}</p>
-                      </div>
-                    )}
+                      )}
+                      
+                      {selectedSupervisorReport.absent_students_count > 0 && (
+                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="text-sm font-bold text-blue-800">عدد الطلاب الغائبين</div>
+                          <div className="text-2xl font-bold text-blue-600 mt-1">
+                            {selectedSupervisorReport.absent_students_count} طالب
+                          </div>
+                        </div>
+                      )}
+                      
+                      {selectedSupervisorReport.general_notes && (
+                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+                          <div className="text-sm font-bold text-gray-800 mb-2">ملاحظات عامة</div>
+                          <p className="text-sm text-gray-700 leading-relaxed">{selectedSupervisorReport.general_notes}</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         <TabsContent value="reports">
