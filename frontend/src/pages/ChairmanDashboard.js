@@ -272,7 +272,7 @@ const ChairmanDashboard = () => {
                 <CardTitle>التصفية</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">الفرع</label>
                     <Select value={selectedBranch} onValueChange={(value) => {
@@ -308,6 +308,22 @@ const ChairmanDashboard = () => {
                               {vp.username} - {vp.branch === "boys" ? "البنين" : "البنات"}
                             </SelectItem>
                           ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">نوع التقرير</label>
+                    <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع التقارير</SelectItem>
+                        <SelectItem value="supervisor">المشرفين</SelectItem>
+                        <SelectItem value="activities">الأنشطة</SelectItem>
+                        <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
+                        <SelectItem value="quality">الجودة</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
