@@ -110,6 +110,15 @@ const DirectorDashboard = () => {
         const reportDate = new Date(r.date);
         return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
       });
+    } else if (timeFilter === "custom" && customStartDate && customEndDate) {
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      end.setHours(23, 59, 59, 999);
+      
+      return filtered.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate >= start && reportDate <= end;
+      });
     }
     
     return filtered;
