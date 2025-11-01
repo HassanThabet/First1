@@ -494,8 +494,13 @@ async def update_supervisor_report(report_id: str, report_data: dict, current_us
 
 @api_router.delete("/reports/supervisor/{report_id}")
 async def delete_supervisor_report(report_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="غير مصرح")
+    # Allow supervisor to delete their own reports, or admin to delete any report
+    report = await db.supervisor_reports.find_one({"id": report_id})
+    if not report:
+        raise HTTPException(status_code=404, detail="التقرير غير موجود")
+    
+    if current_user["role"] != "admin" and report["user_id"] != current_user["id"]:
+        raise HTTPException(status_code=403, detail="غير مصرح لك بحذف هذا التقرير")
     
     await db.supervisor_reports.delete_one({"id": report_id})
     return {"message": "تم حذف التقرير بنجاح"}
