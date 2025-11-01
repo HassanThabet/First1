@@ -75,6 +75,45 @@ const ChairmanDashboard = () => {
     return supervisorReports.filter(r => r.branch === selectedBranch);
   };
 
+  // Helper function to filter reports by time
+  const filterReportsByTime = (reports) => {
+    const today = new Date();
+    
+    // Filter by branch first
+    let filtered = reports;
+    if (selectedBranch !== "all") {
+      filtered = filtered.filter(r => r.branch === selectedBranch);
+    }
+    
+    if (timeFilter === "daily") {
+      const todayStr = today.toISOString().split('T')[0];
+      return filtered.filter(r => r.date === todayStr);
+    } else if (timeFilter === "weekly") {
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4);
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      return filtered.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    } else if (timeFilter === "monthly") {
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      return filtered.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
+      });
+    }
+    
+    return filtered;
+  };
+
   // Calculate overall statistics
   const getOverallStatistics = () => {
     let reports = [...supervisorReports];
