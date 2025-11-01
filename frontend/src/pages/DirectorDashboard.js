@@ -521,14 +521,10 @@ const DirectorDashboard = () => {
   return (
     <DashboardLayout title="لوحة تحكم المدير">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 mb-6">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="overview" className="flex items-center space-x-2 space-x-reverse">
             <BarChart3 className="w-4 h-4" />
             <span>الإحصائيات الإجمالية</span>
-          </TabsTrigger>
-          <TabsTrigger value="detailed" className="flex items-center space-x-2 space-x-reverse">
-            <TrendingUp className="w-4 h-4" />
-            <span>التقارير التفصيلية</span>
           </TabsTrigger>
           <TabsTrigger value="employees" className="flex items-center space-x-2 space-x-reverse">
             <UsersIcon className="w-4 h-4" />
