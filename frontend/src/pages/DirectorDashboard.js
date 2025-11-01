@@ -680,12 +680,143 @@ const DirectorDashboard = () => {
 
               <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300">
                 <CardContent className="p-6">
-                  <div className="text-sm text-gray-700 mb-1 font-semibold">عدد التقارير</div>
-                  <div className="text-4xl font-bold text-purple-700">{stats.totalReports}</div>
-                  <p className="text-xs text-gray-600 mt-2">تقارير المشرفين</p>
+                  <div className="text-sm text-gray-700 mb-1 font-semibold">تقارير المشرفين</div>
+                  <div className="text-4xl font-bold text-purple-700">{stats.supervisorReportsCount}</div>
+                  <p className="text-xs text-gray-600 mt-2">إجمالي تقارير المشرفين</p>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Activities Statistics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-purple-700">📅 إحصائيات الأنشطة</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الأنشطة</div>
+                      <div className="text-4xl font-bold text-purple-700">{stats.totalActivities}</div>
+                      <p className="text-xs text-gray-600 mt-2">{stats.activitiesReportsCount} تقرير</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-l-4 border-indigo-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي المشاركين</div>
+                      <div className="text-4xl font-bold text-indigo-700">{stats.totalActivitiesParticipants}</div>
+                      <p className="text-xs text-gray-600 mt-2">في جميع الأنشطة</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-violet-50 to-violet-100 border-l-4 border-violet-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط التفاعل</div>
+                      <div className="text-4xl font-bold text-violet-700">{stats.avgActivitiesInteraction}/10</div>
+                      <p className="text-xs text-gray-600 mt-2">معدل تفاعل الطلاب</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Social Specialist Statistics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-green-700">👥 إحصائيات الأخصائي الاجتماعي</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                  <Card className="bg-gradient-to-br from-rose-50 to-rose-100 border-l-4 border-rose-500">
+                    <CardContent className="p-4">
+                      <div className="text-xs text-gray-700 mb-1 font-semibold">إجمالي الحالات</div>
+                      <div className="text-3xl font-bold text-rose-700">{stats.totalStudentCases}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500">
+                    <CardContent className="p-4">
+                      <div className="text-xs text-gray-700 mb-1 font-semibold">حالات نفسية</div>
+                      <div className="text-3xl font-bold text-pink-700">{stats.totalPsychologicalCases}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-amber-500">
+                    <CardContent className="p-4">
+                      <div className="text-xs text-gray-700 mb-1 font-semibold">حالات أكاديمية</div>
+                      <div className="text-3xl font-bold text-amber-700">{stats.totalAcademicCases}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+                    <CardContent className="p-4">
+                      <div className="text-xs text-gray-700 mb-1 font-semibold">حالات سلوكية</div>
+                      <div className="text-3xl font-bold text-red-700">{stats.totalBehavioralCases}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-l-4 border-emerald-500">
+                    <CardContent className="p-4">
+                      <div className="text-xs text-gray-700 mb-1 font-semibold">الجلسات</div>
+                      <div className="text-3xl font-bold text-emerald-700">{stats.totalSessions}</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-l-4 border-teal-500">
+                    <CardContent className="p-4">
+                      <div className="text-xs text-gray-700 mb-1 font-semibold">تواصل مع الأسر</div>
+                      <div className="text-3xl font-bold text-teal-700">{stats.totalFamilyContacts}</div>
+                    </CardContent>
+                  </Card>
+                </div>
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800">
+                    📊 إجمالي: {stats.socialReportsCount} تقرير من الأخصائي الاجتماعي
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quality Statistics */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-orange-700">⭐ إحصائيات الجودة</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الزيارات</div>
+                      <div className="text-4xl font-bold text-orange-700">{stats.totalQualityVisits}</div>
+                      <p className="text-xs text-gray-600 mt-2">زيارات الجودة للمعلمين</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-amber-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط الأداء التدريسي</div>
+                      <div className="text-4xl font-bold text-amber-700">{stats.avgQualityTeachingRate}/10</div>
+                      <p className="text-xs text-gray-600 mt-2">معدل أداء المعلمين</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Overall Summary */}
+            <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
+              <CardContent className="p-6">
+                <div className="text-center">
+                  <div className="text-sm mb-2 font-semibold opacity-90">إجمالي جميع التقارير</div>
+                  <div className="text-6xl font-bold">{stats.totalAllReports}</div>
+                  <p className="text-xs mt-3 opacity-80">
+                    مشرفين: {stats.supervisorReportsCount} | أنشطة: {stats.activitiesReportsCount} | 
+                    أخصائي: {stats.socialReportsCount} | جودة: {stats.qualityReportsCount}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </TabsContent>
 
