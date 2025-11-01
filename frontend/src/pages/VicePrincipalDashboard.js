@@ -518,10 +518,11 @@ const VicePrincipalDashboard = () => {
           {
             table: {
               headerRows: 1,
-              widths: [25, 60, 50, 50, 50, 60, 50, 50],
+              widths: [20, 70, 50, 40, 40, 40, 50, 40, 40],
               body: [
                 [
                   { text: '#', style: 'tableHeader' },
+                  { text: 'المشرف', style: 'tableHeader' },
                   { text: 'التاريخ', style: 'tableHeader' },
                   { text: 'متأخرون', style: 'tableHeader' },
                   { text: 'غائبون', style: 'tableHeader' },
