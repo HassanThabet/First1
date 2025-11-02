@@ -1122,7 +1122,7 @@ const DirectorDashboard = () => {
                 )}
 
                 {/* Activities Detailed Reports */}
-                {reportTypeFilter === "activities" && (
+                {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-purple-700">التفاصيل الكاملة - تقارير الأنشطة</CardTitle>
