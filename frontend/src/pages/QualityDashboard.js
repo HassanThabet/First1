@@ -11,13 +11,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { toast } from "sonner";
-import { Eye, FileText } from "lucide-react";
+import { Eye, FileText, BarChart3 } from "lucide-react";
 
 const QualityDashboard = () => {
   const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("create");
   const [reports, setReports] = useState([]);
   const [allReports, setAllReports] = useState([]);
+  
+  // For statistics tab
+  const [supervisorReports, setSupervisorReports] = useState([]);
+  const [activitiesReports, setActivitiesReports] = useState([]);
+  const [socialReports, setSocialReports] = useState([]);
+  const [qualityReports, setQualityReports] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [timeFilter, setTimeFilter] = useState("all");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+  
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
