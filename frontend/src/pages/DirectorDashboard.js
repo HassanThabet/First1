@@ -1197,7 +1197,7 @@ const DirectorDashboard = () => {
                 )}
 
                 {/* Social Specialist Detailed Reports */}
-                {reportTypeFilter === "social" && (
+                {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-green-700">التفاصيل الكاملة - تقارير الأخصائي الاجتماعي</CardTitle>
