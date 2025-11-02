@@ -707,7 +707,7 @@ const DirectorDashboard = () => {
                     setSelectedVicePrincipal("all");
                   }}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="اختر نوع التقرير" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">جميع التقارير</SelectItem>
@@ -724,7 +724,7 @@ const DirectorDashboard = () => {
                   <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
                   <Select value={timeFilter} onValueChange={setTimeFilter}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="اختر الفترة الزمنية" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">جميع الفترات</SelectItem>
