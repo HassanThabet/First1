@@ -38,6 +38,7 @@ const DirectorDashboard = () => {
 
   const fetchAllData = async () => {
     try {
+      console.log("🔄 Fetching all data...");
       const [usersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes] = await Promise.all([
         axios.get(`${API}/users`),
         axios.get(`${API}/reports/supervisor`),
@@ -47,6 +48,14 @@ const DirectorDashboard = () => {
         axios.get(`${API}/reports/vice-principal`)
       ]);
       
+      console.log("✅ Data fetched successfully:");
+      console.log("Users:", usersRes.data.length);
+      console.log("Supervisor reports:", supervisorRes.data.length);
+      console.log("Activities reports:", activitiesRes.data.length);
+      console.log("Social reports:", socialRes.data.length);
+      console.log("Quality reports:", qualityRes.data.length);
+      console.log("VP reports:", vpRes.data.length);
+      
       setUsers(usersRes.data);
       setSupervisorReports(supervisorRes.data);
       setActivitiesReports(activitiesRes.data);
@@ -54,7 +63,7 @@ const DirectorDashboard = () => {
       setQualityReports(qualityRes.data);
       setVicePrincipalReports(vpRes.data);
     } catch (error) {
-      console.error("Failed to fetch data:", error);
+      console.error("❌ Failed to fetch data:", error);
       toast.error("فشل تحميل البيانات");
     }
   };
