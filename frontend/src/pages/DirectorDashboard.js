@@ -780,6 +780,24 @@ const DirectorDashboard = () => {
                 </div>
               )}
             </div>
+            
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center mt-4 pt-4 border-t">
+              <Button 
+                onClick={exportToPDF}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                📄 تصدير التقرير إلى PDF
+              </Button>
+              
+              <Button 
+                onClick={() => setShowDetailedReports(!showDetailedReports)}
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                {showDetailedReports ? "إخفاء التقارير التفصيلية" : "عرض التقارير التفصيلية"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
