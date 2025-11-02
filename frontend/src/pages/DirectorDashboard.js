@@ -1351,7 +1351,6 @@ const DirectorDashboard = () => {
                   </Card>
                 )}
               </>
-            )}
           </div>
         </TabsContent>
 
