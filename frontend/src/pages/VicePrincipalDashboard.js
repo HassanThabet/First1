@@ -1110,7 +1110,9 @@ const VicePrincipalDashboard = () => {
                             </div>
                             <ul className="text-sm text-gray-700 space-y-1">
                               {selectedSupervisorReport.late_teachers.map((lt, i) => (
-                                <li key={i}>• <strong>{lt.teacher}</strong> - {lt.subject} - حصة {lt.period}</li>
+                                <li key={i}>
+                                  {typeof lt === 'string' ? `• ${lt}` : `• ${lt.teacher || ''} - ${lt.subject || ''} - حصة ${lt.period || ''}`}
+                                </li>
                               ))}
                             </ul>
                           </div>
