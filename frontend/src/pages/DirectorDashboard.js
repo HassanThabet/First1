@@ -1200,6 +1200,258 @@ const DirectorDashboard = () => {
             </>
           );
         })()}
+        
+        {/* Report Details Modal */}
+        <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>تفاصيل التقرير الكامل</DialogTitle>
+            </DialogHeader>
+            
+            {selectedReport && (
+              <div className="space-y-4" dir="rtl">
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <span className="font-semibold text-gray-700">اسم الموظف:</span>
+                    <p className="text-gray-900">{selectedReport.userName}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">التاريخ:</span>
+                    <p className="text-gray-900">{selectedReport.date || selectedReport.week_start || 'غير محدد'}</p>
+                  </div>
+                  {selectedReport.week_end && (
+                    <div>
+                      <span className="font-semibold text-gray-700">نهاية الأسبوع:</span>
+                      <p className="text-gray-900">{selectedReport.week_end}</p>
+                    </div>
+                  )}
+                  <div>
+                    <span className="font-semibold text-gray-700">نوع التقرير:</span>
+                    <p className="text-gray-900">
+                      {selectedReport.type === "vice_principal" ? "وكيل" :
+                       selectedReport.type === "supervisor" ? "مشرف" :
+                       selectedReport.type === "activities" ? "أنشطة" :
+                       selectedReport.type === "social" ? "أخصائي اجتماعي" :
+                       selectedReport.type === "quality" ? "جودة" : ""}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Supervisor Report Details */}
+                {selectedReport.type === "supervisor" && (
+                  <div className="space-y-4">
+                    {selectedReport.late_teachers && selectedReport.late_teachers.length > 0 && (
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <h4 className="font-semibold text-orange-800 mb-2">المعلمون المتأخرون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.late_teachers.map((lt, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof lt === 'object' ? `${lt.teacher} - ${lt.subject} - ${lt.minutes_late} دقيقة` : lt}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.absent_teachers && selectedReport.absent_teachers.length > 0 && (
+                      <div className="p-4 bg-red-50 rounded-lg">
+                        <h4 className="font-semibold text-red-800 mb-2">المعلمون الغائبون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.absent_teachers.map((at, idx) => (
+                            <li key={idx} className="text-sm">{at}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.covering_teachers && selectedReport.covering_teachers.length > 0 && (
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-semibold text-green-800 mb-2">المعلمون المغطون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.covering_teachers.map((ct, idx) => (
+                            <li key={idx} className="text-sm">{ct}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.incidents && selectedReport.incidents.length > 0 && (
+                      <div className="p-4 bg-yellow-50 rounded-lg">
+                        <h4 className="font-semibold text-yellow-800 mb-2">الحوادث:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.incidents.map((inc, idx) => (
+                            <li key={idx} className="text-sm">{inc}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <span className="text-xs text-gray-600">انضباط الطلاب</span>
+                        <p className="text-2xl font-bold text-blue-700">{selectedReport.student_discipline || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-cyan-50 rounded-lg">
+                        <span className="text-xs text-gray-600">نظافة الفصول</span>
+                        <p className="text-2xl font-bold text-cyan-700">{selectedReport.classroom_cleanliness || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-purple-50 rounded-lg">
+                        <span className="text-xs text-gray-600">التزام المعلمين</span>
+                        <p className="text-2xl font-bold text-purple-700">{selectedReport.teacher_attendance_rate || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <span className="text-xs text-gray-600">السلوك العام</span>
+                        <p className="text-2xl font-bold text-green-700">{selectedReport.general_behavior || 0}/10</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Activities Report Details */}
+                {selectedReport.type === "activities" && selectedReport.activities && (
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-purple-800">الأنشطة:</h4>
+                    {selectedReport.activities.map((activity, idx) => (
+                      <div key={idx} className="p-4 bg-purple-50 rounded-lg">
+                        <h5 className="font-semibold text-purple-900 mb-2">{activity.activity_name}</h5>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div><span className="font-medium">عدد المشاركين:</span> {activity.participants_count}</div>
+                          <div><span className="font-medium">معدل التفاعل:</span> {activity.interaction_rate}/10</div>
+                          {activity.supervising_teachers && activity.supervising_teachers.length > 0 && (
+                            <div className="col-span-2">
+                              <span className="font-medium">المعلمون المشرفون:</span> {activity.supervising_teachers.join(', ')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Social Specialist Report Details */}
+                {selectedReport.type === "social" && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="p-3 bg-pink-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات نفسية</span>
+                        <p className="text-2xl font-bold text-pink-700">{selectedReport.psychological_cases || 0}</p>
+                      </div>
+                      <div className="p-3 bg-amber-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات أكاديمية</span>
+                        <p className="text-2xl font-bold text-amber-700">{selectedReport.academic_cases || 0}</p>
+                      </div>
+                      <div className="p-3 bg-red-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات سلوكية</span>
+                        <p className="text-2xl font-bold text-red-700">{selectedReport.behavioral_cases || 0}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 bg-emerald-50 rounded-lg">
+                        <span className="text-xs text-gray-600">عدد الجلسات</span>
+                        <p className="text-2xl font-bold text-emerald-700">{selectedReport.sessions_count || 0}</p>
+                      </div>
+                      <div className="p-3 bg-teal-50 rounded-lg">
+                        <span className="text-xs text-gray-600">التواصل مع الأسر</span>
+                        <p className="text-2xl font-bold text-teal-700">{selectedReport.family_contacts || 0}</p>
+                      </div>
+                    </div>
+                    
+                    {selectedReport.actions && selectedReport.actions.length > 0 && (
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-semibold text-green-800 mb-2">الإجراءات المتخذة:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.actions.map((action, idx) => (
+                            <li key={idx} className="text-sm">{action}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Quality Report Details */}
+                {selectedReport.type === "quality" && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-orange-50 rounded-lg">
+                      <span className="text-xs text-gray-600">معدل الأداء التدريسي</span>
+                      <p className="text-2xl font-bold text-orange-700">{selectedReport.teaching_performance_rate || 0}/10</p>
+                    </div>
+                    
+                    {selectedReport.visited_teachers && selectedReport.visited_teachers.length > 0 && (
+                      <div className="p-4 bg-amber-50 rounded-lg">
+                        <h4 className="font-semibold text-amber-800 mb-2">المعلمون المزارون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.visited_teachers.map((teacher, idx) => (
+                            <li key={idx} className="text-sm">{teacher}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Vice Principal Report Details */}
+                {selectedReport.type === "vice_principal" && (
+                  <div className="space-y-4">
+                    {selectedReport.late_teachers && selectedReport.late_teachers.length > 0 && (
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <h4 className="font-semibold text-orange-800 mb-2">المعلمون المتأخرون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.late_teachers.map((lt, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof lt === 'object' ? `${lt.teacher} - ${lt.subject} - ${lt.minutes_late} دقيقة` : lt}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.problems && selectedReport.problems.length > 0 && (
+                      <div className="p-4 bg-red-50 rounded-lg">
+                        <h4 className="font-semibold text-red-800 mb-2">المشكلات:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.problems.map((problem, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof problem === 'object' ? `${problem.description} - ${problem.action || problem.actions}` : problem}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.suggestions && selectedReport.suggestions.length > 0 && (
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold text-blue-800 mb-2">المقترحات:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.suggestions.map((suggestion, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof suggestion === 'object' ? suggestion.description : suggestion}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Notes */}
+                {selectedReport.notes && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">ملاحظات:</h4>
+                    <p className="text-sm text-gray-700">{selectedReport.notes}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <DialogFooter>
+              <Button onClick={() => setShowReportModal(false)} variant="outline">
+                إغلاق
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
