@@ -509,8 +509,6 @@ async def get_supervisor_reports(user_id: Optional[str] = None, branch: Optional
     elif current_user["role"] in ["director", "quality", "educational_supervision"]:
         # Directors with "both" branch can see all reports, otherwise filter by branch
         if current_user["branch"] != "both":
-            # Directors with "both" branch can see all reports, otherwise filter by branch
-        if current_user["branch"] != "both":
             query["branch"] = current_user["branch"]
     
     if user_id:
