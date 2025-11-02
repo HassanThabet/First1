@@ -299,6 +299,381 @@ const DirectorDashboard = () => {
     };
   };
 
+  // Get chart data for teachers
+  const getTeachersChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الغائبون', value: stats.totalAbsentTeachers, fill: '#ef4444' },
+      { name: 'المتأخرون', value: stats.totalLateTeachers, fill: '#f97316' },
+      { name: 'المغطون', value: stats.totalCoveringTeachers, fill: '#22c55e' }
+    ];
+  };
+
+  // Get performance chart data
+  const getPerformanceChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'انضباط الطلاب', value: parseFloat(stats.avgDiscipline) },
+      { name: 'نظافة الفصول', value: parseFloat(stats.avgCleanliness) },
+      { name: 'التزام المعلمين', value: parseFloat(stats.avgAttendance) },
+      { name: 'السلوك العام', value: parseFloat(stats.avgBehavior) }
+    ];
+  };
+
+  // Get activities chart data
+  const getActivitiesChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الأنشطة', value: stats.totalActivities },
+      { name: 'المشاركين', value: Math.floor(stats.totalActivitiesParticipants / 10) }, // Scaled down for better visualization
+      { name: 'التفاعل', value: parseFloat(stats.avgActivitiesInteraction) }
+    ];
+  };
+
+  // Get social cases chart data
+  const getSocialCasesChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'حالات نفسية', value: stats.totalPsychologicalCases, fill: '#ec4899' },
+      { name: 'حالات أكاديمية', value: stats.totalAcademicCases, fill: '#f59e0b' },
+      { name: 'حالات سلوكية', value: stats.totalBehavioralCases, fill: '#ef4444' }
+    ];
+  };
+
+  // Generate PDF Export
+  const exportToPDF = () => {
+    const stats = getOverallStatistics();
+    const reports = getDetailedReports();
+    
+    const timeFilterText = timeFilter === "daily" ? "اليوم" : 
+                          timeFilter === "weekly" ? "هذا الأسبوع" : 
+                          timeFilter === "monthly" ? "هذا الشهر" :
+                          timeFilter === "custom" && customStartDate && customEndDate ? 
+                            `من ${customStartDate} إلى ${customEndDate}` : "جميع الفترات";
+    
+    const reportTypeText = reportTypeFilter === "all" ? "جميع التقارير" :
+                          reportTypeFilter === "vice_principal" ? "تقارير الوكلاء" :
+                          reportTypeFilter === "supervisor" ? "تقارير المشرفين" :
+                          reportTypeFilter === "activities" ? "تقارير الأنشطة" :
+                          reportTypeFilter === "social" ? "تقارير الأخصائي الاجتماعي" :
+                          reportTypeFilter === "quality" ? "تقارير الجودة" : "";
+
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 60, 40, 60],
+      defaultStyle: {
+        font: 'Cairo',
+        fontSize: 11
+      },
+      content: [
+        {
+          text: 'مدارس الفجر الجديد الأهلية',
+          style: 'header',
+          alignment: 'center',
+          margin: [0, 0, 0, 10]
+        },
+        {
+          text: 'تقرير المدير الشامل',
+          style: 'subheader',
+          alignment: 'center',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          text: `${reportTypeText} - ${timeFilterText}`,
+          style: 'info',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        {
+          text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-EG')}`,
+          style: 'info',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        
+        // Statistics Section
+        {
+          text: 'الإحصائيات العامة',
+          style: 'sectionHeader',
+          margin: [0, 10, 0, 10]
+        },
+        {
+          table: {
+            widths: ['*', '*', '*'],
+            body: [
+              [
+                { text: 'المعلمون الغائبون', style: 'tableHeader' },
+                { text: 'المعلمون المتأخرون', style: 'tableHeader' },
+                { text: 'المعلمون المغطون', style: 'tableHeader' }
+              ],
+              [
+                { text: stats.totalAbsentTeachers.toString(), alignment: 'center' },
+                { text: stats.totalLateTeachers.toString(), alignment: 'center' },
+                { text: stats.totalCoveringTeachers.toString(), alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        },
+        {
+          table: {
+            widths: ['*', '*', '*', '*'],
+            body: [
+              [
+                { text: 'انضباط الطلاب', style: 'tableHeader' },
+                { text: 'نظافة الفصول', style: 'tableHeader' },
+                { text: 'التزام المعلمين', style: 'tableHeader' },
+                { text: 'السلوك العام', style: 'tableHeader' }
+              ],
+              [
+                { text: `${stats.avgDiscipline}/10`, alignment: 'center' },
+                { text: `${stats.avgCleanliness}/10`, alignment: 'center' },
+                { text: `${stats.avgAttendance}/10`, alignment: 'center' },
+                { text: `${stats.avgBehavior}/10`, alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        },
+        
+        // Activities Statistics
+        (reportTypeFilter === "all" || reportTypeFilter === "activities") ? {
+          text: 'إحصائيات الأنشطة',
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10]
+        } : {},
+        (reportTypeFilter === "all" || reportTypeFilter === "activities") ? {
+          table: {
+            widths: ['*', '*', '*'],
+            body: [
+              [
+                { text: 'إجمالي الأنشطة', style: 'tableHeader' },
+                { text: 'إجمالي المشاركين', style: 'tableHeader' },
+                { text: 'متوسط التفاعل', style: 'tableHeader' }
+              ],
+              [
+                { text: stats.totalActivities.toString(), alignment: 'center' },
+                { text: stats.totalActivitiesParticipants.toString(), alignment: 'center' },
+                { text: `${stats.avgActivitiesInteraction}/10`, alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        } : {},
+        
+        // Social Specialist Statistics
+        (reportTypeFilter === "all" || reportTypeFilter === "social") ? {
+          text: 'إحصائيات الأخصائي الاجتماعي',
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10]
+        } : {},
+        (reportTypeFilter === "all" || reportTypeFilter === "social") ? {
+          table: {
+            widths: ['*', '*', '*', '*'],
+            body: [
+              [
+                { text: 'حالات نفسية', style: 'tableHeader' },
+                { text: 'حالات أكاديمية', style: 'tableHeader' },
+                { text: 'حالات سلوكية', style: 'tableHeader' },
+                { text: 'إجمالي الحالات', style: 'tableHeader' }
+              ],
+              [
+                { text: stats.totalPsychologicalCases.toString(), alignment: 'center' },
+                { text: stats.totalAcademicCases.toString(), alignment: 'center' },
+                { text: stats.totalBehavioralCases.toString(), alignment: 'center' },
+                { text: stats.totalStudentCases.toString(), alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        } : {},
+        
+        // Quality Statistics
+        (reportTypeFilter === "all" || reportTypeFilter === "quality") ? {
+          text: 'إحصائيات الجودة',
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10]
+        } : {},
+        (reportTypeFilter === "all" || reportTypeFilter === "quality") ? {
+          table: {
+            widths: ['*', '*'],
+            body: [
+              [
+                { text: 'إجمالي الزيارات', style: 'tableHeader' },
+                { text: 'متوسط الأداء التدريسي', style: 'tableHeader' }
+              ],
+              [
+                { text: stats.totalQualityVisits.toString(), alignment: 'center' },
+                { text: `${stats.avgQualityTeachingRate}/10`, alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        } : {},
+        
+        // Detailed Reports
+        {
+          text: 'التقارير التفصيلية',
+          style: 'sectionHeader',
+          margin: [0, 20, 0, 10],
+          pageBreak: 'before'
+        },
+        {
+          text: `إجمالي عدد التقارير: ${reports.length}`,
+          style: 'info',
+          margin: [0, 0, 0, 10]
+        },
+        ...reports.slice(0, 20).map((report, index) => {
+          const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                  report.type === "supervisor" ? "مشرف" :
+                                  report.type === "activities" ? "أنشطة" :
+                                  report.type === "social" ? "أخصائي اجتماعي" :
+                                  report.type === "quality" ? "جودة" : "";
+          
+          return {
+            stack: [
+              {
+                text: `${index + 1}. ${reportTypeArabic} - ${report.userName}`,
+                style: 'reportTitle',
+                margin: [0, 10, 0, 5]
+              },
+              {
+                text: `التاريخ: ${report.date || report.week_start || 'غير محدد'}`,
+                style: 'reportInfo'
+              },
+              report.notes ? {
+                text: `ملاحظات: ${report.notes}`,
+                style: 'reportInfo',
+                margin: [0, 5, 0, 0]
+              } : {}
+            ],
+            margin: [0, 0, 0, 10]
+          };
+        })
+      ],
+      styles: {
+        header: {
+          fontSize: 20,
+          bold: true,
+          color: '#1e40af'
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          color: '#3b82f6'
+        },
+        sectionHeader: {
+          fontSize: 14,
+          bold: true,
+          color: '#1e40af',
+          decoration: 'underline'
+        },
+        info: {
+          fontSize: 10,
+          color: '#666666'
+        },
+        tableHeader: {
+          fillColor: '#dbeafe',
+          bold: true,
+          alignment: 'center',
+          fontSize: 10
+        },
+        reportTitle: {
+          fontSize: 11,
+          bold: true,
+          color: '#1e40af'
+        },
+        reportInfo: {
+          fontSize: 9,
+          color: '#666666'
+        }
+      }
+    };
+
+    pdfMake.createPdf(docDefinition).download(`تقرير_المدير_${new Date().getTime()}.pdf`);
+    toast.success("تم تصدير التقرير بنجاح");
+  };
+
+  // Calculate overall statistics
+  const getOverallStatistics_OLD = () => {
+    let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
+
+    // Supervisor statistics
+    const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
+    const totalAbsentTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
+    const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
+    const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+    const totalAbsentStudents = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
+    
+    const avgDiscipline = filteredSupervisorReports.length > 0 ? 
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.student_discipline || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgCleanliness = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.classroom_cleanliness || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgAttendance = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.teacher_attendance_rate || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgBehavior = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.general_behavior || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+
+    // Activities statistics
+    const totalActivities = filteredActivitiesReports.reduce((sum, r) => sum + (r.activities?.length || 0), 0);
+    const totalActivitiesParticipants = filteredActivitiesReports.reduce((sum, r) => {
+      return sum + (r.activities || []).reduce((aSum, a) => aSum + (a.participants_count || 0), 0);
+    }, 0);
+    const avgActivitiesInteraction = filteredActivitiesReports.length > 0 ? 
+      (filteredActivitiesReports.reduce((sum, r) => {
+        const activities = r.activities || [];
+        const avgInteraction = activities.length > 0 ? 
+          activities.reduce((aSum, a) => aSum + (a.interaction_rate || 0), 0) / activities.length : 0;
+        return sum + avgInteraction;
+      }, 0) / filteredActivitiesReports.length).toFixed(1) : 0;
+
+    // Social Specialist statistics
+    const totalPsychologicalCases = filteredSocialReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademicCases = filteredSocialReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioralCases = filteredSocialReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalStudentCases = totalPsychologicalCases + totalAcademicCases + totalBehavioralCases;
+    const totalSessions = filteredSocialReports.reduce((sum, r) => sum + (r.sessions_count || 0), 0);
+    const totalFamilyContacts = filteredSocialReports.reduce((sum, r) => sum + (r.family_contacts || 0), 0);
+
+    // Quality statistics
+    const totalQualityVisits = filteredQualityReports.length;
+    const avgQualityTeachingRate = filteredQualityReports.length > 0 ?
+      (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
+
+    return {
+      totalLateTeachers,
+      totalAbsentTeachers,
+      totalCoveringTeachers,
+      totalIncidents,
+      totalAbsentStudents,
+      avgDiscipline,
+      avgCleanliness,
+      avgAttendance,
+      avgBehavior,
+      totalActivities,
+      totalActivitiesParticipants,
+      avgActivitiesInteraction,
+      totalStudentCases,
+      totalPsychologicalCases,
+      totalAcademicCases,
+      totalBehavioralCases,
+      totalSessions,
+      totalFamilyContacts,
+      totalQualityVisits,
+      avgQualityTeachingRate,
+      supervisorReportsCount: filteredSupervisorReports.length,
+      activitiesReportsCount: filteredActivitiesReports.length,
+      socialReportsCount: filteredSocialReports.length,
+      qualityReportsCount: filteredQualityReports.length,
+      totalAllReports: filteredSupervisorReports.length + filteredActivitiesReports.length + 
+                       filteredSocialReports.length + filteredQualityReports.length
+    };
+  };
+
   return (
     <DashboardLayout title="لوحة تحكم المدير - مدارس الفجر الجديد الأهلية">
       <div className="space-y-6">
