@@ -2018,22 +2018,39 @@ class BackendTester:
                 if ahmed_user:
                     self.log_test("Ahmed User Found", True, f"Ahmed user exists with role: {ahmed_user.get('role')}, branch: {ahmed_user.get('branch')}")
                 else:
-                    self.log_test("Ahmed User Found", False, "Ahmed user does not exist in system")
+                    self.log_test("Ahmed User Found", False, "Ahmed user does not exist in system - creating it")
                     
-                    # Show available admin users
-                    admin_users = [u for u in users if u.get("role") == "admin"]
-                    if admin_users:
-                        self.log_test("Available Admin Users", True, f"Found {len(admin_users)} admin users")
-                        for i, admin in enumerate(admin_users, 1):
-                            self.log_test(f"Admin User {i}", True, f"Username: {admin.get('username')}, ID: {admin.get('id')}")
-                    else:
-                        self.log_test("Available Admin Users", False, "No admin users found")
+                    # Create ahmed user
+                    self.create_ahmed_user()
                         
             else:
                 self.log_test("Get Users List", False, f"Failed: {response.status_code} - {response.text}")
                 
         except Exception as e:
             self.log_test("Check Ahmed User", False, f"Exception: {str(e)}")
+            
+    def create_ahmed_user(self):
+        """Create ahmed admin user"""
+        print("\n=== Creating Ahmed Admin User ===")
+        
+        user_data = {
+            "username": "ahmed",
+            "password": "123456",
+            "role": "admin",
+            "branch": "both"
+        }
+        
+        try:
+            response = self.session.post(f"{BASE_URL}/users", json=user_data)
+            
+            if response.status_code == 200:
+                created_user = response.json()
+                self.log_test("Create Ahmed User", True, f"Successfully created ahmed user with ID: {created_user.get('id')}")
+            else:
+                self.log_test("Create Ahmed User", False, f"Failed to create ahmed user: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_test("Create Ahmed User", False, f"Exception: {str(e)}")
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
