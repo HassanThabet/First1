@@ -1428,7 +1428,9 @@ const DirectorDashboard = () => {
                             </div>
                             <ul className="text-sm text-gray-700 space-y-1">
                               {selectedReport.late_teachers.map((lt, i) => (
-                                <li key={i}>• <strong>{lt.teacher}</strong> - {lt.subject} - حصة {lt.period}</li>
+                                <li key={i}>
+                                  {typeof lt === 'string' ? `• ${lt}` : `• ${lt.teacher || ''} - ${lt.subject || ''} - حصة ${lt.period || ''}`}
+                                </li>
                               ))}
                             </ul>
                           </div>
@@ -1441,7 +1443,9 @@ const DirectorDashboard = () => {
                             </div>
                             <ul className="text-sm text-gray-700 space-y-1">
                               {selectedReport.absent_teachers.map((at, i) => (
-                                <li key={i}>• <strong>{at.teacher}</strong> - {at.subject} - حصة {at.period}</li>
+                                <li key={i}>
+                                  {typeof at === 'string' ? `• ${at}` : `• ${at.teacher || ''} - ${at.subject || ''} - حصة ${at.period || ''}`}
+                                </li>
                               ))}
                             </ul>
                           </div>
@@ -1454,7 +1458,9 @@ const DirectorDashboard = () => {
                             </div>
                             <ul className="text-sm text-gray-700 space-y-1">
                               {selectedReport.covering_teachers.map((ct, i) => (
-                                <li key={i}>• <strong>{ct.teacher}</strong> - {ct.subject} - حصة {ct.period}</li>
+                                <li key={i}>
+                                  {typeof ct === 'string' ? `• ${ct}` : `• ${ct.teacher || ''} - ${ct.subject || ''} - حصة ${ct.period || ''}`}
+                                </li>
                               ))}
                             </ul>
                           </div>
