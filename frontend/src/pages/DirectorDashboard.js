@@ -1315,7 +1315,9 @@ const DirectorDashboard = () => {
                         <h4 className="font-semibold text-green-800 mb-2">المعلمون المغطون:</h4>
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.covering_teachers.map((ct, idx) => (
-                            <li key={idx} className="text-sm">{ct}</li>
+                            <li key={idx} className="text-sm">
+                              {typeof ct === 'object' ? `${ct.teacher} - ${ct.subject} (الحصة ${ct.period})` : ct}
+                            </li>
                           ))}
                         </ul>
                       </div>
