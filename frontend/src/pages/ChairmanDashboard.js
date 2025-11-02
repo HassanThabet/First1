@@ -210,7 +210,8 @@ const ChairmanDashboard = () => {
   const filterReportsByTimeAndBranch = (reports) => {
     let filtered = filterReportsByTimeOnly(reports);
     
-    if (branchFilter !== "all") {
+    // Only apply branch filter if user has branch="both" and branchFilter is not "all"
+    if (user && user.branch === "both" && branchFilter !== "all") {
       filtered = filtered.filter(r => r.branch === branchFilter);
     }
     
@@ -219,27 +220,33 @@ const ChairmanDashboard = () => {
 
   // Handle chart click to show teachers list
   const handleChartClick = (type) => {
+    console.log("📊 Chart clicked, type:", type);
     let data = { title: "", teachers: [], type: type };
     
     switch(type) {
       case "absent":
         data.title = "قائمة المعلمين الغائبين";
         data.teachers = getAggregatedAbsentTeachers();
+        console.log("✅ Absent teachers:", data.teachers.length);
         break;
       case "late":
         data.title = "قائمة المعلمين المتأخرين";
         data.teachers = getAggregatedLateTeachers();
+        console.log("✅ Late teachers:", data.teachers.length);
         break;
       case "covering":
         data.title = "قائمة المعلمين المغطين";
         data.teachers = getAggregatedCoveringTeachers();
+        console.log("✅ Covering teachers:", data.teachers.length);
         break;
       case "activity":
         data.title = "قائمة المعلمين المشرفين على الأنشطة";
         data.teachers = getAggregatedActivityTeachers();
+        console.log("✅ Activity teachers:", data.teachers.length);
         break;
     }
     
+    console.log("📋 Opening modal with data:", data);
     setTeachersListData(data);
     setShowTeachersListModal(true);
   };
@@ -989,19 +996,22 @@ const ChairmanDashboard = () => {
                   </Select>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium mb-2">الفرع</label>
-                  <Select value={branchFilter} onValueChange={setBranchFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الفرع" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">جميع الفروع</SelectItem>
-                      <SelectItem value="boys">البنين</SelectItem>
-                      <SelectItem value="girls">البنات</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {/* Branch filter - only for directors with branch="both" */}
+                {user && user.branch === "both" && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">الفرع</label>
+                    <Select value={branchFilter} onValueChange={setBranchFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الفرع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الفروع</SelectItem>
+                        <SelectItem value="boys">البنين</SelectItem>
+                        <SelectItem value="girls">البنات</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 
                 {/* Filter for Vice Principals */}
                 {reportTypeFilter === "vice_principal" && (
