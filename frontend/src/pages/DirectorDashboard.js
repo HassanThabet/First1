@@ -1058,11 +1058,20 @@ const DirectorDashboard = () => {
                                   {report.problems && report.problems.length > 0 && (
                                     <div className="bg-orange-50 p-4 rounded-lg">
                                       <h4 className="font-semibold text-orange-700 mb-2">المشاكل والإجراءات ({report.problems.length})</h4>
-                                      <ul className="list-disc list-inside text-sm space-y-1">
+                                      <div className="space-y-2">
                                         {report.problems.map((problem, idx) => (
-                                          <li key={idx}>{problem}</li>
+                                          <div key={idx} className="text-sm bg-white p-2 rounded">
+                                            {typeof problem === 'string' ? (
+                                              <p>{problem}</p>
+                                            ) : (
+                                              <>
+                                                <p className="font-semibold text-gray-800">المشكلة: {problem.description || '-'}</p>
+                                                <p className="text-gray-600 text-xs mt-1">الإجراء: {problem.actions || '-'}</p>
+                                              </>
+                                            )}
+                                          </div>
                                         ))}
-                                      </ul>
+                                      </div>
                                     </div>
                                   )}
 
@@ -1072,7 +1081,7 @@ const DirectorDashboard = () => {
                                       <h4 className="font-semibold text-blue-700 mb-2">الاقتراحات ({report.suggestions.length})</h4>
                                       <ul className="list-disc list-inside text-sm space-y-1">
                                         {report.suggestions.map((suggestion, idx) => (
-                                          <li key={idx}>{suggestion}</li>
+                                          <li key={idx}>{typeof suggestion === 'string' ? suggestion : suggestion.description || '-'}</li>
                                         ))}
                                       </ul>
                                     </div>
