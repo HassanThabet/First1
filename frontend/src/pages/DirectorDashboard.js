@@ -989,19 +989,22 @@ const DirectorDashboard = () => {
                   </Select>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium mb-2">الفرع</label>
-                  <Select value={branchFilter} onValueChange={setBranchFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="اختر الفرع" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">جميع الفروع</SelectItem>
-                      <SelectItem value="boys">البنين</SelectItem>
-                      <SelectItem value="girls">البنات</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {/* Branch filter - only for directors with branch="both" */}
+                {user && user.branch === "both" && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">الفرع</label>
+                    <Select value={branchFilter} onValueChange={setBranchFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الفرع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الفروع</SelectItem>
+                        <SelectItem value="boys">البنين</SelectItem>
+                        <SelectItem value="girls">البنات</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 
                 {/* Filter for Vice Principals */}
                 {reportTypeFilter === "vice_principal" && (
