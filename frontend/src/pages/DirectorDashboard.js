@@ -1580,10 +1580,10 @@ const DirectorDashboard = () => {
                                 <p className="font-semibold text-gray-800 mb-2">
                                   {typeof problem === 'string' ? problem : problem.description || '-'}
                                 </p>
-                                {typeof problem !== 'string' && problem.actions && (
+                                {typeof problem !== 'string' && (problem.actions || problem.action) && (
                                   <div className="bg-white p-2 rounded">
                                     <p className="text-sm text-gray-600">
-                                      <span className="font-semibold text-gray-800">الإجراءات المتخذة:</span> {problem.actions}
+                                      <span className="font-semibold text-gray-800">الإجراءات المتخذة:</span> {problem.actions || problem.action}
                                     </p>
                                   </div>
                                 )}
