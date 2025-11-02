@@ -1048,7 +1048,9 @@ const DirectorDashboard = () => {
                               <CardContent className="p-6">
                                 <div className="mb-4 pb-4 border-b">
                                   <h3 className="text-lg font-bold text-cyan-700">الوكيل: {vp?.username || 'غير معروف'}</h3>
-                                  <p className="text-sm text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                  <p className="text-sm text-gray-600">
+                                    الفترة: {new Date(report.week_start).toLocaleDateString('ar-SA')} - {new Date(report.week_end).toLocaleDateString('ar-SA')}
+                                  </p>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
