@@ -88,7 +88,17 @@ const DirectorDashboard = () => {
     
     if (timeFilter === "daily") {
       const todayStr = today.toISOString().split('T')[0];
-      return filtered.filter(r => r.date === todayStr);
+      return filtered.filter(r => {
+        // For VP reports that use week_start/week_end
+        if (r.week_start) {
+          const weekStart = new Date(r.week_start);
+          const weekEnd = new Date(r.week_end);
+          const todayDate = new Date(todayStr);
+          return todayDate >= weekStart && todayDate <= weekEnd;
+        }
+        // For other reports that use date
+        return r.date === todayStr;
+      });
     } else if (timeFilter === "weekly") {
       const currentDay = today.getDay();
       const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
@@ -100,6 +110,14 @@ const DirectorDashboard = () => {
       weekEnd.setHours(23, 59, 59, 999);
       
       return filtered.filter(r => {
+        // For VP reports that use week_start/week_end
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          // Check if report week overlaps with current week
+          return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
+        }
+        // For other reports that use date
         const reportDate = new Date(r.date);
         return reportDate >= weekStart && reportDate <= weekEnd;
       });
@@ -107,6 +125,12 @@ const DirectorDashboard = () => {
       const currentMonth = today.getMonth();
       const currentYear = today.getFullYear();
       return filtered.filter(r => {
+        // For VP reports that use week_start/week_end
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          return reportWeekStart.getMonth() === currentMonth && reportWeekStart.getFullYear() === currentYear;
+        }
+        // For other reports that use date
         const reportDate = new Date(r.date);
         return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
       });
@@ -116,6 +140,14 @@ const DirectorDashboard = () => {
       end.setHours(23, 59, 59, 999);
       
       return filtered.filter(r => {
+        // For VP reports that use week_start/week_end
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          // Check if report week overlaps with custom date range
+          return (reportWeekStart <= end && reportWeekEnd >= start);
+        }
+        // For other reports that use date
         const reportDate = new Date(r.date);
         return reportDate >= start && reportDate <= end;
       });
