@@ -78,17 +78,13 @@ const ChairmanDashboard = () => {
   };
 
   // Helper function to filter reports by time and employee
-  const filterReportsByTime = (reports) => {
+  // Helper function to filter reports by time only (without employee filter, but with branch for Chairman)
+  const filterReportsByTimeOnly = (reports) => {
     let filtered = reports;
     
-    // Filter by branch first
+    // Filter by branch first (Chairman can see both branches)
     if (selectedBranch !== "all") {
       filtered = filtered.filter(r => r.branch === selectedBranch);
-    }
-    
-    // Filter by specific employee if selected
-    if (selectedSpecificEmployee !== "all") {
-      filtered = filtered.filter(r => r.user_id === selectedSpecificEmployee);
     }
     
     // Filter by time
@@ -122,7 +118,6 @@ const ChairmanDashboard = () => {
         if (r.week_start) {
           const reportWeekStart = new Date(r.week_start);
           const reportWeekEnd = new Date(r.week_end);
-          // Check if report week overlaps with current week
           return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
         }
         // For other reports that use date
@@ -152,7 +147,6 @@ const ChairmanDashboard = () => {
         if (r.week_start) {
           const reportWeekStart = new Date(r.week_start);
           const reportWeekEnd = new Date(r.week_end);
-          // Check if report week overlaps with custom date range
           return (reportWeekStart <= end && reportWeekEnd >= start);
         }
         // For other reports that use date
@@ -160,6 +154,29 @@ const ChairmanDashboard = () => {
         return reportDate >= start && reportDate <= end;
       });
     }
+    
+    return filtered;
+  };
+
+  // Helper function to filter reports by time, branch, and employee
+  const filterReportsByTime = (reports) => {
+    let filtered = filterReportsByTimeOnly(reports);
+    
+    // Filter by specific employee if selected
+    if (selectedSpecificEmployee !== "all") {
+      filtered = filtered.filter(r => r.user_id === selectedSpecificEmployee);
+    }
+    
+    return filtered;
+  };
+
+  // Calculate overall statistics
+  const getOverallStatistics = () => {
+    // For overall statistics, use time and branch filter only (no employee filter)
+    let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
     
     return filtered;
   };
