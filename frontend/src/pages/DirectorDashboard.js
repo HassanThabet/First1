@@ -995,6 +995,71 @@ const DirectorDashboard = () => {
                   </Card>
                 )}
 
+                {/* Vice-Principal Detailed Reports */}
+                {reportTypeFilter === "vice_principal" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-cyan-700">التفاصيل الكاملة - تقارير الوكلاء</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {filterReportsByTime(vicePrincipalReports).map((report) => {
+                          const vp = users.find(u => u.id === report.user_id);
+                          return (
+                            <Card key={report.id} className="border-l-4 border-cyan-500">
+                              <CardContent className="p-6">
+                                <div className="mb-4 pb-4 border-b">
+                                  <h3 className="text-lg font-bold text-cyan-700">الوكيل: {vp?.username || 'غير معروف'}</h3>
+                                  <p className="text-sm text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  {/* Problems and Actions */}
+                                  {report.problems && report.problems.length > 0 && (
+                                    <div className="bg-orange-50 p-4 rounded-lg">
+                                      <h4 className="font-semibold text-orange-700 mb-2">المشاكل والإجراءات ({report.problems.length})</h4>
+                                      <ul className="list-disc list-inside text-sm space-y-1">
+                                        {report.problems.map((problem, idx) => (
+                                          <li key={idx}>{problem}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+
+                                  {/* Suggestions */}
+                                  {report.suggestions && report.suggestions.length > 0 && (
+                                    <div className="bg-blue-50 p-4 rounded-lg">
+                                      <h4 className="font-semibold text-blue-700 mb-2">الاقتراحات ({report.suggestions.length})</h4>
+                                      <ul className="list-disc list-inside text-sm space-y-1">
+                                        {report.suggestions.map((suggestion, idx) => (
+                                          <li key={idx}>{suggestion}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* Notes */}
+                                {report.notes && (
+                                  <div className="mt-4 bg-gray-50 p-4 rounded-lg">
+                                    <h4 className="font-semibold text-gray-700 mb-2">ملاحظات</h4>
+                                    <p className="text-sm whitespace-pre-wrap">{report.notes}</p>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                        {filterReportsByTime(vicePrincipalReports).length === 0 && (
+                          <div className="text-center py-12 text-gray-500">
+                            <p className="text-lg">لا توجد تقارير للوكلاء للفترة المحددة</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Activities Detailed Reports */}
                 {reportTypeFilter === "activities" && (
                   <Card>
