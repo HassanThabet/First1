@@ -772,7 +772,7 @@ const DirectorDashboard = () => {
                         <SelectItem value="all">كل الوكلاء</SelectItem>
                         {users.filter(u => u.role === "vice_principal").map(vp => (
                           <SelectItem key={vp.id} value={vp.id}>
-                            {vp.full_name} ({vp.branch === "boys" ? "بنين" : "بنات"})
+                            {vp.full_name || vp.username} ({vp.branch === "boys" ? "بنين" : "بنات"})
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -792,7 +792,7 @@ const DirectorDashboard = () => {
                         <SelectItem value="all">جميع الموظفين</SelectItem>
                         {getEmployeesForReportType().map(emp => (
                           <SelectItem key={emp.id} value={emp.id}>
-                            {emp.full_name} ({emp.branch === "boys" ? "بنين" : "بنات"})
+                            {emp.full_name || emp.username} ({emp.branch === "boys" ? "بنين" : "بنات"})
                           </SelectItem>
                         ))}
                       </SelectContent>
