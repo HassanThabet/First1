@@ -28,9 +28,12 @@ const ChairmanDashboard = () => {
   const [reportTypeFilter, setReportTypeFilter] = useState("all");
   const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all");
   const [selectedVicePrincipal, setSelectedVicePrincipal] = useState("all");
+  const [branchFilter, setBranchFilter] = useState("all");
   const [showDetailedReports, setShowDetailedReports] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showTeachersListModal, setShowTeachersListModal] = useState(false);
+  const [teachersListData, setTeachersListData] = useState({ title: "", teachers: [], type: "" });
 
   useEffect(() => {
     fetchAllData();
@@ -70,6 +73,296 @@ const ChairmanDashboard = () => {
 
   // Get list of employees based on report type
   const getEmployeesForReportType = () => {
+    if (reportTypeFilter === "vice_principal") {
+      return users.filter(u => u.role === "vice_principal");
+    } else if (reportTypeFilter === "supervisor") {
+      return users.filter(u => u.role === "supervisor");
+    } else if (reportTypeFilter === "activities") {
+      return users.filter(u => u.role === "activities");
+    } else if (reportTypeFilter === "social") {
+      return users.filter(u => u.role === "social_specialist");
+    } else if (reportTypeFilter === "quality") {
+      return users.filter(u => u.role === "quality");
+    }
+    return [];
+  };
+
+  // Get aggregated teachers lists from all reports
+  const getAggregatedAbsentTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.absent_teachers && Array.isArray(report.absent_teachers)) {
+        report.absent_teachers.forEach(teacher => {
+          const name = typeof teacher === 'string' ? teacher : teacher.name || teacher.teacher;
+          if (name) {
+            teachersMap[name] = (teachersMap[name] || 0) + 1;
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const getAggregatedLateTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.late_teachers && Array.isArray(report.late_teachers)) {
+        report.late_teachers.forEach(teacher => {
+          let name, minutes;
+          if (typeof teacher === 'object') {
+            name = teacher.teacher || teacher.name;
+            minutes = teacher.minutes_late || 0;
+          } else {
+            name = teacher;
+            minutes = 0;
+          }
+          
+          if (name) {
+            if (!teachersMap[name]) {
+              teachersMap[name] = { count: 0, totalMinutes: 0 };
+            }
+            teachersMap[name].count += 1;
+            teachersMap[name].totalMinutes += minutes;
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, data]) => ({ 
+        name, 
+        count: data.count, 
+        totalMinutes: data.totalMinutes 
+      }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const getAggregatedCoveringTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.covering_teachers && Array.isArray(report.covering_teachers)) {
+        report.covering_teachers.forEach(teacher => {
+          let name, subject;
+          if (typeof teacher === 'object') {
+            name = teacher.teacher || teacher.name;
+            subject = teacher.subject || '';
+          } else {
+            name = teacher;
+            subject = '';
+          }
+          
+          if (name) {
+            if (!teachersMap[name]) {
+              teachersMap[name] = { count: 0, subjects: [] };
+            }
+            teachersMap[name].count += 1;
+            if (subject && !teachersMap[name].subjects.includes(subject)) {
+              teachersMap[name].subjects.push(subject);
+            }
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, data]) => ({ 
+        name, 
+        count: data.count, 
+        subjects: data.subjects.join(', ') 
+      }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const getAggregatedActivityTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...activitiesReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.activities && Array.isArray(report.activities)) {
+        report.activities.forEach(activity => {
+          if (activity.supervising_teachers && Array.isArray(activity.supervising_teachers)) {
+            activity.supervising_teachers.forEach(teacher => {
+              const name = typeof teacher === 'string' ? teacher : teacher.name || teacher.teacher;
+              if (name) {
+                teachersMap[name] = (teachersMap[name] || 0) + 1;
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  // Helper function to filter by time and branch
+  const filterReportsByTimeAndBranch = (reports) => {
+    let filtered = filterReportsByTimeOnly(reports);
+    
+    if (branchFilter !== "all") {
+      filtered = filtered.filter(r => r.branch === branchFilter);
+    }
+    
+    return filtered;
+  };
+
+  // Handle chart click to show teachers list
+  const handleChartClick = (type) => {
+    let data = { title: "", teachers: [], type: type };
+    
+    switch(type) {
+      case "absent":
+        data.title = "قائمة المعلمين الغائبين";
+        data.teachers = getAggregatedAbsentTeachers();
+        break;
+      case "late":
+        data.title = "قائمة المعلمين المتأخرين";
+        data.teachers = getAggregatedLateTeachers();
+        break;
+      case "covering":
+        data.title = "قائمة المعلمين المغطين";
+        data.teachers = getAggregatedCoveringTeachers();
+        break;
+      case "activity":
+        data.title = "قائمة المعلمين المشرفين على الأنشطة";
+        data.teachers = getAggregatedActivityTeachers();
+        break;
+    }
+    
+    setTeachersListData(data);
+    setShowTeachersListModal(true);
+  };
+
+  // Export teachers list to PDF
+  const exportTeachersListToPDF = () => {
+    if (!teachersListData.teachers || teachersListData.teachers.length === 0) {
+      toast.error("لا توجد بيانات للتصدير");
+      return;
+    }
+
+    // Initialize pdfMake fonts
+    if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
+      pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+      pdfMake.fonts = {
+        Cairo: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Regular.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Regular.ttf'
+        }
+      };
+    }
+
+    const tableBody = [
+      [
+        { text: 'الاسم', style: 'tableHeader' },
+        { text: teachersListData.type === 'late' ? 'عدد المرات' : 
+                teachersListData.type === 'covering' ? 'عدد الحصص' : 
+                teachersListData.type === 'activity' ? 'عدد الأنشطة' : 'عدد المرات', 
+          style: 'tableHeader' },
+        ...(teachersListData.type === 'late' ? [{ text: 'مجموع الدقائق', style: 'tableHeader' }] : []),
+        ...(teachersListData.type === 'covering' ? [{ text: 'المواد', style: 'tableHeader' }] : [])
+      ]
+    ];
+
+    teachersListData.teachers.forEach((teacher, index) => {
+      const row = [
+        { text: teacher.name, alignment: 'center' },
+        { text: teacher.count.toString(), alignment: 'center' }
+      ];
+      
+      if (teachersListData.type === 'late') {
+        row.push({ text: teacher.totalMinutes.toString(), alignment: 'center' });
+      } else if (teachersListData.type === 'covering') {
+        row.push({ text: teacher.subjects || '-', alignment: 'center' });
+      }
+      
+      tableBody.push(row);
+    });
+
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 60, 40, 60],
+      defaultStyle: {
+        font: 'Cairo',
+        fontSize: 11
+      },
+      content: [
+        {
+          text: 'مدارس الفجر الجديد الأهلية',
+          style: 'header',
+          alignment: 'center',
+          margin: [0, 0, 0, 10]
+        },
+        {
+          text: teachersListData.title,
+          style: 'subheader',
+          alignment: 'center',
+          margin: [0, 0, 0, 10]
+        },
+        {
+          text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-EG')}`,
+          style: 'info',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        {
+          text: `إجمالي عدد المعلمين: ${teachersListData.teachers.length}`,
+          style: 'info',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        {
+          table: {
+            widths: teachersListData.type === 'late' || teachersListData.type === 'covering' ? 
+                    ['*', 'auto', 'auto'] : ['*', 'auto'],
+            body: tableBody
+          },
+          margin: [0, 0, 0, 10]
+        }
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          color: '#1e40af'
+        },
+        subheader: {
+          fontSize: 14,
+          bold: true,
+          color: '#3b82f6'
+        },
+        info: {
+          fontSize: 10,
+          color: '#666666'
+        },
+        tableHeader: {
+          fillColor: '#dbeafe',
+          bold: true,
+          alignment: 'center',
+          fontSize: 10
+        }
+      }
+    };
+
+    pdfMake.createPdf(docDefinition).download(`${teachersListData.title}_${new Date().getTime()}.pdf`);
+    toast.success("تم تصدير القائمة بنجاح");
+  };
+
+  // Helper function to filter reports by time only
+  const filterReportsByTimeOnly = (reports) => {
     if (reportTypeFilter === "vice_principal") {
       return users.filter(u => u.role === "vice_principal");
     } else if (reportTypeFilter === "supervisor") {
@@ -241,10 +534,10 @@ const ChairmanDashboard = () => {
 
   // Calculate overall statistics
   const getOverallStatistics = () => {
-    let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
-    let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
-    let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
-    let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
+    let filteredSupervisorReports = filterReportsByTimeAndBranch([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeAndBranch([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeAndBranch([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeAndBranch([...qualityReports]);
 
     // Supervisor statistics
     const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
@@ -722,7 +1015,7 @@ const ChairmanDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">نوع التقرير</label>
                   <Select value={reportTypeFilter} onValueChange={(value) => {
@@ -756,6 +1049,20 @@ const ChairmanDashboard = () => {
                       <SelectItem value="weekly">هذا الأسبوع</SelectItem>
                       <SelectItem value="monthly">هذا الشهر</SelectItem>
                       <SelectItem value="custom">فترة مخصصة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">الفرع</label>
+                  <Select value={branchFilter} onValueChange={setBranchFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر الفرع" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع الفروع</SelectItem>
+                      <SelectItem value="boys">البنين</SelectItem>
+                      <SelectItem value="girls">البنات</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1063,7 +1370,7 @@ const ChairmanDashboard = () => {
                     {/* Teachers Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين (انقر للتفاصيل)</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <PieChart>
                             <Pie
@@ -1075,13 +1382,25 @@ const ChairmanDashboard = () => {
                               outerRadius={100}
                               fill="#8884d8"
                               dataKey="value"
+                              onClick={(data, index) => {
+                                const types = ['absent', 'late', 'covering'];
+                                if (types[index]) {
+                                  handleChartClick(types[index]);
+                                }
+                              }}
+                              style={{ cursor: 'pointer' }}
                             >
                               {getTeachersChartData().map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.fill} />
                               ))}
                             </Pie>
                             <Tooltip />
-                            <Legend />
+                            <Legend onClick={(e) => {
+                              const name = e.value;
+                              if (name === 'الغائبون') handleChartClick('absent');
+                              else if (name === 'المتأخرون') handleChartClick('late');
+                              else if (name === 'المغطون') handleChartClick('covering');
+                            }} wrapperStyle={{ cursor: 'pointer' }} />
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
@@ -1107,17 +1426,36 @@ const ChairmanDashboard = () => {
                     {/* Activities Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة (انقر على "المشاركين" للتفاصيل)</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                          <BarChart data={getActivitiesChartData()}>
+                          <BarChart data={getActivitiesChartData()} onClick={(e) => {
+                            if (e && e.activeLabel === 'المشاركين') {
+                              handleChartClick('activity');
+                            }
+                          }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
                             <YAxis />
                             <Tooltip />
-                            <Legend />
-                            <Bar dataKey="value" fill="#8b5cf6" />
+                            <Legend onClick={(e) => {
+                              if (e.value === 'value' || e.dataKey === 'value') {
+                                // نفترض أن النقر على أي جزء يفتح قائمة المعلمين المشاركين
+                                handleChartClick('activity');
+                              }
+                            }} wrapperStyle={{ cursor: 'pointer' }} />
+                            <Bar dataKey="value" fill="#8b5cf6" onClick={() => handleChartClick('activity')} style={{ cursor: 'pointer' }} />
                           </BarChart>
                         </ResponsiveContainer>
+                        <div className="text-center mt-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleChartClick('activity')}
+                            className="text-xs"
+                          >
+                            👥 عرض قائمة المعلمين المشرفين
+                          </Button>
+                        </div>
                       </div>
                     )}
                     
@@ -1510,6 +1848,90 @@ const ChairmanDashboard = () => {
             
             <DialogFooter>
               <Button onClick={() => setShowReportModal(false)} variant="outline">
+                إغلاق
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {/* Teachers List Modal */}
+        <Dialog open={showTeachersListModal} onOpenChange={setShowTeachersListModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{teachersListData.title}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4" dir="rtl">
+              <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                <span className="font-semibold text-blue-800">
+                  إجمالي عدد المعلمين: {teachersListData.teachers.length}
+                </span>
+                <Button 
+                  onClick={exportTeachersListToPDF}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  size="sm"
+                >
+                  📄 تصدير إلى PDF
+                </Button>
+              </div>
+              
+              {teachersListData.teachers.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-4 py-2 text-center">#</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">اسم المعلم</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          {teachersListData.type === 'late' ? 'عدد مرات التأخير' :
+                           teachersListData.type === 'covering' ? 'عدد الحصص المغطاة' :
+                           teachersListData.type === 'activity' ? 'عدد الأنشطة' : 'عدد المرات'}
+                        </th>
+                        {teachersListData.type === 'late' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">مجموع الدقائق</th>
+                        )}
+                        {teachersListData.type === 'covering' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">المواد</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teachersListData.teachers.map((teacher, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center font-semibold">
+                            {teacher.name}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">
+                            <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold">
+                              {teacher.count}
+                            </span>
+                          </td>
+                          {teachersListData.type === 'late' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center">
+                              <span className="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-bold">
+                                {teacher.totalMinutes} دقيقة
+                              </span>
+                            </td>
+                          )}
+                          {teachersListData.type === 'covering' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center text-sm">
+                              {teacher.subjects || '-'}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  لا توجد بيانات متاحة
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter>
+              <Button onClick={() => setShowTeachersListModal(false)} variant="outline">
                 إغلاق
               </Button>
             </DialogFooter>
