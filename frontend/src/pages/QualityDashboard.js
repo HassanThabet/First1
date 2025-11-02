@@ -106,6 +106,122 @@ const QualityDashboard = () => {
     setReports(filtered);
   };
 
+  // Helper function to filter reports by time only
+  const filterReportsByTimeOnly = (reports) => {
+    const today = new Date();
+    
+    if (timeFilter === "daily") {
+      const todayStr = today.toISOString().split('T')[0];
+      return reports.filter(r => {
+        if (r.week_start) {
+          const weekStart = new Date(r.week_start);
+          const weekEnd = new Date(r.week_end);
+          const todayDate = new Date(todayStr);
+          return todayDate >= weekStart && todayDate <= weekEnd;
+        }
+        return r.date === todayStr;
+      });
+    } else if (timeFilter === "weekly") {
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4);
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
+        }
+        const reportDate = new Date(r.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    } else if (timeFilter === "monthly") {
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          return reportWeekStart.getMonth() === currentMonth && reportWeekStart.getFullYear() === currentYear;
+        }
+        const reportDate = new Date(r.date);
+        return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
+      });
+    } else if (timeFilter === "custom" && customStartDate && customEndDate) {
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      end.setHours(23, 59, 59, 999);
+      
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          return (reportWeekStart <= end && reportWeekEnd >= start);
+        }
+        const reportDate = new Date(r.date);
+        return reportDate >= start && reportDate <= end;
+      });
+    }
+    
+    return reports;
+  };
+
+  // Calculate overall statistics
+  const getOverallStatistics = () => {
+    let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
+
+    // Supervisor statistics
+    const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
+    const totalAbsentTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
+    const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
+    const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+
+    // Activities statistics
+    const totalActivities = filteredActivitiesReports.reduce((sum, r) => sum + (r.activities?.length || 0), 0);
+    const totalActivitiesParticipants = filteredActivitiesReports.reduce((sum, r) => {
+      return sum + (r.activities || []).reduce((aSum, a) => aSum + (a.participants_count || 0), 0);
+    }, 0);
+
+    // Social Specialist statistics
+    const totalPsychologicalCases = filteredSocialReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademicCases = filteredSocialReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioralCases = filteredSocialReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalStudentCases = totalPsychologicalCases + totalAcademicCases + totalBehavioralCases;
+
+    // Quality statistics
+    const totalQualityVisits = filteredQualityReports.length;
+    const avgQualityTeachingRate = filteredQualityReports.length > 0 ?
+      (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
+
+    return {
+      totalLateTeachers,
+      totalAbsentTeachers,
+      totalCoveringTeachers,
+      totalIncidents,
+      totalActivities,
+      totalActivitiesParticipants,
+      totalStudentCases,
+      totalPsychologicalCases,
+      totalAcademicCases,
+      totalBehavioralCases,
+      totalQualityVisits,
+      avgQualityTeachingRate,
+      supervisorReportsCount: filteredSupervisorReports.length,
+      activitiesReportsCount: filteredActivitiesReports.length,
+      socialReportsCount: filteredSocialReports.length,
+      qualityReportsCount: filteredQualityReports.length,
+      totalAllReports: filteredSupervisorReports.length + filteredActivitiesReports.length + 
+                       filteredSocialReports.length + filteredQualityReports.length
+    };
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
