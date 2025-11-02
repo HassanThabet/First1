@@ -64,6 +64,98 @@ const DirectorDashboard = () => {
     }
   };
 
+  // Get list of employees based on report type
+  const getEmployeesForReportType = () => {
+    if (reportTypeFilter === "vice_principal") {
+      return users.filter(u => u.role === "vice_principal");
+    } else if (reportTypeFilter === "supervisor") {
+      return users.filter(u => u.role === "supervisor");
+    } else if (reportTypeFilter === "activities") {
+      return users.filter(u => u.role === "activities");
+    } else if (reportTypeFilter === "social") {
+      return users.filter(u => u.role === "social_specialist");
+    } else if (reportTypeFilter === "quality") {
+      return users.filter(u => u.role === "quality");
+    }
+    return [];
+  };
+
+  // Get detailed reports based on filters
+  const getDetailedReports = () => {
+    let allReports = [];
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "vice_principal") {
+      const filtered = filterReportsByTimeOnly([...vicePrincipalReports]);
+      const vpsFiltered = selectedVicePrincipal === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedVicePrincipal);
+      
+      allReports = [...allReports, ...vpsFiltered.map(r => ({
+        ...r,
+        type: "vice_principal",
+        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
+      }))];
+    }
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "supervisor") {
+      const filtered = filterReportsByTimeOnly([...supervisorReports]);
+      const supFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...supFiltered.map(r => ({
+        ...r,
+        type: "supervisor",
+        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
+      }))];
+    }
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
+      const filtered = filterReportsByTimeOnly([...activitiesReports]);
+      const actFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...actFiltered.map(r => ({
+        ...r,
+        type: "activities",
+        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
+      }))];
+    }
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "social") {
+      const filtered = filterReportsByTimeOnly([...socialReports]);
+      const socFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...socFiltered.map(r => ({
+        ...r,
+        type: "social",
+        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
+      }))];
+    }
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
+      const filtered = filterReportsByTimeOnly([...qualityReports]);
+      const qualFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...qualFiltered.map(r => ({
+        ...r,
+        type: "quality",
+        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
+      }))];
+    }
+    
+    return allReports.sort((a, b) => {
+      const dateA = new Date(a.date || a.week_start);
+      const dateB = new Date(b.date || b.week_start);
+      return dateB - dateA;
+    });
+  };
+
   // Helper function to filter reports by time only
   const filterReportsByTimeOnly = (reports) => {
     const today = new Date();
