@@ -1278,7 +1278,7 @@ const DirectorDashboard = () => {
                 )}
 
                 {/* Quality Detailed Reports */}
-                {reportTypeFilter === "quality" && (
+                {(reportTypeFilter === "all" || reportTypeFilter === "quality") && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-orange-700">التفاصيل الكاملة - تقارير الجودة</CardTitle>
