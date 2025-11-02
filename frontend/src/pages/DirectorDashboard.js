@@ -13,6 +13,10 @@ import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "../fonts/vfs_fonts";
 import { pdfConfig } from "../utils/pdfConfig";
 
+// Initialize pdfMake with fonts
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+pdfMake.fonts = pdfConfig.fonts;
+
 const DirectorDashboard = () => {
   const { user } = useContext(AuthContext);
   
@@ -28,6 +32,10 @@ const DirectorDashboard = () => {
   const [customEndDate, setCustomEndDate] = useState("");
   const [reportTypeFilter, setReportTypeFilter] = useState("all");
   const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all");
+  const [selectedVicePrincipal, setSelectedVicePrincipal] = useState("all");
+  const [showDetailedReports, setShowDetailedReports] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   useEffect(() => {
     fetchAllData();
