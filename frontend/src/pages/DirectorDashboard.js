@@ -210,7 +210,8 @@ const DirectorDashboard = () => {
   const filterReportsByTimeAndBranch = (reports) => {
     let filtered = filterReportsByTimeOnly(reports);
     
-    if (branchFilter !== "all") {
+    // Only apply branch filter if user has branch="both" and branchFilter is not "all"
+    if (user && user.branch === "both" && branchFilter !== "all") {
       filtered = filtered.filter(r => r.branch === branchFilter);
     }
     
