@@ -713,7 +713,7 @@ const ChairmanDashboard = () => {
   };
 
   return (
-    <DashboardLayout title="لوحة تحكم المدير - مدارس الفجر الجديد الأهلية">
+    <DashboardLayout title="لوحة تحكم رئيس مجلس الإدارة - مدارس الفجر الجديد الأهلية">
       <div className="space-y-6">
         {/* Filters */}
         <Card>
