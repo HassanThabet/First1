@@ -1370,7 +1370,7 @@ const DirectorDashboard = () => {
                     {/* Teachers Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين (انقر للتفاصيل)</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <PieChart>
                             <Pie
@@ -1382,13 +1382,25 @@ const DirectorDashboard = () => {
                               outerRadius={100}
                               fill="#8884d8"
                               dataKey="value"
+                              onClick={(data, index) => {
+                                const types = ['absent', 'late', 'covering'];
+                                if (types[index]) {
+                                  handleChartClick(types[index]);
+                                }
+                              }}
+                              style={{ cursor: 'pointer' }}
                             >
                               {getTeachersChartData().map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={entry.fill} />
                               ))}
                             </Pie>
                             <Tooltip />
-                            <Legend />
+                            <Legend onClick={(e) => {
+                              const name = e.value;
+                              if (name === 'الغائبون') handleChartClick('absent');
+                              else if (name === 'المتأخرون') handleChartClick('late');
+                              else if (name === 'المغطون') handleChartClick('covering');
+                            }} wrapperStyle={{ cursor: 'pointer' }} />
                           </PieChart>
                         </ResponsiveContainer>
                       </div>
