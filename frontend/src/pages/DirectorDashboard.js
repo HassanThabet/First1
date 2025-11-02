@@ -5,7 +5,13 @@ import DashboardLayout from "../components/DashboardLayout";
 import { Input } from "../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../components/ui/dialog";
 import { toast } from "sonner";
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "../fonts/vfs_fonts";
+import { pdfConfig } from "../utils/pdfConfig";
 
 const DirectorDashboard = () => {
   const { user } = useContext(AuthContext);
