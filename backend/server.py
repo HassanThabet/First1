@@ -298,7 +298,7 @@ async def create_user(user_data: UserCreate, current_user: dict = Depends(get_cu
 
 @api_router.get("/users", response_model=List[User])
 async def get_users(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] not in ["admin", "chairman", "director", "vice_principal"]:
+    if current_user["role"] not in ["admin", "chairman", "director", "vice_principal", "quality"]:
         raise HTTPException(status_code=403, detail="غير مصرح")
     
     query = {}
