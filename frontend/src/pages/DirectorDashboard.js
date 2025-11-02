@@ -700,6 +700,9 @@ const DirectorDashboard = () => {
               </CardContent>
             </Card>
 
+            {/* Supervisor Statistics - Show only when reportTypeFilter is "all" or "supervisor" */}
+            {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+            <>
             {/* Statistics Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
@@ -780,6 +783,8 @@ const DirectorDashboard = () => {
                 </CardContent>
               </Card>
             </div>
+            </>
+            )}
 
             {/* Activities Statistics - Show only when reportTypeFilter is "all" or "activities" */}
             {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
