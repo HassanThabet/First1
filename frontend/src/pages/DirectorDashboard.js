@@ -1011,6 +1011,179 @@ const DirectorDashboard = () => {
               </Card>
               )}
 
+              {/* Charts Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>📊 الرسوم البيانية والتحليلات</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Teachers Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={getTeachersChartData()}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={(entry) => `${entry.name}: ${entry.value}`}
+                              outerRadius={100}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {getTeachersChartData().map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                    
+                    {/* Performance Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">متوسط الأداء العام</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={getPerformanceChartData()}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis domain={[0, 10]} />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="value" fill="#3b82f6" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                    
+                    {/* Activities Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={getActivitiesChartData()}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="value" fill="#8b5cf6" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                    
+                    {/* Social Cases Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات الأخصائي الاجتماعي</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={getSocialCasesChartData()}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={(entry) => `${entry.name}: ${entry.value}`}
+                              outerRadius={100}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {getSocialCasesChartData().map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Detailed Reports Section */}
+              {showDetailedReports && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>📋 التقارير التفصيلية</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {(() => {
+                      const detailedReports = getDetailedReports();
+                      
+                      if (detailedReports.length === 0) {
+                        return (
+                          <div className="text-center py-8 text-gray-500">
+                            لا توجد تقارير متاحة بناءً على الفلاتر المحددة
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <div className="space-y-4">
+                          <p className="text-sm text-gray-600 mb-4">
+                            إجمالي عدد التقارير: {detailedReports.length}
+                          </p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {detailedReports.map((report, index) => {
+                              const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                                      report.type === "supervisor" ? "مشرف" :
+                                                      report.type === "activities" ? "أنشطة" :
+                                                      report.type === "social" ? "أخصائي اجتماعي" :
+                                                      report.type === "quality" ? "جودة" : "";
+                              
+                              const bgColor = report.type === "vice_principal" ? "from-blue-50 to-blue-100 border-blue-500" :
+                                            report.type === "supervisor" ? "from-purple-50 to-purple-100 border-purple-500" :
+                                            report.type === "activities" ? "from-indigo-50 to-indigo-100 border-indigo-500" :
+                                            report.type === "social" ? "from-green-50 to-green-100 border-green-500" :
+                                            report.type === "quality" ? "from-orange-50 to-orange-100 border-orange-500" : "";
+                              
+                              return (
+                                <Card 
+                                  key={index} 
+                                  className={`bg-gradient-to-br ${bgColor} border-r-4 cursor-pointer hover:shadow-lg transition-shadow`}
+                                  onClick={() => {
+                                    setSelectedReport(report);
+                                    setShowReportModal(true);
+                                  }}
+                                >
+                                  <CardContent className="p-4">
+                                    <div className="flex justify-between items-start mb-2">
+                                      <span className="text-xs font-semibold px-2 py-1 rounded bg-white shadow-sm">
+                                        {reportTypeArabic}
+                                      </span>
+                                      <span className="text-xs text-gray-600">
+                                        {report.date || report.week_start || 'غير محدد'}
+                                      </span>
+                                    </div>
+                                    <h3 className="font-bold text-gray-800 mb-1">{report.userName}</h3>
+                                    {report.notes && (
+                                      <p className="text-xs text-gray-600 line-clamp-2">{report.notes}</p>
+                                    )}
+                                    <div className="mt-3 text-xs text-gray-500">
+                                      انقر لعرض التفاصيل
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Overall Summary */}
               <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
                 <CardContent className="p-6">
