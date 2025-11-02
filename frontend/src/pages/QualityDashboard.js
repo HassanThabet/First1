@@ -28,6 +28,8 @@ const QualityDashboard = () => {
   const [timeFilter, setTimeFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
+  const [reportTypeFilter, setReportTypeFilter] = useState("all");
+  const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all");
   
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
