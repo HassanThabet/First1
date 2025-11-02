@@ -94,11 +94,14 @@ const DirectorDashboard = () => {
         ? filtered 
         : filtered.filter(r => r.user_id === selectedVicePrincipal);
       
-      allReports = [...allReports, ...vpsFiltered.map(r => ({
-        ...r,
-        type: "vice_principal",
-        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
-      }))];
+      allReports = [...allReports, ...vpsFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "vice_principal",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "supervisor") {
@@ -107,11 +110,14 @@ const DirectorDashboard = () => {
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
       
-      allReports = [...allReports, ...supFiltered.map(r => ({
-        ...r,
-        type: "supervisor",
-        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
-      }))];
+      allReports = [...allReports, ...supFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "supervisor",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
@@ -120,11 +126,14 @@ const DirectorDashboard = () => {
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
       
-      allReports = [...allReports, ...actFiltered.map(r => ({
-        ...r,
-        type: "activities",
-        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
-      }))];
+      allReports = [...allReports, ...actFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "activities",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "social") {
@@ -133,11 +142,14 @@ const DirectorDashboard = () => {
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
       
-      allReports = [...allReports, ...socFiltered.map(r => ({
-        ...r,
-        type: "social",
-        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
-      }))];
+      allReports = [...allReports, ...socFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "social",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
@@ -146,11 +158,14 @@ const DirectorDashboard = () => {
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
       
-      allReports = [...allReports, ...qualFiltered.map(r => ({
-        ...r,
-        type: "quality",
-        userName: users.find(u => u.id === r.user_id)?.full_name || "غير معروف"
-      }))];
+      allReports = [...allReports, ...qualFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "quality",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
     }
     
     return allReports.sort((a, b) => {
