@@ -412,7 +412,7 @@ const ChairmanDashboard = () => {
           margin: [0, 0, 0, 10]
         },
         {
-          text: 'تقرير المدير الشامل',
+          text: 'تقرير رئيس مجلس الإدارة الشامل',
           style: 'subheader',
           alignment: 'center',
           margin: [0, 0, 0, 5]
