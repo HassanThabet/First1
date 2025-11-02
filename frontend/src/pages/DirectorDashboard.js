@@ -158,11 +158,28 @@ const DirectorDashboard = () => {
 
   // Calculate overall statistics
   const getOverallStatistics = () => {
-    // Apply time filter to all report types
-    let filteredSupervisorReports = filterReportsByTime([...supervisorReports]);
-    let filteredActivitiesReports = filterReportsByTime([...activitiesReports]);
-    let filteredSocialReports = filterReportsByTime([...socialReports]);
-    let filteredQualityReports = filterReportsByTime([...qualityReports]);
+    // For overall statistics (when reportTypeFilter is "all"), don't filter by specific employee
+    // Otherwise, use the filterReportsByTime which includes employee filtering
+    let filteredSupervisorReports, filteredActivitiesReports, filteredSocialReports, filteredQualityReports;
+    
+    if (reportTypeFilter === "all") {
+      // For "all" view, only apply time filter, not employee filter
+      const tempSelectedEmployee = selectedSpecificEmployee;
+      // Temporarily set to "all" to get all employees
+      selectedSpecificEmployee = "all";
+      filteredSupervisorReports = filterReportsByTime([...supervisorReports]);
+      filteredActivitiesReports = filterReportsByTime([...activitiesReports]);
+      filteredSocialReports = filterReportsByTime([...socialReports]);
+      filteredQualityReports = filterReportsByTime([...qualityReports]);
+      // Restore the selected employee
+      selectedSpecificEmployee = tempSelectedEmployee;
+    } else {
+      // For specific report type, apply both time and employee filters
+      filteredSupervisorReports = reportTypeFilter === "supervisor" ? filterReportsByTime([...supervisorReports]) : [];
+      filteredActivitiesReports = reportTypeFilter === "activities" ? filterReportsByTime([...activitiesReports]) : [];
+      filteredSocialReports = reportTypeFilter === "social" ? filterReportsByTime([...socialReports]) : [];
+      filteredQualityReports = reportTypeFilter === "quality" ? filterReportsByTime([...qualityReports]) : [];
+    }
 
     // Supervisor statistics
     const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
