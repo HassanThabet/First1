@@ -906,7 +906,9 @@ const DirectorDashboard = () => {
                                     {report.late_teachers && report.late_teachers.length > 0 ? (
                                       <ul className="list-disc list-inside text-sm space-y-1">
                                         {report.late_teachers.map((teacher, idx) => (
-                                          <li key={idx}>{teacher}</li>
+                                          <li key={idx}>
+                                            {typeof teacher === 'string' ? teacher : `${teacher.teacher || ''} - ${teacher.subject || ''} - حصة ${teacher.period || ''}`}
+                                          </li>
                                         ))}
                                       </ul>
                                     ) : (
@@ -920,7 +922,9 @@ const DirectorDashboard = () => {
                                     {report.absent_teachers && report.absent_teachers.length > 0 ? (
                                       <ul className="list-disc list-inside text-sm space-y-1">
                                         {report.absent_teachers.map((teacher, idx) => (
-                                          <li key={idx}>{teacher}</li>
+                                          <li key={idx}>
+                                            {typeof teacher === 'string' ? teacher : `${teacher.teacher || ''} - ${teacher.subject || ''} - حصة ${teacher.period || ''}`}
+                                          </li>
                                         ))}
                                       </ul>
                                     ) : (
@@ -934,7 +938,9 @@ const DirectorDashboard = () => {
                                     {report.covering_teachers && report.covering_teachers.length > 0 ? (
                                       <ul className="list-disc list-inside text-sm space-y-1">
                                         {report.covering_teachers.map((teacher, idx) => (
-                                          <li key={idx}>{teacher}</li>
+                                          <li key={idx}>
+                                            {typeof teacher === 'string' ? teacher : `${teacher.teacher || ''} - ${teacher.subject || ''} - حصة ${teacher.period || ''}`}
+                                          </li>
                                         ))}
                                       </ul>
                                     ) : (
