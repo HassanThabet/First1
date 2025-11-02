@@ -11,7 +11,6 @@ import { toast } from "sonner";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "../fonts/vfs_fonts";
-import { pdfConfig } from "../utils/pdfConfig";
 
 // Initialize pdfMake with fonts
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
