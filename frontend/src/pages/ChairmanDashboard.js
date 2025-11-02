@@ -177,22 +177,6 @@ const ChairmanDashboard = () => {
     let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
     let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
     let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
-    
-    return filtered;
-  };
-
-  // Calculate overall statistics
-  const getOverallStatistics = () => {
-    let reports = [...supervisorReports];
-    
-    // Filter by branch first
-    if (selectedBranch !== "all") {
-      reports = reports.filter(r => r.branch === selectedBranch);
-    }
-    
-    // Apply time filter
-    const today = new Date();
-    if (timeFilter === "daily") {
       const todayStr = today.toISOString().split('T')[0];
       reports = reports.filter(r => r.date === todayStr);
     } else if (timeFilter === "weekly") {
