@@ -409,10 +409,10 @@ metadata:
 test_plan:
   current_focus:
     - "Director Dashboard with modal view and filtering"
-  stuck_tasks:
-    - "Director Dashboard with modal view and filtering"
+    - "Interactive teacher lists in charts"
+  stuck_tasks: []
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
   backend_testing_complete: true
 
 agent_communication:
