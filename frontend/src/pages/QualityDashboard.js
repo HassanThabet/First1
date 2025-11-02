@@ -57,12 +57,13 @@ const QualityDashboard = () => {
 
   const fetchAllData = async () => {
     try {
-      const [usersRes, supervisorRes, activitiesRes, socialRes, qualityRes] = await Promise.all([
+      const [usersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes] = await Promise.all([
         axios.get(`${API}/users`),
         axios.get(`${API}/reports/supervisor`),
         axios.get(`${API}/reports/activities`),
         axios.get(`${API}/reports/social-specialist`),
-        axios.get(`${API}/reports/quality`)
+        axios.get(`${API}/reports/quality`),
+        axios.get(`${API}/reports/vice-principal`)
       ]);
       
       setUsers(usersRes.data);
@@ -70,6 +71,7 @@ const QualityDashboard = () => {
       setActivitiesReports(activitiesRes.data);
       setSocialReports(socialRes.data);
       setQualityReports(qualityRes.data);
+      setVicePrincipalReports(vpRes.data);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     }
