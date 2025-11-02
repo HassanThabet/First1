@@ -869,6 +869,208 @@ const QualityDashboard = () => {
                       </div>
                     </CardContent>
                   </Card>
+
+                  {/* Detailed Reports Section */}
+                  <>
+                    {/* Supervisor Detailed Reports */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && supervisorReports.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-blue-700">📋 تقارير المشرفين التفصيلية</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {filterReportsByTimeOnly(supervisorReports).slice(0, 5).map((report) => {
+                              const supervisor = users.find(u => u.id === report.user_id);
+                              return (
+                                <Card key={report.id} className="border-l-4 border-blue-500">
+                                  <CardContent className="p-4">
+                                    <div className="mb-3 pb-3 border-b">
+                                      <h3 className="text-md font-bold text-blue-700">المشرف: {supervisor?.username || 'غير معروف'}</h3>
+                                      <p className="text-xs text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                      <div className="bg-orange-50 p-2 rounded">
+                                        <p className="font-semibold text-orange-700">متأخرون: {report.late_teachers?.length || 0}</p>
+                                      </div>
+                                      <div className="bg-red-50 p-2 rounded">
+                                        <p className="font-semibold text-red-700">غائبون: {report.absent_teachers?.length || 0}</p>
+                                      </div>
+                                      <div className="bg-green-50 p-2 rounded">
+                                        <p className="font-semibold text-green-700">مغطون: {report.covering_teachers?.length || 0}</p>
+                                      </div>
+                                      <div className="bg-blue-50 p-2 rounded">
+                                        <p className="font-semibold text-blue-700">طلاب غائبون: {report.absent_students_count || 0}</p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                            {filterReportsByTimeOnly(supervisorReports).length > 5 && (
+                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(supervisorReports).length - 5} تقرير إضافي</p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Vice-Principal Detailed Reports */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "vice_principal") && vicePrincipalReports.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-cyan-700">📋 تقارير الوكلاء التفصيلية</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {filterReportsByTimeOnly(vicePrincipalReports).slice(0, 5).map((report) => {
+                              const vp = users.find(u => u.id === report.user_id);
+                              return (
+                                <Card key={report.id} className="border-l-4 border-cyan-500">
+                                  <CardContent className="p-4">
+                                    <div className="mb-3 pb-3 border-b">
+                                      <h3 className="text-md font-bold text-cyan-700">الوكيل: {vp?.username || 'غير معروف'}</h3>
+                                      <p className="text-xs text-gray-600">
+                                        الفترة: {new Date(report.week_start).toLocaleDateString('ar-SA')} - {new Date(report.week_end).toLocaleDateString('ar-SA')}
+                                      </p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3 text-sm">
+                                      <div className="bg-orange-50 p-2 rounded">
+                                        <p className="font-semibold text-orange-700">مشاكل: {report.problems?.length || 0}</p>
+                                      </div>
+                                      <div className="bg-blue-50 p-2 rounded">
+                                        <p className="font-semibold text-blue-700">اقتراحات: {report.suggestions?.length || 0}</p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                            {filterReportsByTimeOnly(vicePrincipalReports).length > 5 && (
+                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(vicePrincipalReports).length - 5} تقرير إضافي</p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Activities Detailed Reports */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "activities") && activitiesReports.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-purple-700">📋 تقارير الأنشطة التفصيلية</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {filterReportsByTimeOnly(activitiesReports).slice(0, 5).map((report) => {
+                              const activityUser = users.find(u => u.id === report.user_id);
+                              return (
+                                <Card key={report.id} className="border-l-4 border-purple-500">
+                                  <CardContent className="p-4">
+                                    <div className="mb-3 pb-3 border-b">
+                                      <h3 className="text-md font-bold text-purple-700">مسؤول الأنشطة: {activityUser?.username || 'غير معروف'}</h3>
+                                      <p className="text-xs text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3 text-sm">
+                                      <div className="bg-purple-50 p-2 rounded">
+                                        <p className="font-semibold text-purple-700">عدد الأنشطة: {report.activities?.length || 0}</p>
+                                      </div>
+                                      <div className="bg-indigo-50 p-2 rounded">
+                                        <p className="font-semibold text-indigo-700">المشاركون: {report.activities?.reduce((sum, a) => sum + (a.participants_count || 0), 0) || 0}</p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                            {filterReportsByTimeOnly(activitiesReports).length > 5 && (
+                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(activitiesReports).length - 5} تقرير إضافي</p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Social Specialist Detailed Reports */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "social") && socialReports.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-green-700">📋 تقارير الأخصائي الاجتماعي التفصيلية</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {filterReportsByTimeOnly(socialReports).slice(0, 5).map((report) => {
+                              const socialUser = users.find(u => u.id === report.user_id);
+                              return (
+                                <Card key={report.id} className="border-l-4 border-green-500">
+                                  <CardContent className="p-4">
+                                    <div className="mb-3 pb-3 border-b">
+                                      <h3 className="text-md font-bold text-green-700">الأخصائي: {socialUser?.username || 'غير معروف'}</h3>
+                                      <p className="text-xs text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                      <div className="bg-purple-50 p-2 rounded">
+                                        <p className="font-semibold text-purple-700">نفسية: {report.psychological_cases || 0}</p>
+                                      </div>
+                                      <div className="bg-blue-50 p-2 rounded">
+                                        <p className="font-semibold text-blue-700">أكاديمية: {report.academic_cases || 0}</p>
+                                      </div>
+                                      <div className="bg-red-50 p-2 rounded">
+                                        <p className="font-semibold text-red-700">سلوكية: {report.behavioral_cases || 0}</p>
+                                      </div>
+                                      <div className="bg-green-50 p-2 rounded">
+                                        <p className="font-semibold text-green-700">جلسات: {report.sessions_count || 0}</p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                            {filterReportsByTimeOnly(socialReports).length > 5 && (
+                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(socialReports).length - 5} تقرير إضافي</p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+
+                    {/* Quality Detailed Reports */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "quality") && qualityReports.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-orange-700">📋 تقارير الجودة التفصيلية</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-4">
+                            {filterReportsByTimeOnly(qualityReports).slice(0, 5).map((report) => {
+                              const qualityUser = users.find(u => u.id === report.user_id);
+                              return (
+                                <Card key={report.id} className="border-l-4 border-orange-500">
+                                  <CardContent className="p-4">
+                                    <div className="mb-3 pb-3 border-b">
+                                      <h3 className="text-md font-bold text-orange-700">مسؤول الجودة: {qualityUser?.username || 'غير معروف'}</h3>
+                                      <p className="text-xs text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3 text-sm">
+                                      <div className="bg-blue-50 p-2 rounded">
+                                        <p className="font-semibold text-blue-700">المعلم: {report.teacher_name || '-'}</p>
+                                      </div>
+                                      <div className="bg-amber-50 p-2 rounded">
+                                        <p className="font-semibold text-amber-700">الأداء: {report.teaching_performance_rate || 0}/10</p>
+                                      </div>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                            {filterReportsByTimeOnly(qualityReports).length > 5 && (
+                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(qualityReports).length - 5} تقرير إضافي</p>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </>
                 </>
               );
             })()}
