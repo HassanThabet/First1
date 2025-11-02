@@ -220,27 +220,33 @@ const DirectorDashboard = () => {
 
   // Handle chart click to show teachers list
   const handleChartClick = (type) => {
+    console.log("📊 Chart clicked, type:", type);
     let data = { title: "", teachers: [], type: type };
     
     switch(type) {
       case "absent":
         data.title = "قائمة المعلمين الغائبين";
         data.teachers = getAggregatedAbsentTeachers();
+        console.log("✅ Absent teachers:", data.teachers.length);
         break;
       case "late":
         data.title = "قائمة المعلمين المتأخرين";
         data.teachers = getAggregatedLateTeachers();
+        console.log("✅ Late teachers:", data.teachers.length);
         break;
       case "covering":
         data.title = "قائمة المعلمين المغطين";
         data.teachers = getAggregatedCoveringTeachers();
+        console.log("✅ Covering teachers:", data.teachers.length);
         break;
       case "activity":
         data.title = "قائمة المعلمين المشرفين على الأنشطة";
         data.teachers = getAggregatedActivityTeachers();
+        console.log("✅ Activity teachers:", data.teachers.length);
         break;
     }
     
+    console.log("📋 Opening modal with data:", data);
     setTeachersListData(data);
     setShowTeachersListModal(true);
   };
