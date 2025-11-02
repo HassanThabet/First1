@@ -28,9 +28,12 @@ const DirectorDashboard = () => {
   const [reportTypeFilter, setReportTypeFilter] = useState("all");
   const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all");
   const [selectedVicePrincipal, setSelectedVicePrincipal] = useState("all");
+  const [branchFilter, setBranchFilter] = useState("all");
   const [showDetailedReports, setShowDetailedReports] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showTeachersListModal, setShowTeachersListModal] = useState(false);
+  const [teachersListData, setTeachersListData] = useState({ title: "", teachers: [], type: "" });
 
   useEffect(() => {
     fetchAllData();
