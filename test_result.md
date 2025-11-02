@@ -330,9 +330,9 @@ frontend:
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/pages/DirectorDashboard.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -345,6 +345,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ COMPREHENSIVE TESTING SUCCESSFUL: Director Dashboard now fully functional! 1) ✅ Statistics display real data (19/22 statistics > 0): 92 absent students, 4 late teachers, 4 absent teachers, 3 covering teachers, performance metrics 38.7-41.2/10, 2) ✅ Filters working: Report type filter (جميع التقارير/المشرفين/الوكلاء/الأنشطة/الأخصائي الاجتماعي/الجودة), time period filter (اليوم/هذا الأسبوع/هذا الشهر/فترة مخصصة), employee selection filter, 3) ✅ 'عرض التقارير التفصيلية' button shows 20 report cards with employee names and departments (بنين/بنات), 4) ✅ Modal functionality working: Click on report cards opens detailed modal with full report info including employee name, department, dates, and report content, 5) ✅ Charts display real data: 7 charts with meaningful data visualization (pie charts for teacher distribution, bar charts for performance metrics), 6) ✅ PDF export working: Shows success message 'تم تصدير التقرير بنجاح', 7) ✅ Department indicators: Found 20 department references (10 بنين, 10 بنات), 8) ✅ Data loading: Console shows successful API calls (15 users, 13 supervisor reports, 1 activities, 1 social, 1 quality, 4 VP reports). All requested functionality working perfectly as per user requirements."
+      - working: false
+        agent: "testing"
+        comment: "❌ ARABIC TESTING RESULTS - CRITICAL MODAL ISSUE FOUND: Conducted comprehensive testing as requested by user in Arabic. FINDINGS: 1) ✅ Login successful (ahmed/123456), 2) ✅ Director Dashboard loads correctly with title 'لوحة تحكم المدير', 3) ✅ Data loading successful: 15 users, 13 supervisor reports, 1 activities, 1 social, 1 quality, 4 VP reports, 4) ✅ Statistics display real data: 92 absent students, 4 late/absent teachers, 3 covering teachers, performance 38.7-41.2/10, 5) ✅ 'عرض التقارير التفصيلية' button works and shows detailed reports section, 6) ✅ Supervisor filter ('المشرفين') selection works, 7) ❌ CRITICAL ISSUE: Modal functionality NOT WORKING - report cards are visible but clicking them does not open modal with full report details (sender name, late_teachers, absent_teachers, covering_teachers, incidents, notes), 8) ❌ Employee selection dropdown appears but may be empty or not properly populated when 'المشرفين' is selected. ROOT CAUSE: Modal click handlers not functioning properly, preventing users from viewing complete report details as requested."
 
   - task: "Chairman Dashboard with modal view and filtering"
     implemented: false
