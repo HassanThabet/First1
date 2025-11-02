@@ -1,106 +1,193 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { API } from "../App";
+import { API, AuthContext } from "../App";
 import DashboardLayout from "../components/DashboardLayout";
-import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { Button } from "../components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../components/ui/dialog";
 import { toast } from "sonner";
-import { Eye, BarChart3, Users as UsersIcon, TrendingUp, FileDown } from "lucide-react";
-import pdfMake from '../utils/pdfConfig';
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfMakeFonts from "../fonts/vfs_fonts";
 
 const ChairmanDashboard = () => {
-  const [activeTab, setActiveTab] = useState("overview");
-  const [loading, setLoading] = useState(false);
+  const { user } = useContext(AuthContext);
   
-  // Data states
-  const [users, setUsers] = useState([]);
+  // For statistics
   const [supervisorReports, setSupervisorReports] = useState([]);
-  const [vicePrincipalReports, setVicePrincipalReports] = useState([]);
   const [activitiesReports, setActivitiesReports] = useState([]);
   const [socialReports, setSocialReports] = useState([]);
   const [qualityReports, setQualityReports] = useState([]);
-  const [directorReports, setDirectorReports] = useState([]);
-  
-  // Filter states
-  const [selectedBranch, setSelectedBranch] = useState("all"); // all, boys, girls
-  const [selectedEmployee, setSelectedEmployee] = useState("all");
+  const [vicePrincipalReports, setVicePrincipalReports] = useState([]);
+  const [users, setUsers] = useState([]);
   const [timeFilter, setTimeFilter] = useState("all");
-  const [reportTypeFilter, setReportTypeFilter] = useState("all"); // all, vice_principal, supervisor, activities, social, quality
-  const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all"); // For specific employee within type
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
-  
-  // Modal states
+  const [reportTypeFilter, setReportTypeFilter] = useState("all");
+  const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all");
+  const [selectedVicePrincipal, setSelectedVicePrincipal] = useState("all");
+  const [showDetailedReports, setShowDetailedReports] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
-  const [reportType, setReportType] = useState("");
 
   useEffect(() => {
     fetchAllData();
   }, []);
 
   const fetchAllData = async () => {
-    setLoading(true);
     try {
-      const [usersRes, supervisorRes, vpRes, activitiesRes, socialRes, qualityRes, directorRes] = await Promise.all([
+      console.log("🔄 Fetching all data...");
+      const [usersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes] = await Promise.all([
         axios.get(`${API}/users`),
         axios.get(`${API}/reports/supervisor`),
-        axios.get(`${API}/reports/vice-principal`),
         axios.get(`${API}/reports/activities`),
         axios.get(`${API}/reports/social-specialist`),
         axios.get(`${API}/reports/quality`),
-        axios.get(`${API}/reports/director`)
+        axios.get(`${API}/reports/vice-principal`)
       ]);
+      
+      console.log("✅ Data fetched successfully:");
+      console.log("Users:", usersRes.data.length);
+      console.log("Supervisor reports:", supervisorRes.data.length);
+      console.log("Activities reports:", activitiesRes.data.length);
+      console.log("Social reports:", socialRes.data.length);
+      console.log("Quality reports:", qualityRes.data.length);
+      console.log("VP reports:", vpRes.data.length);
       
       setUsers(usersRes.data);
       setSupervisorReports(supervisorRes.data);
-      setVicePrincipalReports(vpRes.data);
       setActivitiesReports(activitiesRes.data);
       setSocialReports(socialRes.data);
       setQualityReports(qualityRes.data);
-      setDirectorReports(directorRes.data);
+      setVicePrincipalReports(vpRes.data);
     } catch (error) {
+      console.error("❌ Failed to fetch data:", error);
       toast.error("فشل تحميل البيانات");
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Get filtered reports based on branch
-  const getFilteredReports = () => {
-    if (selectedBranch === "all") {
-      return supervisorReports;
+  // Get list of employees based on report type
+  const getEmployeesForReportType = () => {
+    if (reportTypeFilter === "vice_principal") {
+      return users.filter(u => u.role === "vice_principal");
+    } else if (reportTypeFilter === "supervisor") {
+      return users.filter(u => u.role === "supervisor");
+    } else if (reportTypeFilter === "activities") {
+      return users.filter(u => u.role === "activities");
+    } else if (reportTypeFilter === "social") {
+      return users.filter(u => u.role === "social_specialist");
+    } else if (reportTypeFilter === "quality") {
+      return users.filter(u => u.role === "quality");
     }
-    return supervisorReports.filter(r => r.branch === selectedBranch);
+    return [];
   };
 
-  // Helper function to filter reports by time and employee
-  // Helper function to filter reports by time only (without employee filter, but with branch for Chairman)
+  // Get detailed reports based on filters
+  const getDetailedReports = () => {
+    let allReports = [];
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "vice_principal") {
+      const filtered = filterReportsByTimeOnly([...vicePrincipalReports]);
+      const vpsFiltered = selectedVicePrincipal === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedVicePrincipal);
+      
+      allReports = [...allReports, ...vpsFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "vice_principal",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
+    }
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "supervisor") {
+      const filtered = filterReportsByTimeOnly([...supervisorReports]);
+      const supFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...supFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "supervisor",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
+    }
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
+      const filtered = filterReportsByTimeOnly([...activitiesReports]);
+      const actFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...actFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "activities",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
+    }
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "social") {
+      const filtered = filterReportsByTimeOnly([...socialReports]);
+      const socFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...socFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "social",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
+    }
+    
+    if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
+      const filtered = filterReportsByTimeOnly([...qualityReports]);
+      const qualFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...qualFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "quality",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
+    }
+    
+    return allReports.sort((a, b) => {
+      const dateA = new Date(a.date || a.week_start);
+      const dateB = new Date(b.date || b.week_start);
+      return dateB - dateA;
+    });
+  };
+
+  // Helper function to filter reports by time only
   const filterReportsByTimeOnly = (reports) => {
-    let filtered = reports;
-    
-    // Filter by branch first (Chairman can see both branches)
-    if (selectedBranch !== "all") {
-      filtered = filtered.filter(r => r.branch === selectedBranch);
-    }
-    
-    // Filter by time
     const today = new Date();
     
     if (timeFilter === "daily") {
       const todayStr = today.toISOString().split('T')[0];
-      return filtered.filter(r => {
-        // For VP reports that use week_start/week_end
+      return reports.filter(r => {
         if (r.week_start) {
           const weekStart = new Date(r.week_start);
           const weekEnd = new Date(r.week_end);
           const todayDate = new Date(todayStr);
           return todayDate >= weekStart && todayDate <= weekEnd;
         }
-        // For other reports that use date
         return r.date === todayStr;
       });
     } else if (timeFilter === "weekly") {
@@ -113,27 +200,23 @@ const ChairmanDashboard = () => {
       weekEnd.setDate(weekStart.getDate() + 4);
       weekEnd.setHours(23, 59, 59, 999);
       
-      return filtered.filter(r => {
-        // For VP reports that use week_start/week_end
+      return reports.filter(r => {
         if (r.week_start) {
           const reportWeekStart = new Date(r.week_start);
           const reportWeekEnd = new Date(r.week_end);
           return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
         }
-        // For other reports that use date
         const reportDate = new Date(r.date);
         return reportDate >= weekStart && reportDate <= weekEnd;
       });
     } else if (timeFilter === "monthly") {
       const currentMonth = today.getMonth();
       const currentYear = today.getFullYear();
-      return filtered.filter(r => {
-        // For VP reports that use week_start/week_end
+      return reports.filter(r => {
         if (r.week_start) {
           const reportWeekStart = new Date(r.week_start);
           return reportWeekStart.getMonth() === currentMonth && reportWeekStart.getFullYear() === currentYear;
         }
-        // For other reports that use date
         const reportDate = new Date(r.date);
         return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
       });
@@ -142,37 +225,22 @@ const ChairmanDashboard = () => {
       const end = new Date(customEndDate);
       end.setHours(23, 59, 59, 999);
       
-      return filtered.filter(r => {
-        // For VP reports that use week_start/week_end
+      return reports.filter(r => {
         if (r.week_start) {
           const reportWeekStart = new Date(r.week_start);
           const reportWeekEnd = new Date(r.week_end);
           return (reportWeekStart <= end && reportWeekEnd >= start);
         }
-        // For other reports that use date
         const reportDate = new Date(r.date);
         return reportDate >= start && reportDate <= end;
       });
     }
     
-    return filtered;
-  };
-
-  // Helper function to filter reports by time, branch, and employee
-  const filterReportsByTime = (reports) => {
-    let filtered = filterReportsByTimeOnly(reports);
-    
-    // Filter by specific employee if selected
-    if (selectedSpecificEmployee !== "all") {
-      filtered = filtered.filter(r => r.user_id === selectedSpecificEmployee);
-    }
-    
-    return filtered;
+    return reports;
   };
 
   // Calculate overall statistics
   const getOverallStatistics = () => {
-    // For overall statistics, use time and branch filter only (no employee filter)
     let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
     let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
     let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
@@ -221,7 +289,6 @@ const ChairmanDashboard = () => {
       (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
 
     return {
-      // Supervisor stats
       totalLateTeachers,
       totalAbsentTeachers,
       totalCoveringTeachers,
@@ -231,542 +298,1224 @@ const ChairmanDashboard = () => {
       avgCleanliness,
       avgAttendance,
       avgBehavior,
-      supervisorReportsCount: filteredSupervisorReports.length,
-      
-      // Activities stats
       totalActivities,
       totalActivitiesParticipants,
       avgActivitiesInteraction,
-      activitiesReportsCount: filteredActivitiesReports.length,
-      
-      // Social Specialist stats
       totalStudentCases,
       totalPsychologicalCases,
       totalAcademicCases,
       totalBehavioralCases,
       totalSessions,
       totalFamilyContacts,
-      socialReportsCount: filteredSocialReports.length,
-      
-      // Quality stats
       totalQualityVisits,
       avgQualityTeachingRate,
+      supervisorReportsCount: filteredSupervisorReports.length,
+      activitiesReportsCount: filteredActivitiesReports.length,
+      socialReportsCount: filteredSocialReports.length,
       qualityReportsCount: filteredQualityReports.length,
-      
-      // Total
       totalAllReports: filteredSupervisorReports.length + filteredActivitiesReports.length + 
                        filteredSocialReports.length + filteredQualityReports.length
     };
   };
 
-  // Get reports for selected employee
-  const getEmployeeReports = () => {
-    if (selectedEmployee === "all") return [];
-    
-    const employee = users.find(u => u.id === selectedEmployee);
-    if (!employee) return [];
-    
-    let reports = [];
-    
-    if (employee.role === "supervisor") {
-      reports = supervisorReports.filter(r => r.user_id === employee.id);
-    } else if (employee.role === "vice_principal") {
-      const vpReports = vicePrincipalReports.filter(r => r.user_id === employee.id);
-      const supervisorsUnderVP = users.filter(u => u.role === "supervisor" && u.assigned_to === employee.id);
-      const supervisorIds = supervisorsUnderVP.map(s => s.id);
-      const supervisorReportsUnderVP = supervisorReports.filter(r => supervisorIds.includes(r.user_id));
-      reports = [...vpReports, ...supervisorReportsUnderVP];
-    } else if (employee.role === "director") {
-      reports = directorReports.filter(r => r.user_id === employee.id);
-    } else if (employee.role === "activities") {
-      reports = activitiesReports.filter(r => r.user_id === employee.id);
-    } else if (employee.role === "social_specialist") {
-      reports = socialReports.filter(r => r.user_id === employee.id);
-    } else if (employee.role === "quality") {
-      reports = qualityReports.filter(r => r.user_id === employee.id);
+  // Get chart data for teachers
+  const getTeachersChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الغائبون', value: stats.totalAbsentTeachers, fill: '#ef4444' },
+      { name: 'المتأخرون', value: stats.totalLateTeachers, fill: '#f97316' },
+      { name: 'المغطون', value: stats.totalCoveringTeachers, fill: '#22c55e' }
+    ];
+  };
+
+  // Get performance chart data
+  const getPerformanceChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'انضباط الطلاب', value: parseFloat(stats.avgDiscipline) },
+      { name: 'نظافة الفصول', value: parseFloat(stats.avgCleanliness) },
+      { name: 'التزام المعلمين', value: parseFloat(stats.avgAttendance) },
+      { name: 'السلوك العام', value: parseFloat(stats.avgBehavior) }
+    ];
+  };
+
+  // Get activities chart data
+  const getActivitiesChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الأنشطة', value: stats.totalActivities },
+      { name: 'المشاركين', value: Math.floor(stats.totalActivitiesParticipants / 10) }, // Scaled down for better visualization
+      { name: 'التفاعل', value: parseFloat(stats.avgActivitiesInteraction) }
+    ];
+  };
+
+  // Get social cases chart data
+  const getSocialCasesChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'حالات نفسية', value: stats.totalPsychologicalCases, fill: '#ec4899' },
+      { name: 'حالات أكاديمية', value: stats.totalAcademicCases, fill: '#f59e0b' },
+      { name: 'حالات سلوكية', value: stats.totalBehavioralCases, fill: '#ef4444' }
+    ];
+  };
+
+  // Generate PDF Export
+  const exportToPDF = () => {
+    // Initialize pdfMake fonts for this export
+    if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
+      pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+      pdfMake.fonts = {
+        Cairo: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Regular.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Regular.ttf'
+        },
+        Roboto: {
+          normal: 'Roboto-Regular.ttf',
+          bold: 'Roboto-Medium.ttf',
+          italics: 'Roboto-Italic.ttf',
+          bolditalics: 'Roboto-MediumItalic.ttf'
+        }
+      };
     }
     
-    return reports;
+    const stats = getOverallStatistics();
+    const reports = getDetailedReports();
+    
+    const timeFilterText = timeFilter === "daily" ? "اليوم" : 
+                          timeFilter === "weekly" ? "هذا الأسبوع" : 
+                          timeFilter === "monthly" ? "هذا الشهر" :
+                          timeFilter === "custom" && customStartDate && customEndDate ? 
+                            `من ${customStartDate} إلى ${customEndDate}` : "جميع الفترات";
+    
+    const reportTypeText = reportTypeFilter === "all" ? "جميع التقارير" :
+                          reportTypeFilter === "vice_principal" ? "تقارير الوكلاء" :
+                          reportTypeFilter === "supervisor" ? "تقارير المشرفين" :
+                          reportTypeFilter === "activities" ? "تقارير الأنشطة" :
+                          reportTypeFilter === "social" ? "تقارير الأخصائي الاجتماعي" :
+                          reportTypeFilter === "quality" ? "تقارير الجودة" : "";
+
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 60, 40, 60],
+      defaultStyle: {
+        font: 'Cairo',
+        fontSize: 11
+      },
+      content: [
+        {
+          text: 'مدارس الفجر الجديد الأهلية',
+          style: 'header',
+          alignment: 'center',
+          margin: [0, 0, 0, 10]
+        },
+        {
+          text: 'تقرير رئيس مجلس الإدارة الشامل',
+          style: 'subheader',
+          alignment: 'center',
+          margin: [0, 0, 0, 5]
+        },
+        {
+          text: `${reportTypeText} - ${timeFilterText}`,
+          style: 'info',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        {
+          text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-EG')}`,
+          style: 'info',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        
+        // Statistics Section
+        {
+          text: 'الإحصائيات العامة',
+          style: 'sectionHeader',
+          margin: [0, 10, 0, 10]
+        },
+        {
+          table: {
+            widths: ['*', '*', '*'],
+            body: [
+              [
+                { text: 'المعلمون الغائبون', style: 'tableHeader' },
+                { text: 'المعلمون المتأخرون', style: 'tableHeader' },
+                { text: 'المعلمون المغطون', style: 'tableHeader' }
+              ],
+              [
+                { text: stats.totalAbsentTeachers.toString(), alignment: 'center' },
+                { text: stats.totalLateTeachers.toString(), alignment: 'center' },
+                { text: stats.totalCoveringTeachers.toString(), alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        },
+        {
+          table: {
+            widths: ['*', '*', '*', '*'],
+            body: [
+              [
+                { text: 'انضباط الطلاب', style: 'tableHeader' },
+                { text: 'نظافة الفصول', style: 'tableHeader' },
+                { text: 'التزام المعلمين', style: 'tableHeader' },
+                { text: 'السلوك العام', style: 'tableHeader' }
+              ],
+              [
+                { text: `${stats.avgDiscipline}/10`, alignment: 'center' },
+                { text: `${stats.avgCleanliness}/10`, alignment: 'center' },
+                { text: `${stats.avgAttendance}/10`, alignment: 'center' },
+                { text: `${stats.avgBehavior}/10`, alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        },
+        
+        // Activities Statistics
+        (reportTypeFilter === "all" || reportTypeFilter === "activities") ? {
+          text: 'إحصائيات الأنشطة',
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10]
+        } : {},
+        (reportTypeFilter === "all" || reportTypeFilter === "activities") ? {
+          table: {
+            widths: ['*', '*', '*'],
+            body: [
+              [
+                { text: 'إجمالي الأنشطة', style: 'tableHeader' },
+                { text: 'إجمالي المشاركين', style: 'tableHeader' },
+                { text: 'متوسط التفاعل', style: 'tableHeader' }
+              ],
+              [
+                { text: stats.totalActivities.toString(), alignment: 'center' },
+                { text: stats.totalActivitiesParticipants.toString(), alignment: 'center' },
+                { text: `${stats.avgActivitiesInteraction}/10`, alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        } : {},
+        
+        // Social Specialist Statistics
+        (reportTypeFilter === "all" || reportTypeFilter === "social") ? {
+          text: 'إحصائيات الأخصائي الاجتماعي',
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10]
+        } : {},
+        (reportTypeFilter === "all" || reportTypeFilter === "social") ? {
+          table: {
+            widths: ['*', '*', '*', '*'],
+            body: [
+              [
+                { text: 'حالات نفسية', style: 'tableHeader' },
+                { text: 'حالات أكاديمية', style: 'tableHeader' },
+                { text: 'حالات سلوكية', style: 'tableHeader' },
+                { text: 'إجمالي الحالات', style: 'tableHeader' }
+              ],
+              [
+                { text: stats.totalPsychologicalCases.toString(), alignment: 'center' },
+                { text: stats.totalAcademicCases.toString(), alignment: 'center' },
+                { text: stats.totalBehavioralCases.toString(), alignment: 'center' },
+                { text: stats.totalStudentCases.toString(), alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        } : {},
+        
+        // Quality Statistics
+        (reportTypeFilter === "all" || reportTypeFilter === "quality") ? {
+          text: 'إحصائيات الجودة',
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10]
+        } : {},
+        (reportTypeFilter === "all" || reportTypeFilter === "quality") ? {
+          table: {
+            widths: ['*', '*'],
+            body: [
+              [
+                { text: 'إجمالي الزيارات', style: 'tableHeader' },
+                { text: 'متوسط الأداء التدريسي', style: 'tableHeader' }
+              ],
+              [
+                { text: stats.totalQualityVisits.toString(), alignment: 'center' },
+                { text: `${stats.avgQualityTeachingRate}/10`, alignment: 'center' }
+              ]
+            ]
+          },
+          margin: [0, 0, 0, 10]
+        } : {},
+        
+        // Detailed Reports
+        {
+          text: 'التقارير التفصيلية',
+          style: 'sectionHeader',
+          margin: [0, 20, 0, 10],
+          pageBreak: 'before'
+        },
+        {
+          text: `إجمالي عدد التقارير: ${reports.length}`,
+          style: 'info',
+          margin: [0, 0, 0, 10]
+        },
+        ...reports.slice(0, 20).map((report, index) => {
+          const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                  report.type === "supervisor" ? "مشرف" :
+                                  report.type === "activities" ? "أنشطة" :
+                                  report.type === "social" ? "أخصائي اجتماعي" :
+                                  report.type === "quality" ? "جودة" : "";
+          
+          return {
+            stack: [
+              {
+                text: `${index + 1}. ${reportTypeArabic} - ${report.userName}`,
+                style: 'reportTitle',
+                margin: [0, 10, 0, 5]
+              },
+              {
+                text: `التاريخ: ${report.date || report.week_start || 'غير محدد'}`,
+                style: 'reportInfo'
+              },
+              report.notes ? {
+                text: `ملاحظات: ${report.notes}`,
+                style: 'reportInfo',
+                margin: [0, 5, 0, 0]
+              } : {}
+            ],
+            margin: [0, 0, 0, 10]
+          };
+        })
+      ],
+      styles: {
+        header: {
+          fontSize: 20,
+          bold: true,
+          color: '#1e40af'
+        },
+        subheader: {
+          fontSize: 16,
+          bold: true,
+          color: '#3b82f6'
+        },
+        sectionHeader: {
+          fontSize: 14,
+          bold: true,
+          color: '#1e40af',
+          decoration: 'underline'
+        },
+        info: {
+          fontSize: 10,
+          color: '#666666'
+        },
+        tableHeader: {
+          fillColor: '#dbeafe',
+          bold: true,
+          alignment: 'center',
+          fontSize: 10
+        },
+        reportTitle: {
+          fontSize: 11,
+          bold: true,
+          color: '#1e40af'
+        },
+        reportInfo: {
+          fontSize: 9,
+          color: '#666666'
+        }
+      }
+    };
+
+    pdfMake.createPdf(docDefinition).download(`تقرير_المدير_${new Date().getTime()}.pdf`);
+    toast.success("تم تصدير التقرير بنجاح");
   };
 
-  const stats = getOverallStatistics();
-  const employeeReports = getEmployeeReports();
+  // Calculate overall statistics
+  const getOverallStatistics_OLD = () => {
+    let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
 
-  const roleNames = {
-    director: "المدير",
-    vice_principal: "الوكيل",
-    supervisor: "المشرف",
-    activities: "الأنشطة",
-    educational_supervision: "الإشراف التربوي",
-    social_specialist: "الأخصائي الاجتماعي",
-    quality: "الجودة"
-  };
+    // Supervisor statistics
+    const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
+    const totalAbsentTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
+    const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
+    const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+    const totalAbsentStudents = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
+    
+    const avgDiscipline = filteredSupervisorReports.length > 0 ? 
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.student_discipline || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgCleanliness = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.classroom_cleanliness || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgAttendance = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.teacher_attendance_rate || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgBehavior = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.general_behavior || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
 
-  const branchNames = {
-    boys: "البنين",
-    girls: "البنات"
+    // Activities statistics
+    const totalActivities = filteredActivitiesReports.reduce((sum, r) => sum + (r.activities?.length || 0), 0);
+    const totalActivitiesParticipants = filteredActivitiesReports.reduce((sum, r) => {
+      return sum + (r.activities || []).reduce((aSum, a) => aSum + (a.participants_count || 0), 0);
+    }, 0);
+    const avgActivitiesInteraction = filteredActivitiesReports.length > 0 ? 
+      (filteredActivitiesReports.reduce((sum, r) => {
+        const activities = r.activities || [];
+        const avgInteraction = activities.length > 0 ? 
+          activities.reduce((aSum, a) => aSum + (a.interaction_rate || 0), 0) / activities.length : 0;
+        return sum + avgInteraction;
+      }, 0) / filteredActivitiesReports.length).toFixed(1) : 0;
+
+    // Social Specialist statistics
+    const totalPsychologicalCases = filteredSocialReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademicCases = filteredSocialReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioralCases = filteredSocialReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalStudentCases = totalPsychologicalCases + totalAcademicCases + totalBehavioralCases;
+    const totalSessions = filteredSocialReports.reduce((sum, r) => sum + (r.sessions_count || 0), 0);
+    const totalFamilyContacts = filteredSocialReports.reduce((sum, r) => sum + (r.family_contacts || 0), 0);
+
+    // Quality statistics
+    const totalQualityVisits = filteredQualityReports.length;
+    const avgQualityTeachingRate = filteredQualityReports.length > 0 ?
+      (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
+
+    return {
+      totalLateTeachers,
+      totalAbsentTeachers,
+      totalCoveringTeachers,
+      totalIncidents,
+      totalAbsentStudents,
+      avgDiscipline,
+      avgCleanliness,
+      avgAttendance,
+      avgBehavior,
+      totalActivities,
+      totalActivitiesParticipants,
+      avgActivitiesInteraction,
+      totalStudentCases,
+      totalPsychologicalCases,
+      totalAcademicCases,
+      totalBehavioralCases,
+      totalSessions,
+      totalFamilyContacts,
+      totalQualityVisits,
+      avgQualityTeachingRate,
+      supervisorReportsCount: filteredSupervisorReports.length,
+      activitiesReportsCount: filteredActivitiesReports.length,
+      socialReportsCount: filteredSocialReports.length,
+      qualityReportsCount: filteredQualityReports.length,
+      totalAllReports: filteredSupervisorReports.length + filteredActivitiesReports.length + 
+                       filteredSocialReports.length + filteredQualityReports.length
+    };
   };
 
   return (
-    <DashboardLayout title="لوحة تحكم رئيس مجلس الإدارة">
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="overview" className="flex items-center space-x-2 space-x-reverse">
-            <BarChart3 className="w-4 h-4" />
-            <span>الإحصائيات الشاملة</span>
-          </TabsTrigger>
-          <TabsTrigger value="employees" className="flex items-center space-x-2 space-x-reverse">
-            <UsersIcon className="w-4 h-4" />
-            <span>تقارير الموظفين</span>
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview">
-          <div className="space-y-6">
-            {/* Filters */}
-            <Card>
-              <CardHeader>
-                <CardTitle>التصفية</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">الفرع</label>
-                      <Select value={selectedBranch} onValueChange={(value) => {
-                        setSelectedBranch(value);
-                        setSelectedSpecificEmployee("all");
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">الفرعين (البنين والبنات)</SelectItem>
-                          <SelectItem value="boys">البنين</SelectItem>
-                          <SelectItem value="girls">البنات</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">نوع التقرير</label>
-                      <Select value={reportTypeFilter} onValueChange={(value) => {
-                        setReportTypeFilter(value);
-                        setSelectedSpecificEmployee("all");
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">جميع التقارير</SelectItem>
-                          <SelectItem value="vice_principal">الوكلاء</SelectItem>
-                          <SelectItem value="supervisor">المشرفين</SelectItem>
-                          <SelectItem value="activities">الأنشطة</SelectItem>
-                          <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
-                          <SelectItem value="quality">الجودة</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {reportTypeFilter !== "all" && (
-                      <div>
-                        <label className="block text-sm font-medium mb-2">
-                          {reportTypeFilter === "vice_principal" && "اختر الوكيل"}
-                          {reportTypeFilter === "supervisor" && "اختر المشرف"}
-                          {reportTypeFilter === "activities" && "اختر مسؤول الأنشطة"}
-                          {reportTypeFilter === "social" && "اختر الأخصائي"}
-                          {reportTypeFilter === "quality" && "اختر مسؤول الجودة"}
-                        </label>
-                        <Select value={selectedSpecificEmployee} onValueChange={setSelectedSpecificEmployee}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">
-                              {reportTypeFilter === "vice_principal" && "جميع الوكلاء"}
-                              {reportTypeFilter === "supervisor" && "جميع المشرفين"}
-                              {reportTypeFilter === "activities" && "جميع مسؤولي الأنشطة"}
-                              {reportTypeFilter === "social" && "جميع الأخصائيين"}
-                              {reportTypeFilter === "quality" && "جميع مسؤولي الجودة"}
-                            </SelectItem>
-                            {users
-                              .filter(u => 
-                                u.role === reportTypeFilter && 
-                                (selectedBranch === "all" || u.branch === selectedBranch)
-                              )
-                              .map(emp => (
-                                <SelectItem key={emp.id} value={emp.id}>
-                                  {emp.username} - {emp.branch === "boys" ? "البنين" : "البنات"}
-                                </SelectItem>
-                              ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
-                      <Select value={timeFilter} onValueChange={setTimeFilter}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">جميع الفترات</SelectItem>
-                          <SelectItem value="daily">اليوم</SelectItem>
-                          <SelectItem value="weekly">هذا الأسبوع</SelectItem>
-                          <SelectItem value="monthly">هذا الشهر</SelectItem>
-                          <SelectItem value="custom">فترة مخصصة</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {timeFilter === "custom" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">من تاريخ</label>
-                        <Input 
-                          type="date" 
-                          value={customStartDate}
-                          onChange={(e) => setCustomStartDate(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
-                        <Input 
-                          type="date" 
-                          value={customEndDate}
-                          onChange={(e) => setCustomEndDate(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
-                <CardContent className="p-6">
-                  <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون الغائبون</div>
-                  <div className="text-4xl font-bold text-red-700">{stats.totalAbsentTeachers}</div>
-                  <p className="text-xs text-gray-600 mt-2">
-                    {selectedBranch === "all" ? "الفرعين" : branchNames[selectedBranch]} - 
-                    {timeFilter === "daily" ? " اليوم" : timeFilter === "weekly" ? " هذا الأسبوع" : timeFilter === "monthly" ? " هذا الشهر" : " جميع الفترات"}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
-                <CardContent className="p-6">
-                  <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المتأخرون</div>
-                  <div className="text-4xl font-bold text-orange-700">{stats.totalLateTeachers}</div>
-                  <p className="text-xs text-gray-600 mt-2">
-                    {selectedBranch === "all" ? "الفرعين" : branchNames[selectedBranch]} - 
-                    {timeFilter === "daily" ? " اليوم" : timeFilter === "weekly" ? " هذا الأسبوع" : timeFilter === "monthly" ? " هذا الشهر" : " جميع الفترات"}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
-                <CardContent className="p-6">
-                  <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المغطون</div>
-                  <div className="text-4xl font-bold text-green-700">{stats.totalCoveringTeachers}</div>
-                  <p className="text-xs text-gray-600 mt-2">
-                    {selectedBranch === "all" ? "الفرعين" : branchNames[selectedBranch]} - 
-                    {timeFilter === "daily" ? " اليوم" : timeFilter === "weekly" ? " هذا الأسبوع" : timeFilter === "monthly" ? " هذا الشهر" : " جميع الفترات"}
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
-                <CardContent className="p-6">
-                  <div className="text-sm text-gray-700 mb-1 font-semibold">الطلاب الغائبون</div>
-                  <div className="text-4xl font-bold text-blue-700">{stats.totalAbsentStudents}</div>
-                  <p className="text-xs text-gray-600 mt-2">
-                    {selectedBranch === "all" ? "الفرعين" : branchNames[selectedBranch]} - 
-                    {timeFilter === "daily" ? " اليوم" : timeFilter === "weekly" ? " هذا الأسبوع" : timeFilter === "monthly" ? " هذا الشهر" : " جميع الفترات"}
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Performance Averages */}
-            <Card>
-              <CardHeader>
-                <CardTitle>متوسط الأداء العام</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
-                    <div className="text-sm text-gray-700 mb-1 font-semibold">انضباط الطلاب</div>
-                    <div className="text-3xl font-bold text-cyan-700">{stats.avgDiscipline}/10</div>
-                  </div>
-                  <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
-                    <div className="text-sm text-gray-700 mb-1 font-semibold">نظافة الفصول</div>
-                    <div className="text-3xl font-bold text-blue-700">{stats.avgCleanliness}/10</div>
-                  </div>
-                  <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
-                    <div className="text-sm text-gray-700 mb-1 font-semibold">التزام المعلمين</div>
-                    <div className="text-3xl font-bold text-purple-700">{stats.avgAttendance}/10</div>
-                  </div>
-                  <div className="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
-                    <div className="text-sm text-gray-700 mb-1 font-semibold">السلوك العام</div>
-                    <div className="text-3xl font-bold text-green-700">{stats.avgBehavior}/10</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Additional Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300">
-                <CardContent className="p-6">
-                  <div className="text-sm text-gray-700 mb-1 font-semibold">الحوادث والمخالفات</div>
-                  <div className="text-4xl font-bold text-yellow-700">{stats.totalIncidents}</div>
-                  <p className="text-xs text-gray-600 mt-2">إجمالي الحوادث المسجلة</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300">
-                <CardContent className="p-6">
-                  <div className="text-sm text-gray-700 mb-1 font-semibold">عدد التقارير</div>
-                  <div className="text-4xl font-bold text-purple-700">{stats.totalReports}</div>
-                  <p className="text-xs text-gray-600 mt-2">تقارير المشرفين</p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="employees">
-          <div className="space-y-6">
-            {/* Employee Selector */}
-            <Card>
-              <CardHeader>
-                <CardTitle>اختر موظف لعرض تقاريره</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+    <DashboardLayout title="لوحة تحكم رئيس مجلس الإدارة - مدارس الفجر الجديد الأهلية">
+      <div className="space-y-6">
+        {/* Filters */}
+        <Card>
+          <CardHeader>
+            <CardTitle>التصفية</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">الفرع</label>
-                  <Select value={selectedBranch} onValueChange={(value) => {
-                    setSelectedBranch(value);
-                    setSelectedEmployee("all");
+                  <label className="block text-sm font-medium mb-2">نوع التقرير</label>
+                  <Select value={reportTypeFilter} onValueChange={(value) => {
+                    setReportTypeFilter(value);
+                    setSelectedSpecificEmployee("all");
+                    setSelectedVicePrincipal("all");
                   }}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="اختر نوع التقرير" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">جميع الفروع</SelectItem>
-                      <SelectItem value="boys">البنين</SelectItem>
-                      <SelectItem value="girls">البنات</SelectItem>
+                      <SelectItem value="all">جميع التقارير</SelectItem>
+                      <SelectItem value="vice_principal">الوكلاء</SelectItem>
+                      <SelectItem value="supervisor">المشرفين</SelectItem>
+                      <SelectItem value="activities">الأنشطة</SelectItem>
+                      <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
+                      <SelectItem value="quality">الجودة</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-2">الموظف</label>
-                  <Select value={selectedEmployee} onValueChange={setSelectedEmployee}>
+                  <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
+                  <Select value={timeFilter} onValueChange={setTimeFilter}>
                     <SelectTrigger>
-                      <SelectValue placeholder="اختر موظف" />
+                      <SelectValue placeholder="اختر الفترة الزمنية" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">جميع الموظفين</SelectItem>
-                      {users
-                        .filter(u => 
-                          ["director", "vice_principal", "supervisor", "activities", "educational_supervision", "social_specialist", "quality"].includes(u.role) &&
-                          (selectedBranch === "all" || u.branch === selectedBranch)
-                        )
-                        .map(u => (
-                          <SelectItem key={u.id} value={u.id}>
-                            {u.username} - {roleNames[u.role]} - {branchNames[u.branch]}
-                          </SelectItem>
-                        ))}
+                      <SelectItem value="all">جميع الفترات</SelectItem>
+                      <SelectItem value="daily">اليوم</SelectItem>
+                      <SelectItem value="weekly">هذا الأسبوع</SelectItem>
+                      <SelectItem value="monthly">هذا الشهر</SelectItem>
+                      <SelectItem value="custom">فترة مخصصة</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Reports List - Same as Director Dashboard */}
-            {selectedEmployee !== "all" && employeeReports.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold text-gray-800">
-                  التقارير ({employeeReports.length})
-                </h3>
-
-                <div className="grid grid-cols-1 gap-3">
-                  {employeeReports.map((report) => (
-                    <Card
-                      key={report.id}
-                      className="report-card hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => {
-                        setSelectedReport(report);
-                        setReportType(report.date ? "supervisor" : report.week_start ? "vice_principal" : "other");
-                        setShowReportModal(true);
-                      }}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-bold text-gray-800">
-                              {report.date ? `تقرير مشرف - ${new Date(report.date).toLocaleDateString("ar-SA")}` :
-                               report.week_start ? `تقرير وكيل - من ${new Date(report.week_start).toLocaleDateString("ar-SA")} إلى ${new Date(report.week_end).toLocaleDateString("ar-SA")}` :
-                               "تقرير"}
-                            </h4>
-                            <p className="text-sm text-gray-500">
-                              تم الإنشاء: {new Date(report.created_at).toLocaleString("ar-SA")}
-                            </p>
-                          </div>
-
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedReport(report);
-                              setReportType(report.date ? "supervisor" : report.week_start ? "vice_principal" : "other");
-                              setShowReportModal(true);
-                            }}
-                          >
-                            <Eye className="w-4 h-4 ml-1" />
-                            عرض
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Report Modal - Same content as Director Dashboard */}
-          <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
-            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="text-2xl">
-                  {selectedReport && (reportType === "supervisor" ? 
-                    `تقرير مشرف - ${new Date(selectedReport.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}` :
-                    reportType === "vice_principal" ?
-                    `تقرير وكيل` : "تقرير"
-                  )}
-                </DialogTitle>
-              </DialogHeader>
-
-              {/* Same modal content as DirectorDashboard */}
-              {selectedReport && reportType === "supervisor" && (
-                <div className="space-y-6 p-4">
+                
+                {/* Filter for Vice Principals */}
+                {reportTypeFilter === "vice_principal" && (
                   <div>
-                    <h4 className="text-lg font-bold text-gray-800 mb-4">المؤشرات الرئيسية</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
-                        <div className="text-sm text-gray-700 mb-1 font-semibold">انضباط الطلاب</div>
-                        <div className="text-3xl font-bold text-cyan-700">{selectedReport.student_discipline}/10</div>
-                      </div>
-                      <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
-                        <div className="text-sm text-gray-700 mb-1 font-semibold">نظافة الفصول</div>
-                        <div className="text-3xl font-bold text-blue-700">{selectedReport.classroom_cleanliness}/10</div>
-                      </div>
-                      <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
-                        <div className="text-sm text-gray-700 mb-1 font-semibold">التزام المعلمين</div>
-                        <div className="text-3xl font-bold text-purple-700">{selectedReport.teacher_attendance_rate}/10</div>
-                      </div>
-                      <div className="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
-                        <div className="text-sm text-gray-700 mb-1 font-semibold">السلوك العام</div>
-                        <div className="text-3xl font-bold text-green-700">{selectedReport.general_behavior}/10</div>
-                      </div>
-                    </div>
+                    <label className="block text-sm font-medium mb-2">اختيار الوكيل</label>
+                    <Select value={selectedVicePrincipal} onValueChange={setSelectedVicePrincipal}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الوكيل" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">كل الوكلاء</SelectItem>
+                        {users.filter(u => u.role === "vice_principal").map(vp => (
+                          <SelectItem key={vp.id} value={vp.id}>
+                            {vp.full_name || vp.username} ({vp.branch === "boys" ? "بنين" : "بنات"})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
+                )}
+                
+                {/* Filter for other employees */}
+                {reportTypeFilter !== "all" && reportTypeFilter !== "vice_principal" && getEmployeesForReportType().length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">اختيار الموظف</label>
+                    <Select value={selectedSpecificEmployee} onValueChange={setSelectedSpecificEmployee}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الموظف" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الموظفين</SelectItem>
+                        {getEmployeesForReportType().map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.full_name || emp.username} ({emp.branch === "boys" ? "بنين" : "بنات"})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
 
-                  {/* Teacher Details */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {(selectedReport.late_teachers?.length > 0 || selectedReport.absent_teachers?.length > 0 || selectedReport.covering_teachers?.length > 0) && (
-                      <div className="space-y-3">
-                        <h4 className="text-md font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">بيانات المعلمين</h4>
-                        
-                        {selectedReport.late_teachers && selectedReport.late_teachers.length > 0 && (
-                          <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                            <div className="text-sm font-bold text-orange-800 mb-2">
-                              المعلمون المتأخرون ({selectedReport.late_teachers.length})
-                            </div>
-                            <ul className="text-sm text-gray-700 space-y-1">
-                              {selectedReport.late_teachers.map((lt, i) => (
-                                <li key={i}>
-                                  {typeof lt === 'string' ? `• ${lt}` : `• ${lt.teacher || ''} - ${lt.subject || ''} - حصة ${lt.period || ''}`}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        
-                        {selectedReport.absent_teachers && selectedReport.absent_teachers.length > 0 && (
-                          <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                            <div className="text-sm font-bold text-red-800 mb-2">
-                              المعلمون الغائبون ({selectedReport.absent_teachers.length})
-                            </div>
-                            <ul className="text-sm text-gray-700 space-y-1">
-                              {selectedReport.absent_teachers.map((at, i) => (
-                                <li key={i}>
-                                  {typeof at === 'string' ? `• ${at}` : `• ${at.teacher || ''} - ${at.subject || ''} - حصة ${at.period || ''}`}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        
-                        {selectedReport.covering_teachers && selectedReport.covering_teachers.length > 0 && (
-                          <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                            <div className="text-sm font-bold text-green-800 mb-2">
-                              المعلمون المغطون ({selectedReport.covering_teachers.length})
-                            </div>
-                            <ul className="text-sm text-gray-700 space-y-1">
-                              {selectedReport.covering_teachers.map((ct, i) => (
-                                <li key={i}>
-                                  {typeof ct === 'string' ? `• ${ct}` : `• ${ct.teacher || ''} - ${ct.subject || ''} - حصة ${ct.period || ''}`}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    
-                    {/* Other Info */}
-                    <div className="space-y-3">
-                      <h4 className="text-md font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">معلومات إضافية</h4>
-                      
-                      {selectedReport.incidents && selectedReport.incidents.length > 0 && (
-                        <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200">
-                          <div className="text-sm font-bold text-yellow-800 mb-2">
-                            الحوادث والمخالفات ({selectedReport.incidents.length})
-                          </div>
-                          <div className="space-y-2">
-                            {selectedReport.incidents.map((inc, i) => (
-                              <div key={i} className="text-sm bg-white p-2 rounded">
-                                <p className="font-semibold text-gray-800">{inc.description}</p>
-                                <p className="text-gray-600 text-xs mt-1">الإجراء: {inc.action}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {selectedReport.general_notes && (
-                        <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-                          <div className="text-sm font-bold text-gray-800 mb-2">ملاحظات عامة</div>
-                          <p className="text-sm text-gray-700 leading-relaxed">{selectedReport.general_notes}</p>
-                        </div>
-                      )}
-                    </div>
+              {timeFilter === "custom" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">من تاريخ</label>
+                    <Input 
+                      type="date" 
+                      value={customStartDate}
+                      onChange={(e) => setCustomStartDate(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
+                    <Input 
+                      type="date" 
+                      value={customEndDate}
+                      onChange={(e) => setCustomEndDate(e.target.value)}
+                    />
                   </div>
                 </div>
               )}
-            </DialogContent>
-          </Dialog>
-        </TabsContent>
-      </Tabs>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center mt-4 pt-4 border-t">
+              <Button 
+                onClick={exportToPDF}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                📄 تصدير التقرير إلى PDF
+              </Button>
+              
+              <Button 
+                onClick={() => setShowDetailedReports(!showDetailedReports)}
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                {showDetailedReports ? "إخفاء التقارير التفصيلية" : "عرض التقارير التفصيلية"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {(() => {
+          const stats = getOverallStatistics();
+          return (
+            <>
+              {/* Supervisor Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون الغائبون</div>
+                      <div className="text-4xl font-bold text-red-700">{stats.totalAbsentTeachers}</div>
+                      <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المتأخرون</div>
+                      <div className="text-4xl font-bold text-orange-700">{stats.totalLateTeachers}</div>
+                      <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المغطون</div>
+                      <div className="text-4xl font-bold text-green-700">{stats.totalCoveringTeachers}</div>
+                      <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">الطلاب الغائبون</div>
+                      <div className="text-4xl font-bold text-blue-700">{stats.totalAbsentStudents}</div>
+                      <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>متوسط الأداء العام</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500 p-4 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">انضباط الطلاب</div>
+                        <div className="text-3xl font-bold text-cyan-700">{stats.avgDiscipline}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500 p-4 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">نظافة الفصول</div>
+                        <div className="text-3xl font-bold text-blue-700">{stats.avgCleanliness}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500 p-4 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">التزام المعلمين</div>
+                        <div className="text-3xl font-bold text-purple-700">{stats.avgAttendance}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 p-4 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">السلوك العام</div>
+                        <div className="text-3xl font-bold text-green-700">{stats.avgBehavior}/10</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">الحوادث والمخالفات</div>
+                      <div className="text-4xl font-bold text-yellow-700">{stats.totalIncidents}</div>
+                      <p className="text-xs text-gray-600 mt-2">إجمالي الحوادث المسجلة</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">تقارير المشرفين</div>
+                      <div className="text-4xl font-bold text-purple-700">{stats.supervisorReportsCount}</div>
+                      <p className="text-xs text-gray-600 mt-2">إجمالي تقارير المشرفين</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </>
+              )}
+
+              {/* Activities Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-purple-700">🎯 إحصائيات الأنشطة</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الأنشطة</div>
+                        <div className="text-4xl font-bold text-purple-700">{stats.totalActivities}</div>
+                        <p className="text-xs text-gray-600 mt-2">{stats.activitiesReportsCount} تقرير</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-l-4 border-indigo-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي المشاركين</div>
+                        <div className="text-4xl font-bold text-indigo-700">{stats.totalActivitiesParticipants}</div>
+                        <p className="text-xs text-gray-600 mt-2">في جميع الأنشطة</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-violet-50 to-violet-100 border-l-4 border-violet-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط التفاعل</div>
+                        <div className="text-4xl font-bold text-violet-700">{stats.avgActivitiesInteraction}/10</div>
+                        <p className="text-xs text-gray-600 mt-2">معدل تفاعل الطلاب</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+              )}
+
+              {/* Social Specialist Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-green-700">👥 إحصائيات الأخصائي الاجتماعي</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <Card className="bg-gradient-to-br from-rose-50 to-rose-100 border-l-4 border-rose-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">إجمالي الحالات</div>
+                        <div className="text-3xl font-bold text-rose-700">{stats.totalStudentCases}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">حالات نفسية</div>
+                        <div className="text-3xl font-bold text-pink-700">{stats.totalPsychologicalCases}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-amber-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">حالات أكاديمية</div>
+                        <div className="text-3xl font-bold text-amber-700">{stats.totalAcademicCases}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">حالات سلوكية</div>
+                        <div className="text-3xl font-bold text-red-700">{stats.totalBehavioralCases}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-l-4 border-emerald-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">الجلسات</div>
+                        <div className="text-3xl font-bold text-emerald-700">{stats.totalSessions}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-l-4 border-teal-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">تواصل مع الأسر</div>
+                        <div className="text-3xl font-bold text-teal-700">{stats.totalFamilyContacts}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      📊 إجمالي: {stats.socialReportsCount} تقرير من الأخصائي الاجتماعي
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              )}
+
+              {/* Quality Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "quality") && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-orange-700">⭐ إحصائيات الجودة</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الزيارات</div>
+                        <div className="text-4xl font-bold text-orange-700">{stats.totalQualityVisits}</div>
+                        <p className="text-xs text-gray-600 mt-2">زيارات الجودة للمعلمين</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-amber-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط الأداء التدريسي</div>
+                        <div className="text-4xl font-bold text-amber-700">{stats.avgQualityTeachingRate}/10</div>
+                        <p className="text-xs text-gray-600 mt-2">معدل أداء المعلمين</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+              )}
+
+              {/* Charts Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>📊 الرسوم البيانية والتحليلات</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Teachers Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={getTeachersChartData()}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={(entry) => `${entry.name}: ${entry.value}`}
+                              outerRadius={100}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {getTeachersChartData().map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                    
+                    {/* Performance Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">متوسط الأداء العام</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={getPerformanceChartData()}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis domain={[0, 10]} />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="value" fill="#3b82f6" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                    
+                    {/* Activities Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={getActivitiesChartData()}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="value" fill="#8b5cf6" />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                    
+                    {/* Social Cases Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات الأخصائي الاجتماعي</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={getSocialCasesChartData()}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={(entry) => `${entry.name}: ${entry.value}`}
+                              outerRadius={100}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {getSocialCasesChartData().map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Detailed Reports Section */}
+              {showDetailedReports && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>📋 التقارير التفصيلية</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {(() => {
+                      const detailedReports = getDetailedReports();
+                      
+                      if (detailedReports.length === 0) {
+                        return (
+                          <div className="text-center py-8 text-gray-500">
+                            لا توجد تقارير متاحة بناءً على الفلاتر المحددة
+                          </div>
+                        );
+                      }
+                      
+                      return (
+                        <div className="space-y-4">
+                          <p className="text-sm text-gray-600 mb-4">
+                            إجمالي عدد التقارير: {detailedReports.length}
+                          </p>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {detailedReports.map((report, index) => {
+                              const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                                      report.type === "supervisor" ? "مشرف" :
+                                                      report.type === "activities" ? "أنشطة" :
+                                                      report.type === "social" ? "أخصائي اجتماعي" :
+                                                      report.type === "quality" ? "جودة" : "";
+                              
+                              const bgColor = report.type === "vice_principal" ? "from-blue-50 to-blue-100 border-blue-500" :
+                                            report.type === "supervisor" ? "from-purple-50 to-purple-100 border-purple-500" :
+                                            report.type === "activities" ? "from-indigo-50 to-indigo-100 border-indigo-500" :
+                                            report.type === "social" ? "from-green-50 to-green-100 border-green-500" :
+                                            report.type === "quality" ? "from-orange-50 to-orange-100 border-orange-500" : "";
+                              
+                              return (
+                                <Card 
+                                  key={index} 
+                                  className={`bg-gradient-to-br ${bgColor} border-r-4 cursor-pointer hover:shadow-lg transition-shadow`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log("Card clicked, opening modal for report:", report.type, report.userName);
+                                    setSelectedReport(report);
+                                    setShowReportModal(true);
+                                  }}
+                                >
+                                  <CardContent className="p-4">
+                                    <div className="flex justify-between items-start mb-2">
+                                      <span className="text-xs font-semibold px-2 py-1 rounded bg-white shadow-sm">
+                                        {reportTypeArabic}
+                                      </span>
+                                      <span className="text-xs text-gray-600">
+                                        {report.date || report.week_start || 'غير محدد'}
+                                      </span>
+                                    </div>
+                                    <h3 className="font-bold text-gray-800 mb-1">{report.userName || 'غير معروف'}</h3>
+                                    <p className="text-xs text-gray-500 mb-2">
+                                      {users.find(u => u.id === report.user_id)?.branch === "boys" ? "قسم البنين" : "قسم البنات"}
+                                    </p>
+                                    {report.notes && (
+                                      <p className="text-xs text-gray-600 line-clamp-2">{report.notes}</p>
+                                    )}
+                                    {!report.notes && (
+                                      <p className="text-xs text-gray-500 italic">
+                                        {report.type === "supervisor" && `${report.absent_teachers?.length || 0} غائب، ${report.late_teachers?.length || 0} متأخر`}
+                                        {report.type === "activities" && `${report.activities?.length || 0} نشاط`}
+                                        {report.type === "social" && `${(report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0)} حالة`}
+                                        {report.type === "quality" && `${report.visited_teachers?.length || 0} زيارة`}
+                                      </p>
+                                    )}
+                                    <div className="mt-3 text-xs text-blue-600 font-medium">
+                                      👆 انقر لعرض التفاصيل الكاملة
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Overall Summary */}
+              <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="text-sm mb-2 font-semibold opacity-90">إجمالي جميع التقارير</div>
+                    <div className="text-6xl font-bold">{stats.totalAllReports}</div>
+                    <p className="text-xs mt-3 opacity-80">
+                      مشرفين: {stats.supervisorReportsCount} | أنشطة: {stats.activitiesReportsCount} | 
+                      أخصائي: {stats.socialReportsCount} | جودة: {stats.qualityReportsCount}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          );
+        })()}
+        
+        {/* Report Details Modal */}
+        <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>تفاصيل التقرير الكامل</DialogTitle>
+            </DialogHeader>
+            
+            {selectedReport && (
+              <div className="space-y-4" dir="rtl">
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <span className="font-semibold text-gray-700">اسم الموظف:</span>
+                    <p className="text-gray-900">{selectedReport.userName || 'غير معروف'}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">الجهة:</span>
+                    <p className="text-gray-900">
+                      {users.find(u => u.id === selectedReport.user_id)?.branch === "boys" ? "قسم البنين" : "قسم البنات"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">التاريخ:</span>
+                    <p className="text-gray-900">{selectedReport.date || selectedReport.week_start || 'غير محدد'}</p>
+                  </div>
+                  {selectedReport.week_end && (
+                    <div>
+                      <span className="font-semibold text-gray-700">نهاية الأسبوع:</span>
+                      <p className="text-gray-900">{selectedReport.week_end}</p>
+                    </div>
+                  )}
+                  <div>
+                    <span className="font-semibold text-gray-700">نوع التقرير:</span>
+                    <p className="text-gray-900">
+                      {selectedReport.type === "vice_principal" ? "وكيل" :
+                       selectedReport.type === "supervisor" ? "مشرف" :
+                       selectedReport.type === "activities" ? "أنشطة" :
+                       selectedReport.type === "social" ? "أخصائي اجتماعي" :
+                       selectedReport.type === "quality" ? "جودة" : ""}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Supervisor Report Details */}
+                {selectedReport.type === "supervisor" && (
+                  <div className="space-y-4">
+                    {selectedReport.late_teachers && selectedReport.late_teachers.length > 0 && (
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <h4 className="font-semibold text-orange-800 mb-2">المعلمون المتأخرون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.late_teachers.map((lt, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof lt === 'object' ? `${lt.teacher} - ${lt.subject} - ${lt.minutes_late} دقيقة` : lt}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.absent_teachers && selectedReport.absent_teachers.length > 0 && (
+                      <div className="p-4 bg-red-50 rounded-lg">
+                        <h4 className="font-semibold text-red-800 mb-2">المعلمون الغائبون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.absent_teachers.map((at, idx) => (
+                            <li key={idx} className="text-sm">{at}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.covering_teachers && selectedReport.covering_teachers.length > 0 && (
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-semibold text-green-800 mb-2">المعلمون المغطون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.covering_teachers.map((ct, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof ct === 'object' ? `${ct.teacher} - ${ct.subject} (الحصة ${ct.period})` : ct}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.incidents && selectedReport.incidents.length > 0 && (
+                      <div className="p-4 bg-yellow-50 rounded-lg">
+                        <h4 className="font-semibold text-yellow-800 mb-2">الحوادث:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.incidents.map((inc, idx) => (
+                            <li key={idx} className="text-sm">{inc}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <span className="text-xs text-gray-600">انضباط الطلاب</span>
+                        <p className="text-2xl font-bold text-blue-700">{selectedReport.student_discipline || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-cyan-50 rounded-lg">
+                        <span className="text-xs text-gray-600">نظافة الفصول</span>
+                        <p className="text-2xl font-bold text-cyan-700">{selectedReport.classroom_cleanliness || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-purple-50 rounded-lg">
+                        <span className="text-xs text-gray-600">التزام المعلمين</span>
+                        <p className="text-2xl font-bold text-purple-700">{selectedReport.teacher_attendance_rate || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <span className="text-xs text-gray-600">السلوك العام</span>
+                        <p className="text-2xl font-bold text-green-700">{selectedReport.general_behavior || 0}/10</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Activities Report Details */}
+                {selectedReport.type === "activities" && selectedReport.activities && (
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-purple-800">الأنشطة:</h4>
+                    {selectedReport.activities.map((activity, idx) => (
+                      <div key={idx} className="p-4 bg-purple-50 rounded-lg">
+                        <h5 className="font-semibold text-purple-900 mb-2">{activity.activity_name}</h5>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div><span className="font-medium">عدد المشاركين:</span> {activity.participants_count}</div>
+                          <div><span className="font-medium">معدل التفاعل:</span> {activity.interaction_rate}/10</div>
+                          {activity.supervising_teachers && activity.supervising_teachers.length > 0 && (
+                            <div className="col-span-2">
+                              <span className="font-medium">المعلمون المشرفون:</span> {activity.supervising_teachers.join(', ')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Social Specialist Report Details */}
+                {selectedReport.type === "social" && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="p-3 bg-pink-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات نفسية</span>
+                        <p className="text-2xl font-bold text-pink-700">{selectedReport.psychological_cases || 0}</p>
+                      </div>
+                      <div className="p-3 bg-amber-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات أكاديمية</span>
+                        <p className="text-2xl font-bold text-amber-700">{selectedReport.academic_cases || 0}</p>
+                      </div>
+                      <div className="p-3 bg-red-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات سلوكية</span>
+                        <p className="text-2xl font-bold text-red-700">{selectedReport.behavioral_cases || 0}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 bg-emerald-50 rounded-lg">
+                        <span className="text-xs text-gray-600">عدد الجلسات</span>
+                        <p className="text-2xl font-bold text-emerald-700">{selectedReport.sessions_count || 0}</p>
+                      </div>
+                      <div className="p-3 bg-teal-50 rounded-lg">
+                        <span className="text-xs text-gray-600">التواصل مع الأسر</span>
+                        <p className="text-2xl font-bold text-teal-700">{selectedReport.family_contacts || 0}</p>
+                      </div>
+                    </div>
+                    
+                    {selectedReport.actions && selectedReport.actions.length > 0 && (
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-semibold text-green-800 mb-2">الإجراءات المتخذة:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.actions.map((action, idx) => (
+                            <li key={idx} className="text-sm">{action}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Quality Report Details */}
+                {selectedReport.type === "quality" && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-orange-50 rounded-lg">
+                      <span className="text-xs text-gray-600">معدل الأداء التدريسي</span>
+                      <p className="text-2xl font-bold text-orange-700">{selectedReport.teaching_performance_rate || 0}/10</p>
+                    </div>
+                    
+                    {selectedReport.visited_teachers && selectedReport.visited_teachers.length > 0 && (
+                      <div className="p-4 bg-amber-50 rounded-lg">
+                        <h4 className="font-semibold text-amber-800 mb-2">المعلمون المزارون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.visited_teachers.map((teacher, idx) => (
+                            <li key={idx} className="text-sm">{teacher}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Vice Principal Report Details */}
+                {selectedReport.type === "vice_principal" && (
+                  <div className="space-y-4">
+                    {selectedReport.late_teachers && selectedReport.late_teachers.length > 0 && (
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <h4 className="font-semibold text-orange-800 mb-2">المعلمون المتأخرون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.late_teachers.map((lt, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof lt === 'object' ? `${lt.teacher} - ${lt.subject} - ${lt.minutes_late} دقيقة` : lt}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.problems && selectedReport.problems.length > 0 && (
+                      <div className="p-4 bg-red-50 rounded-lg">
+                        <h4 className="font-semibold text-red-800 mb-2">المشكلات:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.problems.map((problem, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof problem === 'object' ? `${problem.description} - ${problem.action || problem.actions}` : problem}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.suggestions && selectedReport.suggestions.length > 0 && (
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold text-blue-800 mb-2">المقترحات:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.suggestions.map((suggestion, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof suggestion === 'object' ? suggestion.description : suggestion}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Notes */}
+                {selectedReport.notes && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">ملاحظات:</h4>
+                    <p className="text-sm text-gray-700">{selectedReport.notes}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <DialogFooter>
+              <Button onClick={() => setShowReportModal(false)} variant="outline">
+                إغلاق
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </DashboardLayout>
   );
 };
