@@ -71,8 +71,8 @@ const DirectorDashboard = () => {
     }
   };
 
-  // Get list of employees based on report type
-  const getEmployeesForReportType = () => {
+  // Helper function to filter reports by time only
+  const filterReportsByTimeOnly = (reports) => {
     if (reportTypeFilter === "vice_principal") {
       return users.filter(u => u.role === "vice_principal");
     } else if (reportTypeFilter === "supervisor") {
