@@ -534,10 +534,10 @@ const DirectorDashboard = () => {
 
   // Calculate overall statistics
   const getOverallStatistics = () => {
-    let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
-    let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
-    let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
-    let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
+    let filteredSupervisorReports = filterReportsByTimeAndBranch([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeAndBranch([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeAndBranch([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeAndBranch([...qualityReports]);
 
     // Supervisor statistics
     const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
