@@ -1183,12 +1183,23 @@ const DirectorDashboard = () => {
                                         {report.date || report.week_start || 'غير محدد'}
                                       </span>
                                     </div>
-                                    <h3 className="font-bold text-gray-800 mb-1">{report.userName}</h3>
+                                    <h3 className="font-bold text-gray-800 mb-1">{report.userName || 'غير معروف'}</h3>
+                                    <p className="text-xs text-gray-500 mb-2">
+                                      {users.find(u => u.id === report.user_id)?.branch === "boys" ? "قسم البنين" : "قسم البنات"}
+                                    </p>
                                     {report.notes && (
                                       <p className="text-xs text-gray-600 line-clamp-2">{report.notes}</p>
                                     )}
-                                    <div className="mt-3 text-xs text-gray-500">
-                                      انقر لعرض التفاصيل
+                                    {!report.notes && (
+                                      <p className="text-xs text-gray-500 italic">
+                                        {report.type === "supervisor" && `${report.absent_teachers?.length || 0} غائب، ${report.late_teachers?.length || 0} متأخر`}
+                                        {report.type === "activities" && `${report.activities?.length || 0} نشاط`}
+                                        {report.type === "social" && `${(report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0)} حالة`}
+                                        {report.type === "quality" && `${report.visited_teachers?.length || 0} زيارة`}
+                                      </p>
+                                    )}
+                                    <div className="mt-3 text-xs text-blue-600 font-medium">
+                                      👆 انقر لعرض التفاصيل الكاملة
                                     </div>
                                   </CardContent>
                                 </Card>
