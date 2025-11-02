@@ -1853,6 +1853,90 @@ const DirectorDashboard = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        {/* Teachers List Modal */}
+        <Dialog open={showTeachersListModal} onOpenChange={setShowTeachersListModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{teachersListData.title}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4" dir="rtl">
+              <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                <span className="font-semibold text-blue-800">
+                  إجمالي عدد المعلمين: {teachersListData.teachers.length}
+                </span>
+                <Button 
+                  onClick={exportTeachersListToPDF}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  size="sm"
+                >
+                  📄 تصدير إلى PDF
+                </Button>
+              </div>
+              
+              {teachersListData.teachers.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-4 py-2 text-center">#</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">اسم المعلم</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          {teachersListData.type === 'late' ? 'عدد مرات التأخير' :
+                           teachersListData.type === 'covering' ? 'عدد الحصص المغطاة' :
+                           teachersListData.type === 'activity' ? 'عدد الأنشطة' : 'عدد المرات'}
+                        </th>
+                        {teachersListData.type === 'late' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">مجموع الدقائق</th>
+                        )}
+                        {teachersListData.type === 'covering' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">المواد</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teachersListData.teachers.map((teacher, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center font-semibold">
+                            {teacher.name}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">
+                            <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold">
+                              {teacher.count}
+                            </span>
+                          </td>
+                          {teachersListData.type === 'late' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center">
+                              <span className="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-bold">
+                                {teacher.totalMinutes} دقيقة
+                              </span>
+                            </td>
+                          )}
+                          {teachersListData.type === 'covering' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center text-sm">
+                              {teacher.subjects || '-'}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  لا توجد بيانات متاحة
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter>
+              <Button onClick={() => setShowTeachersListModal(false)} variant="outline">
+                إغلاق
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );
