@@ -1125,7 +1125,9 @@ const VicePrincipalDashboard = () => {
                             </div>
                             <ul className="text-sm text-gray-700 space-y-1">
                               {selectedSupervisorReport.absent_teachers.map((at, i) => (
-                                <li key={i}>• <strong>{at.teacher}</strong> - {at.subject} - حصة {at.period}</li>
+                                <li key={i}>
+                                  {typeof at === 'string' ? `• ${at}` : `• ${at.teacher || ''} - ${at.subject || ''} - حصة ${at.period || ''}`}
+                                </li>
                               ))}
                             </ul>
                           </div>
