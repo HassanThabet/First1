@@ -177,48 +177,51 @@ const ChairmanDashboard = () => {
     let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
     let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
     let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
-      const todayStr = today.toISOString().split('T')[0];
-      reports = reports.filter(r => r.date === todayStr);
-    } else if (timeFilter === "weekly") {
-      const currentDay = today.getDay();
-      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
-      const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - daysFromSaturday);
-      weekStart.setHours(0, 0, 0, 0);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 4);
-      weekEnd.setHours(23, 59, 59, 999);
-      
-      reports = reports.filter(r => {
-        const reportDate = new Date(r.date);
-        return reportDate >= weekStart && reportDate <= weekEnd;
-      });
-    } else if (timeFilter === "monthly") {
-      const currentMonth = today.getMonth();
-      const currentYear = today.getFullYear();
-      reports = reports.filter(r => {
-        const reportDate = new Date(r.date);
-        return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
-      });
-    }
 
-    // Calculate statistics
-    const totalLateTeachers = reports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
-    const totalAbsentTeachers = reports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
-    const totalCoveringTeachers = reports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
-    const totalIncidents = reports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
-    const totalAbsentStudents = reports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
+    // Supervisor statistics
+    const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
+    const totalAbsentTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
+    const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
+    const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+    const totalAbsentStudents = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
     
-    const avgDiscipline = reports.length > 0 ? 
-      (reports.reduce((sum, r) => sum + r.student_discipline, 0) / reports.length).toFixed(1) : 0;
-    const avgCleanliness = reports.length > 0 ?
-      (reports.reduce((sum, r) => sum + r.classroom_cleanliness, 0) / reports.length).toFixed(1) : 0;
-    const avgAttendance = reports.length > 0 ?
-      (reports.reduce((sum, r) => sum + r.teacher_attendance_rate, 0) / reports.length).toFixed(1) : 0;
-    const avgBehavior = reports.length > 0 ?
-      (reports.reduce((sum, r) => sum + r.general_behavior, 0) / reports.length).toFixed(1) : 0;
+    const avgDiscipline = filteredSupervisorReports.length > 0 ? 
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.student_discipline || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgCleanliness = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.classroom_cleanliness || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgAttendance = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.teacher_attendance_rate || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgBehavior = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.general_behavior || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+
+    // Activities statistics
+    const totalActivities = filteredActivitiesReports.reduce((sum, r) => sum + (r.activities?.length || 0), 0);
+    const totalActivitiesParticipants = filteredActivitiesReports.reduce((sum, r) => {
+      return sum + (r.activities || []).reduce((aSum, a) => aSum + (a.participants_count || 0), 0);
+    }, 0);
+    const avgActivitiesInteraction = filteredActivitiesReports.length > 0 ? 
+      (filteredActivitiesReports.reduce((sum, r) => {
+        const activities = r.activities || [];
+        const avgInteraction = activities.length > 0 ? 
+          activities.reduce((aSum, a) => aSum + (a.interaction_rate || 0), 0) / activities.length : 0;
+        return sum + avgInteraction;
+      }, 0) / filteredActivitiesReports.length).toFixed(1) : 0;
+
+    // Social Specialist statistics
+    const totalPsychologicalCases = filteredSocialReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademicCases = filteredSocialReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioralCases = filteredSocialReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalStudentCases = totalPsychologicalCases + totalAcademicCases + totalBehavioralCases;
+    const totalSessions = filteredSocialReports.reduce((sum, r) => sum + (r.sessions_count || 0), 0);
+    const totalFamilyContacts = filteredSocialReports.reduce((sum, r) => sum + (r.family_contacts || 0), 0);
+
+    // Quality statistics
+    const totalQualityVisits = filteredQualityReports.length;
+    const avgQualityTeachingRate = filteredQualityReports.length > 0 ?
+      (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
 
     return {
+      // Supervisor stats
       totalLateTeachers,
       totalAbsentTeachers,
       totalCoveringTeachers,
@@ -228,7 +231,31 @@ const ChairmanDashboard = () => {
       avgCleanliness,
       avgAttendance,
       avgBehavior,
-      totalReports: reports.length
+      supervisorReportsCount: filteredSupervisorReports.length,
+      
+      // Activities stats
+      totalActivities,
+      totalActivitiesParticipants,
+      avgActivitiesInteraction,
+      activitiesReportsCount: filteredActivitiesReports.length,
+      
+      // Social Specialist stats
+      totalStudentCases,
+      totalPsychologicalCases,
+      totalAcademicCases,
+      totalBehavioralCases,
+      totalSessions,
+      totalFamilyContacts,
+      socialReportsCount: filteredSocialReports.length,
+      
+      // Quality stats
+      totalQualityVisits,
+      avgQualityTeachingRate,
+      qualityReportsCount: filteredQualityReports.length,
+      
+      // Total
+      totalAllReports: filteredSupervisorReports.length + filteredActivitiesReports.length + 
+                       filteredSocialReports.length + filteredQualityReports.length
     };
   };
 
