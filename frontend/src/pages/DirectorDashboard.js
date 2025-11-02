@@ -924,10 +924,9 @@ const DirectorDashboard = () => {
             </Card>
 
             {/* Detailed Reports Section - Based on Filter */}
-            {reportTypeFilter !== "all" && (
-              <>
+            <>
                 {/* Supervisor Detailed Reports */}
-                {reportTypeFilter === "supervisor" && (
+                {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-blue-700">التفاصيل الكاملة - تقارير المشرفين</CardTitle>
