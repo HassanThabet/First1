@@ -1520,4 +1520,4 @@ const ChairmanDashboard = () => {
   );
 };
 
-export default DirectorDashboard;
+export default ChairmanDashboard;
