@@ -71,6 +71,296 @@ const DirectorDashboard = () => {
     }
   };
 
+  // Get list of employees based on report type
+  const getEmployeesForReportType = () => {
+    if (reportTypeFilter === "vice_principal") {
+      return users.filter(u => u.role === "vice_principal");
+    } else if (reportTypeFilter === "supervisor") {
+      return users.filter(u => u.role === "supervisor");
+    } else if (reportTypeFilter === "activities") {
+      return users.filter(u => u.role === "activities");
+    } else if (reportTypeFilter === "social") {
+      return users.filter(u => u.role === "social_specialist");
+    } else if (reportTypeFilter === "quality") {
+      return users.filter(u => u.role === "quality");
+    }
+    return [];
+  };
+
+  // Get aggregated teachers lists from all reports
+  const getAggregatedAbsentTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.absent_teachers && Array.isArray(report.absent_teachers)) {
+        report.absent_teachers.forEach(teacher => {
+          const name = typeof teacher === 'string' ? teacher : teacher.name || teacher.teacher;
+          if (name) {
+            teachersMap[name] = (teachersMap[name] || 0) + 1;
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const getAggregatedLateTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.late_teachers && Array.isArray(report.late_teachers)) {
+        report.late_teachers.forEach(teacher => {
+          let name, minutes;
+          if (typeof teacher === 'object') {
+            name = teacher.teacher || teacher.name;
+            minutes = teacher.minutes_late || 0;
+          } else {
+            name = teacher;
+            minutes = 0;
+          }
+          
+          if (name) {
+            if (!teachersMap[name]) {
+              teachersMap[name] = { count: 0, totalMinutes: 0 };
+            }
+            teachersMap[name].count += 1;
+            teachersMap[name].totalMinutes += minutes;
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, data]) => ({ 
+        name, 
+        count: data.count, 
+        totalMinutes: data.totalMinutes 
+      }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const getAggregatedCoveringTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.covering_teachers && Array.isArray(report.covering_teachers)) {
+        report.covering_teachers.forEach(teacher => {
+          let name, subject;
+          if (typeof teacher === 'object') {
+            name = teacher.teacher || teacher.name;
+            subject = teacher.subject || '';
+          } else {
+            name = teacher;
+            subject = '';
+          }
+          
+          if (name) {
+            if (!teachersMap[name]) {
+              teachersMap[name] = { count: 0, subjects: [] };
+            }
+            teachersMap[name].count += 1;
+            if (subject && !teachersMap[name].subjects.includes(subject)) {
+              teachersMap[name].subjects.push(subject);
+            }
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, data]) => ({ 
+        name, 
+        count: data.count, 
+        subjects: data.subjects.join(', ') 
+      }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const getAggregatedActivityTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...activitiesReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.activities && Array.isArray(report.activities)) {
+        report.activities.forEach(activity => {
+          if (activity.supervising_teachers && Array.isArray(activity.supervising_teachers)) {
+            activity.supervising_teachers.forEach(teacher => {
+              const name = typeof teacher === 'string' ? teacher : teacher.name || teacher.teacher;
+              if (name) {
+                teachersMap[name] = (teachersMap[name] || 0) + 1;
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  // Helper function to filter by time and branch
+  const filterReportsByTimeAndBranch = (reports) => {
+    let filtered = filterReportsByTimeOnly(reports);
+    
+    if (branchFilter !== "all") {
+      filtered = filtered.filter(r => r.branch === branchFilter);
+    }
+    
+    return filtered;
+  };
+
+  // Handle chart click to show teachers list
+  const handleChartClick = (type) => {
+    let data = { title: "", teachers: [], type: type };
+    
+    switch(type) {
+      case "absent":
+        data.title = "قائمة المعلمين الغائبين";
+        data.teachers = getAggregatedAbsentTeachers();
+        break;
+      case "late":
+        data.title = "قائمة المعلمين المتأخرين";
+        data.teachers = getAggregatedLateTeachers();
+        break;
+      case "covering":
+        data.title = "قائمة المعلمين المغطين";
+        data.teachers = getAggregatedCoveringTeachers();
+        break;
+      case "activity":
+        data.title = "قائمة المعلمين المشرفين على الأنشطة";
+        data.teachers = getAggregatedActivityTeachers();
+        break;
+    }
+    
+    setTeachersListData(data);
+    setShowTeachersListModal(true);
+  };
+
+  // Export teachers list to PDF
+  const exportTeachersListToPDF = () => {
+    if (!teachersListData.teachers || teachersListData.teachers.length === 0) {
+      toast.error("لا توجد بيانات للتصدير");
+      return;
+    }
+
+    // Initialize pdfMake fonts
+    if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
+      pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+      pdfMake.fonts = {
+        Cairo: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Regular.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Regular.ttf'
+        }
+      };
+    }
+
+    const tableBody = [
+      [
+        { text: 'الاسم', style: 'tableHeader' },
+        { text: teachersListData.type === 'late' ? 'عدد المرات' : 
+                teachersListData.type === 'covering' ? 'عدد الحصص' : 
+                teachersListData.type === 'activity' ? 'عدد الأنشطة' : 'عدد المرات', 
+          style: 'tableHeader' },
+        ...(teachersListData.type === 'late' ? [{ text: 'مجموع الدقائق', style: 'tableHeader' }] : []),
+        ...(teachersListData.type === 'covering' ? [{ text: 'المواد', style: 'tableHeader' }] : [])
+      ]
+    ];
+
+    teachersListData.teachers.forEach((teacher, index) => {
+      const row = [
+        { text: teacher.name, alignment: 'center' },
+        { text: teacher.count.toString(), alignment: 'center' }
+      ];
+      
+      if (teachersListData.type === 'late') {
+        row.push({ text: teacher.totalMinutes.toString(), alignment: 'center' });
+      } else if (teachersListData.type === 'covering') {
+        row.push({ text: teacher.subjects || '-', alignment: 'center' });
+      }
+      
+      tableBody.push(row);
+    });
+
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 60, 40, 60],
+      defaultStyle: {
+        font: 'Cairo',
+        fontSize: 11
+      },
+      content: [
+        {
+          text: 'مدارس الفجر الجديد الأهلية',
+          style: 'header',
+          alignment: 'center',
+          margin: [0, 0, 0, 10]
+        },
+        {
+          text: teachersListData.title,
+          style: 'subheader',
+          alignment: 'center',
+          margin: [0, 0, 0, 10]
+        },
+        {
+          text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-EG')}`,
+          style: 'info',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        {
+          text: `إجمالي عدد المعلمين: ${teachersListData.teachers.length}`,
+          style: 'info',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        {
+          table: {
+            widths: teachersListData.type === 'late' || teachersListData.type === 'covering' ? 
+                    ['*', 'auto', 'auto'] : ['*', 'auto'],
+            body: tableBody
+          },
+          margin: [0, 0, 0, 10]
+        }
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          color: '#1e40af'
+        },
+        subheader: {
+          fontSize: 14,
+          bold: true,
+          color: '#3b82f6'
+        },
+        info: {
+          fontSize: 10,
+          color: '#666666'
+        },
+        tableHeader: {
+          fillColor: '#dbeafe',
+          bold: true,
+          alignment: 'center',
+          fontSize: 10
+        }
+      }
+    };
+
+    pdfMake.createPdf(docDefinition).download(`${teachersListData.title}_${new Date().getTime()}.pdf`);
+    toast.success("تم تصدير القائمة بنجاح");
+  };
+
   // Helper function to filter reports by time only
   const filterReportsByTimeOnly = (reports) => {
     if (reportTypeFilter === "vice_principal") {
