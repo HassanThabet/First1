@@ -1607,7 +1607,9 @@ const DirectorDashboard = () => {
                               <div className="flex-shrink-0 w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                 {i + 1}
                               </div>
-                              <p className="flex-1 text-gray-800">{suggestion}</p>
+                              <p className="flex-1 text-gray-800">
+                                {typeof suggestion === 'string' ? suggestion : suggestion.description || suggestion.text || '-'}
+                              </p>
                             </div>
                           </div>
                         ))}
