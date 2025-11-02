@@ -1426,17 +1426,36 @@ const DirectorDashboard = () => {
                     {/* Activities Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة (انقر على "المشاركين" للتفاصيل)</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                          <BarChart data={getActivitiesChartData()}>
+                          <BarChart data={getActivitiesChartData()} onClick={(e) => {
+                            if (e && e.activeLabel === 'المشاركين') {
+                              handleChartClick('activity');
+                            }
+                          }}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
                             <YAxis />
                             <Tooltip />
-                            <Legend />
-                            <Bar dataKey="value" fill="#8b5cf6" />
+                            <Legend onClick={(e) => {
+                              if (e.value === 'value' || e.dataKey === 'value') {
+                                // نفترض أن النقر على أي جزء يفتح قائمة المعلمين المشاركين
+                                handleChartClick('activity');
+                              }
+                            }} wrapperStyle={{ cursor: 'pointer' }} />
+                            <Bar dataKey="value" fill="#8b5cf6" onClick={() => handleChartClick('activity')} style={{ cursor: 'pointer' }} />
                           </BarChart>
                         </ResponsiveContainer>
+                        <div className="text-center mt-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleChartClick('activity')}
+                            className="text-xs"
+                          >
+                            👥 عرض قائمة المعلمين المشرفين
+                          </Button>
+                        </div>
                       </div>
                     )}
                     
