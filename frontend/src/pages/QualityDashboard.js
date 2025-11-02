@@ -593,6 +593,7 @@ const QualityDashboard = () => {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="all">جميع التقارير</SelectItem>
+                          <SelectItem value="vice_principal">الوكلاء</SelectItem>
                           <SelectItem value="supervisor">المشرفين</SelectItem>
                           <SelectItem value="activities">الأنشطة</SelectItem>
                           <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
