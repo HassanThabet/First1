@@ -1178,7 +1178,9 @@ const DirectorDashboard = () => {
                                 <Card 
                                   key={index} 
                                   className={`bg-gradient-to-br ${bgColor} border-r-4 cursor-pointer hover:shadow-lg transition-shadow`}
-                                  onClick={() => {
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log("Card clicked, opening modal for report:", report.type, report.userName);
                                     setSelectedReport(report);
                                     setShowReportModal(true);
                                   }}
