@@ -330,11 +330,11 @@ frontend:
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
-    working: true
+    working: false
     file: "frontend/src/pages/DirectorDashboard.js"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -354,6 +354,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ ARABIC DASHBOARD REQUIREMENTS VERIFIED: Conducted comprehensive testing of specific Arabic requirements. RESULTS: 1) ✅ Branch Filter Functionality: Branch filter 'الفرع' correctly appears ONLY for General Manager (ahmed - branch='both') and does NOT appear for specific branch managers (ابراهيم - branch='boys'), 2) ✅ Chart Click Functionality: Charts are interactive through legend clicks and dedicated buttons, successfully opens modals with teacher lists ('قائمة المعلمين الغائبين', 'قائمة المعلمين المشرفين على الأنشطة'), 3) ✅ PDF Export: PDF export buttons functional in teacher list modals, 4) ✅ Supervisor Teachers Button: '👥 عرض قائمة المعلمين المشرفين' button successfully opens modal with supervisor teachers list. TECHNICAL: Found 17 SVG elements, 145 recharts elements, 2 pie charts, 8 legend elements. Chart interaction works via legend clicks and buttons rather than direct sector clicks. All Arabic UI elements properly displayed and functional."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL STATISTICS CALCULATION ISSUE IDENTIFIED: Conducted comprehensive testing as specifically requested by user in Arabic (ahmed/123456 login, 10-second wait, console analysis). FINDINGS: 1) ✅ Login successful - ahmed has director role, 2) ✅ Data fetching successful: Console shows 'Data fetched successfully: Users: 15, Supervisor reports: 7, Activities: 0, Social: 0, Quality: 0, VP: 3', 3) ❌ CRITICAL ISSUE: ALL STATISTICS DISPLAY ZERO VALUES despite successful data fetching (0 absent teachers, 0 late teachers, 0 covering teachers, 0/10 performance metrics), 4) ✅ Charts section present (150 chart elements found), 5) ❌ ROOT CAUSE: Data is being fetched successfully from API but statistics calculation logic is failing - likely due to data filtering/processing issue in getOverallStatistics() function, 6) 🔍 BRANCH FILTER: No branch filter visible in UI (expected behavior for ahmed user), 7) ⚠️ CONSOLE ERRORS: Multiple 401 authentication errors and font loading failures, 8) 📊 DATA MISMATCH: API returns 7 supervisor reports but all calculated statistics show 0, indicating frontend statistics calculation function is not processing the fetched data correctly. URGENT FIX NEEDED in statistics calculation logic."
 
   - task: "Chairman Dashboard with modal view and filtering"
     implemented: true
