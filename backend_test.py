@@ -1984,11 +1984,56 @@ class BackendTester:
         print(f"Base URL: {BASE_URL}")
         print("=" * 60)
         
+        # First login with known admin to check users
+        self.test_authentication()
+        
+        if self.auth_token:
+            # Check if ahmed user exists
+            self.check_ahmed_user_exists()
+            
         # Test Ahmed admin login and report retrieval
         self.test_admin_ahmed_login_and_reports()
         
         # Print summary
         self.print_summary()
+        
+    def check_ahmed_user_exists(self):
+        """Check if ahmed user exists in the system"""
+        print("\n=== Checking if Ahmed User Exists ===")
+        
+        try:
+            response = self.session.get(f"{BASE_URL}/users")
+            
+            if response.status_code == 200:
+                users = response.json()
+                self.log_test("Get Users List", True, f"Retrieved {len(users)} users")
+                
+                # Look for ahmed user
+                ahmed_user = None
+                for user in users:
+                    if user.get("username") == "ahmed":
+                        ahmed_user = user
+                        break
+                
+                if ahmed_user:
+                    self.log_test("Ahmed User Found", True, f"Ahmed user exists with role: {ahmed_user.get('role')}, branch: {ahmed_user.get('branch')}")
+                else:
+                    self.log_test("Ahmed User Found", False, "Ahmed user does not exist in system")
+                    
+                    # Show available admin users
+                    admin_users = [u for u in users if u.get("role") == "admin"]
+                    if admin_users:
+                        self.log_test("Available Admin Users", True, f"Found {len(admin_users)} admin users")
+                        for i, admin in enumerate(admin_users, 1):
+                            self.log_test(f"Admin User {i}", True, f"Username: {admin.get('username')}, ID: {admin.get('id')}")
+                    else:
+                        self.log_test("Available Admin Users", False, "No admin users found")
+                        
+            else:
+                self.log_test("Get Users List", False, f"Failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_test("Check Ahmed User", False, f"Exception: {str(e)}")
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
