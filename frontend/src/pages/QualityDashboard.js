@@ -297,7 +297,7 @@ const QualityDashboard = () => {
   return (
     <DashboardLayout title="لوحة تحكم الجودة">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="create" className="flex items-center space-x-2 space-x-reverse">
             <FileText className="w-4 h-4" />
             <span>إنشاء تقرير جديد</span>
@@ -305,6 +305,10 @@ const QualityDashboard = () => {
           <TabsTrigger value="reports" className="flex items-center space-x-2 space-x-reverse">
             <Eye className="w-4 h-4" />
             <span>التقارير</span>
+          </TabsTrigger>
+          <TabsTrigger value="statistics" className="flex items-center space-x-2 space-x-reverse">
+            <BarChart3 className="w-4 h-4" />
+            <span>الإحصائيات الإجمالية</span>
           </TabsTrigger>
         </TabsList>
 
