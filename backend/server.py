@@ -303,7 +303,9 @@ async def get_users(current_user: dict = Depends(get_current_user)):
     
     query = {}
     if current_user["role"] in ["director", "vice_principal"]:
-        query["branch"] = current_user["branch"]
+        # Directors with "both" branch can see all reports, otherwise filter by branch
+        if current_user["branch"] != "both":
+            query["branch"] = current_user["branch"]
     
     users = await db.users.find(query, {"_id": 0, "password": 0}).to_list(1000)
     return users
@@ -507,6 +509,8 @@ async def get_supervisor_reports(user_id: Optional[str] = None, branch: Optional
     elif current_user["role"] in ["director", "quality", "educational_supervision"]:
         # Directors with "both" branch can see all reports, otherwise filter by branch
         if current_user["branch"] != "both":
+            # Directors with "both" branch can see all reports, otherwise filter by branch
+        if current_user["branch"] != "both":
             query["branch"] = current_user["branch"]
     
     if user_id:
@@ -575,7 +579,9 @@ async def get_vice_principal_reports(user_id: Optional[str] = None, branch: Opti
     if current_user["role"] == "vice_principal":
         query["user_id"] = current_user["id"]
     elif current_user["role"] in ["director", "quality"]:
-        query["branch"] = current_user["branch"]
+        # Directors with "both" branch can see all reports, otherwise filter by branch
+        if current_user["branch"] != "both":
+            query["branch"] = current_user["branch"]
     
     if user_id:
         query["user_id"] = user_id
@@ -634,7 +640,9 @@ async def get_activities_reports(user_id: Optional[str] = None, branch: Optional
     if current_user["role"] == "activities":
         query["user_id"] = current_user["id"]
     elif current_user["role"] in ["director", "quality"]:
-        query["branch"] = current_user["branch"]
+        # Directors with "both" branch can see all reports, otherwise filter by branch
+        if current_user["branch"] != "both":
+            query["branch"] = current_user["branch"]
     
     if user_id:
         query["user_id"] = user_id
@@ -695,7 +703,9 @@ async def get_educational_supervision_reports(user_id: Optional[str] = None, bra
     if current_user["role"] == "educational_supervision":
         query["user_id"] = current_user["id"]
     elif current_user["role"] in ["director", "quality"]:
-        query["branch"] = current_user["branch"]
+        # Directors with "both" branch can see all reports, otherwise filter by branch
+        if current_user["branch"] != "both":
+            query["branch"] = current_user["branch"]
     
     if user_id:
         query["user_id"] = user_id
@@ -752,7 +762,9 @@ async def get_social_specialist_reports(user_id: Optional[str] = None, branch: O
     if current_user["role"] == "social_specialist":
         query["user_id"] = current_user["id"]
     elif current_user["role"] in ["director", "quality"]:
-        query["branch"] = current_user["branch"]
+        # Directors with "both" branch can see all reports, otherwise filter by branch
+        if current_user["branch"] != "both":
+            query["branch"] = current_user["branch"]
     
     if user_id:
         query["user_id"] = user_id
@@ -813,7 +825,9 @@ async def get_quality_reports(user_id: Optional[str] = None, branch: Optional[st
     if current_user["role"] == "quality":
         query["user_id"] = current_user["id"]
     elif current_user["role"] == "director":
-        query["branch"] = current_user["branch"]
+        # Directors with "both" branch can see all reports, otherwise filter by branch
+        if current_user["branch"] != "both":
+            query["branch"] = current_user["branch"]
     
     if user_id:
         query["user_id"] = user_id
@@ -939,7 +953,9 @@ async def get_teacher_evaluations(branch: Optional[str] = None, current_user: di
     if branch:
         query["branch"] = branch
     elif current_user["role"] == "director":
-        query["branch"] = current_user["branch"]
+        # Directors with "both" branch can see all reports, otherwise filter by branch
+        if current_user["branch"] != "both":
+            query["branch"] = current_user["branch"]
     
     # Get educational supervision reports
     ed_reports = await db.educational_supervision_reports.find(query, {"_id": 0}).to_list(1000)
