@@ -24,6 +24,7 @@ const QualityDashboard = () => {
   const [activitiesReports, setActivitiesReports] = useState([]);
   const [socialReports, setSocialReports] = useState([]);
   const [qualityReports, setQualityReports] = useState([]);
+  const [vicePrincipalReports, setVicePrincipalReports] = useState([]);
   const [users, setUsers] = useState([]);
   const [timeFilter, setTimeFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState("");
