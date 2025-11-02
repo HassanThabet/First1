@@ -690,6 +690,7 @@ const DirectorDashboard = () => {
                   <Select value={reportTypeFilter} onValueChange={(value) => {
                     setReportTypeFilter(value);
                     setSelectedSpecificEmployee("all");
+                    setSelectedVicePrincipal("all");
                   }}>
                     <SelectTrigger>
                       <SelectValue />
@@ -720,6 +721,42 @@ const DirectorDashboard = () => {
                     </SelectContent>
                   </Select>
                 </div>
+                
+                {/* Filter for Vice Principals */}
+                {reportTypeFilter === "vice_principal" && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">اختيار الوكيل</label>
+                    <Select value={selectedVicePrincipal} onValueChange={setSelectedVicePrincipal}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">كل الوكلاء</SelectItem>
+                        {users.filter(u => u.role === "vice_principal").map(vp => (
+                          <SelectItem key={vp.id} value={vp.id}>{vp.full_name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                
+                {/* Filter for other employees */}
+                {reportTypeFilter !== "all" && reportTypeFilter !== "vice_principal" && getEmployeesForReportType().length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">اختيار الموظف</label>
+                    <Select value={selectedSpecificEmployee} onValueChange={setSelectedSpecificEmployee}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الموظفين</SelectItem>
+                        {getEmployeesForReportType().map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>{emp.full_name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
 
               {timeFilter === "custom" && (
