@@ -1871,6 +1871,124 @@ class BackendTester:
         # Print summary
         self.print_summary()
 
+    def test_admin_ahmed_login_and_reports(self):
+        """Test specific admin login scenario as requested by user"""
+        print("\n=== Testing Admin Ahmed Login and Report Retrieval ===")
+        
+        # Test login with ahmed credentials
+        login_data = {
+            "username": "ahmed",
+            "password": "123456",
+            "remember_me": False
+        }
+        
+        try:
+            response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "user" in data and "token" in data:
+                    self.auth_token = data["token"]
+                    user_info = data["user"]
+                    self.log_test(
+                        "Ahmed Admin Login", 
+                        True, 
+                        f"Successfully logged in as {user_info.get('username', 'Unknown')} with role {user_info.get('role', 'Unknown')}"
+                    )
+                    
+                    # Now test all report endpoints
+                    self.test_all_reports_as_admin()
+                    
+                else:
+                    self.log_test("Ahmed Admin Login", False, "Login response missing user or token")
+            else:
+                self.log_test("Ahmed Admin Login", False, f"Login failed: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            self.log_test("Ahmed Admin Login", False, f"Login exception: {str(e)}")
+            
+    def test_all_reports_as_admin(self):
+        """Test all report endpoints after admin login"""
+        print("\n=== Testing All Report Endpoints as Admin ===")
+        
+        report_endpoints = [
+            ("Supervisor Reports", "/reports/supervisor"),
+            ("Activities Reports", "/reports/activities"),
+            ("Social Specialist Reports", "/reports/social-specialist"),
+            ("Quality Reports", "/reports/quality"),
+            ("Vice-Principal Reports", "/reports/vice-principal"),
+            ("Users List", "/users")
+        ]
+        
+        for report_name, endpoint in report_endpoints:
+            try:
+                response = self.session.get(f"{BASE_URL}{endpoint}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    self.log_test(
+                        f"GET {report_name}", 
+                        True, 
+                        f"Retrieved {len(data)} records"
+                    )
+                    
+                    # Check data quality for reports
+                    if endpoint != "/users" and len(data) > 0:
+                        # Check if reports have user_id and complete data
+                        sample_record = data[0]
+                        has_user_id = "user_id" in sample_record
+                        has_created_at = "created_at" in sample_record
+                        
+                        if has_user_id and has_created_at:
+                            self.log_test(
+                                f"{report_name} Data Quality", 
+                                True, 
+                                f"Records contain user_id and timestamps. Sample user_id: {sample_record.get('user_id', 'N/A')}"
+                            )
+                        else:
+                            self.log_test(
+                                f"{report_name} Data Quality", 
+                                False, 
+                                f"Missing required fields - user_id: {has_user_id}, created_at: {has_created_at}"
+                            )
+                    
+                    # For users endpoint, check if admin user exists
+                    if endpoint == "/users":
+                        admin_found = any(user.get("username") == "ahmed" for user in data)
+                        if admin_found:
+                            self.log_test(
+                                "Ahmed User in System", 
+                                True, 
+                                "Ahmed admin user found in users list"
+                            )
+                        else:
+                            self.log_test(
+                                "Ahmed User in System", 
+                                False, 
+                                "Ahmed admin user not found in users list"
+                            )
+                            
+                else:
+                    self.log_test(
+                        f"GET {report_name}", 
+                        False, 
+                        f"Failed: {response.status_code} - {response.text}"
+                    )
+                    
+            except Exception as e:
+                self.log_test(f"GET {report_name}", False, f"Exception: {str(e)}")
+
+    def run_ahmed_admin_test(self):
+        """Run specific test for Ahmed admin login and report retrieval"""
+        print("🚀 Starting Ahmed Admin Login and Report Testing...")
+        print(f"Base URL: {BASE_URL}")
+        print("=" * 60)
+        
+        # Test Ahmed admin login and report retrieval
+        self.test_admin_ahmed_login_and_reports()
+        
+        # Print summary
+        self.print_summary()
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Backend API Tests for School Management System")
