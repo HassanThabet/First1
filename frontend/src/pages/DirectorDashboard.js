@@ -208,13 +208,21 @@ const DirectorDashboard = () => {
 
   // Helper function to filter by time and branch
   const filterReportsByTimeAndBranch = (reports) => {
+    console.log("🔍 filterReportsByTimeAndBranch called with", reports.length, "reports");
+    console.log("⏰ timeFilter:", timeFilter);
+    console.log("🏢 branchFilter:", branchFilter);
+    console.log("👤 user.branch:", user?.branch);
+    
     let filtered = filterReportsByTimeOnly(reports);
+    console.log("✅ After time filter:", filtered.length, "reports");
     
     // Only apply branch filter if user has branch="both" and branchFilter is not "all"
     if (user && user.branch === "both" && branchFilter !== "all") {
       filtered = filtered.filter(r => r.branch === branchFilter);
+      console.log("✅ After branch filter:", filtered.length, "reports");
     }
     
+    console.log("📊 Final filtered reports:", filtered.length);
     return filtered;
   };
 
