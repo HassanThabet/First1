@@ -405,13 +405,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Detailed Reports Tab for Director Dashboard"
-    - "Detailed Reports Tab for Chairman Dashboard"
-    - "Vice-Principal PDF with Supervisor Names"
-    - "Report Type Filtering with Employee Names"
-  stuck_tasks: []
+    - "Director Dashboard with modal view and filtering"
+  stuck_tasks:
+    - "Director Dashboard with modal view and filtering"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "stuck_first"
   backend_testing_complete: true
 
 agent_communication:
