@@ -357,6 +357,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL STATISTICS CALCULATION ISSUE IDENTIFIED: Conducted comprehensive testing as specifically requested by user in Arabic (ahmed/123456 login, 10-second wait, console analysis). FINDINGS: 1) ✅ Login successful - ahmed has director role, 2) ✅ Data fetching successful: Console shows 'Data fetched successfully: Users: 15, Supervisor reports: 7, Activities: 0, Social: 0, Quality: 0, VP: 3', 3) ❌ CRITICAL ISSUE: ALL STATISTICS DISPLAY ZERO VALUES despite successful data fetching (0 absent teachers, 0 late teachers, 0 covering teachers, 0/10 performance metrics), 4) ✅ Charts section present (150 chart elements found), 5) ❌ ROOT CAUSE: Data is being fetched successfully from API but statistics calculation logic is failing - likely due to data filtering/processing issue in getOverallStatistics() function, 6) 🔍 BRANCH FILTER: No branch filter visible in UI (expected behavior for ahmed user), 7) ⚠️ CONSOLE ERRORS: Multiple 401 authentication errors and font loading failures, 8) 📊 DATA MISMATCH: API returns 7 supervisor reports but all calculated statistics show 0, indicating frontend statistics calculation function is not processing the fetched data correctly. URGENT FIX NEEDED in statistics calculation logic."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 FIXED filterReportsByTimeOnly FUNCTION: The root cause was identified - filterReportsByTimeOnly function was returning users filtered by role instead of reports filtered by time. Replaced the entire function (lines 380-442) with correct implementation from QualityDashboard.js that properly filters reports by daily/weekly/monthly/custom date ranges. Applied same fix to ChairmanDashboard.js. Ready for frontend testing to verify statistics now display correctly."
 
   - task: "Chairman Dashboard with modal view and filtering"
     implemented: true
