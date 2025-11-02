@@ -1015,7 +1015,7 @@ const DirectorDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">نوع التقرير</label>
                   <Select value={reportTypeFilter} onValueChange={(value) => {
@@ -1049,6 +1049,20 @@ const DirectorDashboard = () => {
                       <SelectItem value="weekly">هذا الأسبوع</SelectItem>
                       <SelectItem value="monthly">هذا الشهر</SelectItem>
                       <SelectItem value="custom">فترة مخصصة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">الفرع</label>
+                  <Select value={branchFilter} onValueChange={setBranchFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر الفرع" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع الفروع</SelectItem>
+                      <SelectItem value="boys">البنين</SelectItem>
+                      <SelectItem value="girls">البنات</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
