@@ -12,7 +12,7 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfMakeFonts from "../fonts/vfs_fonts";
 
-const DirectorDashboard = () => {
+const ChairmanDashboard = () => {
   const { user } = useContext(AuthContext);
   
   // For statistics
