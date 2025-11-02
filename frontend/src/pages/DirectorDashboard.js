@@ -1046,7 +1046,7 @@ const DirectorDashboard = () => {
                 )}
 
                 {/* Vice-Principal Detailed Reports */}
-                {reportTypeFilter === "vice_principal" && (
+                {(reportTypeFilter === "all" || reportTypeFilter === "vice_principal") && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-cyan-700">التفاصيل الكاملة - تقارير الوكلاء</CardTitle>
