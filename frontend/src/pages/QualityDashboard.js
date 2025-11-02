@@ -568,6 +568,181 @@ const QualityDashboard = () => {
             </DialogContent>
           </Dialog>
         </TabsContent>
+
+        {/* Statistics Tab */}
+        <TabsContent value="statistics">
+          <div className="space-y-6">
+            {/* Time Filters */}
+            <Card>
+              <CardHeader>
+                <CardTitle>فلترة الإحصائيات</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label>الفترة الزمنية</Label>
+                    <Select value={timeFilter} onValueChange={setTimeFilter}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الأوقات</SelectItem>
+                        <SelectItem value="daily">اليوم</SelectItem>
+                        <SelectItem value="weekly">هذا الأسبوع</SelectItem>
+                        <SelectItem value="monthly">هذا الشهر</SelectItem>
+                        <SelectItem value="custom">فترة مخصصة</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {timeFilter === "custom" && (
+                    <>
+                      <div>
+                        <Label>من تاريخ</Label>
+                        <Input
+                          type="date"
+                          value={customStartDate}
+                          onChange={(e) => setCustomStartDate(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label>إلى تاريخ</Label>
+                        <Input
+                          type="date"
+                          value={customEndDate}
+                          onChange={(e) => setCustomEndDate(e.target.value)}
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Overall Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {(() => {
+                const stats = getOverallStatistics();
+                return (
+                  <>
+                    {/* Supervisor Statistics */}
+                    <Card className="border-l-4 border-l-purple-500">
+                      <CardHeader>
+                        <CardTitle className="text-purple-700 text-lg">الإشراف التربوي</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">عدد التقارير</span>
+                          <span className="text-xl font-bold text-purple-700">{stats.supervisorReportsCount}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">معلمون متأخرون</span>
+                          <span className="text-lg font-semibold text-orange-600">{stats.totalLateTeachers}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">معلمون غائبون</span>
+                          <span className="text-lg font-semibold text-red-600">{stats.totalAbsentTeachers}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">معلمون مغطون</span>
+                          <span className="text-lg font-semibold text-green-600">{stats.totalCoveringTeachers}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">الحوادث</span>
+                          <span className="text-lg font-semibold text-yellow-600">{stats.totalIncidents}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Activities Statistics */}
+                    <Card className="border-l-4 border-l-green-500">
+                      <CardHeader>
+                        <CardTitle className="text-green-700 text-lg">الأنشطة</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">عدد التقارير</span>
+                          <span className="text-xl font-bold text-green-700">{stats.activitiesReportsCount}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">إجمالي الأنشطة</span>
+                          <span className="text-lg font-semibold text-green-600">{stats.totalActivities}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">المشاركون</span>
+                          <span className="text-lg font-semibold text-blue-600">{stats.totalActivitiesParticipants}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Social Specialist Statistics */}
+                    <Card className="border-l-4 border-l-orange-500">
+                      <CardHeader>
+                        <CardTitle className="text-orange-700 text-lg">الأخصائي الاجتماعي</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">عدد التقارير</span>
+                          <span className="text-xl font-bold text-orange-700">{stats.socialReportsCount}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">إجمالي الحالات</span>
+                          <span className="text-lg font-semibold text-orange-600">{stats.totalStudentCases}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">- نفسية</span>
+                          <span className="text-sm font-semibold text-purple-600">{stats.totalPsychologicalCases}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">- أكاديمية</span>
+                          <span className="text-sm font-semibold text-blue-600">{stats.totalAcademicCases}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">- سلوكية</span>
+                          <span className="text-sm font-semibold text-red-600">{stats.totalBehavioralCases}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Quality Statistics */}
+                    <Card className="border-l-4 border-l-cyan-500">
+                      <CardHeader>
+                        <CardTitle className="text-cyan-700 text-lg">الجودة</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">عدد التقارير</span>
+                          <span className="text-xl font-bold text-cyan-700">{stats.qualityReportsCount}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">الزيارات</span>
+                          <span className="text-lg font-semibold text-cyan-600">{stats.totalQualityVisits}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-600">متوسط الأداء</span>
+                          <span className="text-lg font-semibold text-green-600">{stats.avgQualityTeachingRate}%</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* Total Statistics */}
+                    <Card className="col-span-full border-l-4 border-l-indigo-500">
+                      <CardHeader>
+                        <CardTitle className="text-indigo-700">الإحصائيات الإجمالية</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="text-center">
+                          <div className="text-4xl font-bold text-indigo-700">{stats.totalAllReports}</div>
+                          <div className="text-sm text-gray-600 mt-2">إجمالي التقارير</div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </TabsContent>
       </Tabs>
     </DashboardLayout>
   );
