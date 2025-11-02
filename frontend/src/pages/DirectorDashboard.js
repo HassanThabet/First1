@@ -781,7 +781,8 @@ const DirectorDashboard = () => {
               </Card>
             </div>
 
-            {/* Activities Statistics */}
+            {/* Activities Statistics - Show only when reportTypeFilter is "all" or "activities" */}
+            {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-purple-700">📅 إحصائيات الأنشطة</CardTitle>
@@ -814,8 +815,10 @@ const DirectorDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+            )}
 
-            {/* Social Specialist Statistics */}
+            {/* Social Specialist Statistics - Show only when reportTypeFilter is "all" or "social" */}
+            {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-green-700">👥 إحصائيات الأخصائي الاجتماعي</CardTitle>
@@ -871,8 +874,10 @@ const DirectorDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+            )}
 
-            {/* Quality Statistics */}
+            {/* Quality Statistics - Show only when reportTypeFilter is "all" or "quality" */}
+            {(reportTypeFilter === "all" || reportTypeFilter === "quality") && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-orange-700">⭐ إحصائيات الجودة</CardTitle>
@@ -897,6 +902,7 @@ const DirectorDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+            )}
 
             {/* Overall Summary */}
             <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
