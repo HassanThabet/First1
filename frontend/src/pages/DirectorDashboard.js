@@ -74,21 +74,13 @@ const DirectorDashboard = () => {
     }
   };
 
-  // Helper function to filter reports by time and employee
-  const filterReportsByTime = (reports) => {
-    let filtered = reports;
-    
-    // Filter by specific employee if selected
-    if (selectedSpecificEmployee !== "all") {
-      filtered = filtered.filter(r => r.user_id === selectedSpecificEmployee);
-    }
-    
-    // Filter by time
+  // Helper function to filter reports by time only (without employee filter)
+  const filterReportsByTimeOnly = (reports) => {
     const today = new Date();
     
     if (timeFilter === "daily") {
       const todayStr = today.toISOString().split('T')[0];
-      return filtered.filter(r => {
+      return reports.filter(r => {
         // For VP reports that use week_start/week_end
         if (r.week_start) {
           const weekStart = new Date(r.week_start);
@@ -109,12 +101,11 @@ const DirectorDashboard = () => {
       weekEnd.setDate(weekStart.getDate() + 4);
       weekEnd.setHours(23, 59, 59, 999);
       
-      return filtered.filter(r => {
+      return reports.filter(r => {
         // For VP reports that use week_start/week_end
         if (r.week_start) {
           const reportWeekStart = new Date(r.week_start);
           const reportWeekEnd = new Date(r.week_end);
-          // Check if report week overlaps with current week
           return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
         }
         // For other reports that use date
@@ -124,7 +115,7 @@ const DirectorDashboard = () => {
     } else if (timeFilter === "monthly") {
       const currentMonth = today.getMonth();
       const currentYear = today.getFullYear();
-      return filtered.filter(r => {
+      return reports.filter(r => {
         // For VP reports that use week_start/week_end
         if (r.week_start) {
           const reportWeekStart = new Date(r.week_start);
@@ -139,12 +130,11 @@ const DirectorDashboard = () => {
       const end = new Date(customEndDate);
       end.setHours(23, 59, 59, 999);
       
-      return filtered.filter(r => {
+      return reports.filter(r => {
         // For VP reports that use week_start/week_end
         if (r.week_start) {
           const reportWeekStart = new Date(r.week_start);
           const reportWeekEnd = new Date(r.week_end);
-          // Check if report week overlaps with custom date range
           return (reportWeekStart <= end && reportWeekEnd >= start);
         }
         // For other reports that use date
@@ -153,33 +143,28 @@ const DirectorDashboard = () => {
       });
     }
     
-    return filtered;
+    return reports;
+  };
+
+  // Helper function to filter reports by time and employee
+  const filterReportsByTime = (reports) => {
+    let filtered = reports;
+    
+    // Filter by specific employee if selected
+    if (selectedSpecificEmployee !== "all") {
+      filtered = filtered.filter(r => r.user_id === selectedSpecificEmployee);
+    }
+    
+    return filterReportsByTimeOnly(filtered);
   };
 
   // Calculate overall statistics
   const getOverallStatistics = () => {
-    // For overall statistics (when reportTypeFilter is "all"), don't filter by specific employee
-    // Otherwise, use the filterReportsByTime which includes employee filtering
-    let filteredSupervisorReports, filteredActivitiesReports, filteredSocialReports, filteredQualityReports;
-    
-    if (reportTypeFilter === "all") {
-      // For "all" view, only apply time filter, not employee filter
-      const tempSelectedEmployee = selectedSpecificEmployee;
-      // Temporarily set to "all" to get all employees
-      selectedSpecificEmployee = "all";
-      filteredSupervisorReports = filterReportsByTime([...supervisorReports]);
-      filteredActivitiesReports = filterReportsByTime([...activitiesReports]);
-      filteredSocialReports = filterReportsByTime([...socialReports]);
-      filteredQualityReports = filterReportsByTime([...qualityReports]);
-      // Restore the selected employee
-      selectedSpecificEmployee = tempSelectedEmployee;
-    } else {
-      // For specific report type, apply both time and employee filters
-      filteredSupervisorReports = reportTypeFilter === "supervisor" ? filterReportsByTime([...supervisorReports]) : [];
-      filteredActivitiesReports = reportTypeFilter === "activities" ? filterReportsByTime([...activitiesReports]) : [];
-      filteredSocialReports = reportTypeFilter === "social" ? filterReportsByTime([...socialReports]) : [];
-      filteredQualityReports = reportTypeFilter === "quality" ? filterReportsByTime([...qualityReports]) : [];
-    }
+    // For overall statistics, use time filter only (no employee filter)
+    let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
 
     // Supervisor statistics
     const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
