@@ -1293,12 +1293,16 @@ const VicePrincipalDashboard = () => {
                                 {i + 1}
                               </div>
                               <div className="flex-1">
-                                <p className="font-semibold text-gray-800 mb-2">{problem.description}</p>
-                                <div className="bg-white p-2 rounded">
-                                  <p className="text-sm text-gray-600">
-                                    <span className="font-semibold text-gray-800">الإجراءات المتخذة:</span> {problem.actions}
-                                  </p>
-                                </div>
+                                <p className="font-semibold text-gray-800 mb-2">
+                                  {typeof problem === 'string' ? problem : problem.description || '-'}
+                                </p>
+                                {typeof problem !== 'string' && problem.action && (
+                                  <div className="bg-white p-2 rounded">
+                                    <p className="text-sm text-gray-600">
+                                      <span className="font-semibold text-gray-800">الإجراءات المتخذة:</span> {problem.action}
+                                    </p>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
