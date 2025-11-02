@@ -1242,7 +1242,13 @@ const DirectorDashboard = () => {
                 <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                   <div>
                     <span className="font-semibold text-gray-700">اسم الموظف:</span>
-                    <p className="text-gray-900">{selectedReport.userName}</p>
+                    <p className="text-gray-900">{selectedReport.userName || 'غير معروف'}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">الجهة:</span>
+                    <p className="text-gray-900">
+                      {users.find(u => u.id === selectedReport.user_id)?.branch === "boys" ? "قسم البنين" : "قسم البنات"}
+                    </p>
                   </div>
                   <div>
                     <span className="font-semibold text-gray-700">التاريخ:</span>
