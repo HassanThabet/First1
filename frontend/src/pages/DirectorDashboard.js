@@ -779,8 +779,8 @@ const DirectorDashboard = () => {
   // Generate PDF Export
   const exportToPDF = () => {
     // Initialize pdfMake fonts for this export
-    if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
-      pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+    if (pdfMakeFonts) {
+      pdfMake.vfs = pdfMakeFonts;
     }
     
     pdfMake.fonts = {
