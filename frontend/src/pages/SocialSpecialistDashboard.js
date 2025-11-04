@@ -272,6 +272,22 @@ const SocialSpecialistDashboard = () => {
         return row.map(val => String(val || '-'));
       });
 
+      // Log data structure
+      console.log('📊 Reports data rows:', reportsData.length);
+      if (reportsData.length > 0) {
+        console.log('First row columns:', reportsData[0].length);
+        console.log('First row:', reportsData[0]);
+      }
+
+      // Verify all rows have exactly 10 columns
+      const invalidRows = reportsData.filter(row => row.length !== 10);
+      if (invalidRows.length > 0) {
+        console.error('❌ Found rows with invalid column count:', invalidRows.length);
+        invalidRows.forEach((row, idx) => {
+          console.error(`Row ${idx}: ${row.length} columns`, row);
+        });
+      }
+
       // Define PDF document
       const docDefinition = {
         pageSize: 'A4',
