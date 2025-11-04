@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import pdfMake from "@digicole/pdfmake-rtl";
 import pdfMakeFonts from "../fonts/vfs_fonts";
+import { createRTLTable, createStatsGrid, generatePDF, pdfStyles } from "../utils/pdfTemplate";
 
 const ChairmanDashboard = () => {
   const { user } = useContext(AuthContext);
