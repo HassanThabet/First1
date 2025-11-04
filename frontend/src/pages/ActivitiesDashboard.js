@@ -282,6 +282,11 @@ const ActivitiesDashboard = () => {
         periodText = `من ${mergedStartDate} إلى ${mergedEndDate}`;
       }
 
+      // Add activity filter to period text
+      if (selectedActivity !== "all") {
+        periodText += ` - ${selectedActivity}`;
+      }
+
       // Prepare activities table data
       const activitiesData = allActivities.map((activity, index) => {
         const supervisors = activity.supervisors && Array.isArray(activity.supervisors) && activity.supervisors.length > 0 
