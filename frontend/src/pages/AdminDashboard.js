@@ -282,18 +282,20 @@ const AdminDashboard = () => {
                           data-testid="user-username-input"
                         />
                       </div>
-                      {!editingItem && (
-                        <div>
-                          <Label>كلمة المرور</Label>
-                          <Input
-                            type="password"
-                            value={userForm.password}
-                            onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                            required
-                            data-testid="user-password-input"
-                          />
-                        </div>
-                      )}
+                      <div>
+                        <Label>كلمة المرور</Label>
+                        {editingItem && (
+                          <p className="text-xs text-gray-500 mb-1">اتركها فارغة للاحتفاظ بكلمة المرور الحالية</p>
+                        )}
+                        <Input
+                          type="password"
+                          placeholder={editingItem ? "كلمة مرور جديدة (اختياري)" : "كلمة المرور"}
+                          value={userForm.password}
+                          onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                          required={!editingItem}
+                          data-testid="user-password-input"
+                        />
+                      </div>
                       <div>
                         <Label>الدور</Label>
                         <Select value={userForm.role} onValueChange={(value) => {
