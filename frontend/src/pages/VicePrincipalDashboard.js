@@ -1126,7 +1126,16 @@ const VicePrincipalDashboard = () => {
             <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle className="text-2xl">
-                  {selectedSupervisorReport && `تقرير ${new Date(selectedSupervisorReport.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                  {selectedSupervisorReport && (
+                    <div className="space-y-1">
+                      <div className="text-sm text-gray-600 font-normal">
+                        المشرف: {getUserName(selectedSupervisorReport.user_id)}
+                      </div>
+                      <div>
+                        تقرير {new Date(selectedSupervisorReport.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                      </div>
+                    </div>
+                  )}
                 </DialogTitle>
               </DialogHeader>
               
