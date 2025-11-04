@@ -17,7 +17,7 @@ import {
   createSection,
   createChartImage,
   captureChartAsImage,
-  generatePDF as generatePDFTemplate
+  generatePDF
 } from "../utils/pdfTemplate";
 import DirectorReportForm from "./DirectorReportForm";
 import DirectorReportsList from "./DirectorReportsList";
