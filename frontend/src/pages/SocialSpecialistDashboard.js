@@ -334,10 +334,10 @@ const SocialSpecialistDashboard = () => {
             margin: [0, 0, 0, 15]
           },
           
-          // Total Cases Box
+          // Total Cases Box - Full width
           {
             table: {
-              widths: [500], // Fixed width instead of '*'
+              widths: ['*'], // ملء العرض بالكامل
               body: [
                 [
                   { 
@@ -345,13 +345,15 @@ const SocialSpecialistDashboard = () => {
                     style: 'totalCases',
                     alignment: 'center',
                     fillColor: '#E1BEE7',
-                    margin: [0, 5, 0, 5]
+                    fontSize: 14,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
                   }
                 ]
               ]
             },
             layout: 'noBorders',
-            margin: [0, 0, 0, 10]
+            margin: [0, 0, 0, 15]
           },
 
           // Cases Distribution - Rebuilt without colSpan
