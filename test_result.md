@@ -351,6 +351,12 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🚀 DIRECTOR DASHBOARD PDF ENHANCEMENT IN PROGRESS (Step 3): Enhanced DirectorDashboard.js exportToPDF function to match ChairmanDashboard enhancements. Added: 1) Detailed teacher tables (absent teachers with days/counts, late teachers with times, covering teachers with subjects, activity supervisor teachers), 2) Teacher evaluation progress table from educational supervision reports showing first/last evaluation scores and improvement status, 3) Detailed sections for Activities, Social Specialist, and Quality statistics. Ready for testing."
+      - working: false
+        agent: "user"
+        comment: "❌ USER REPORTED: PDF export working in DirectorDashboard but NOT working in ChairmanDashboard. Also, TeacherProgressView PDF export not working in both dashboards. Error: 'Unrecognized document structure' with styles object."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 FIXED PDF EXPORT BUGS: 1) ChairmanDashboard.js - Fixed function name mismatch. Was importing 'generatePDF as generatePDFTemplate' and calling generatePDFTemplate, changed to just import and use 'generatePDF', 2) TeacherProgressView.js - Fixed document structure error. Was pushing styles object into content array (lines 269-275) which caused 'Unrecognized document structure'. Removed duplicate styles from content.push() - styles are already properly defined in docDefinition. Both issues were causing the same error as previously fixed in DirectorDashboard. Ready for testing."
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
