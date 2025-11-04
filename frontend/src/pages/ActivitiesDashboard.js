@@ -417,26 +417,50 @@ const ActivitiesDashboard = () => {
             margin: [0, 0, 0, 15]
           },
           
-          // Statistics Box - Rebuilt without colSpan
+          // Statistics Box - Full width with better spacing
           {
             text: 'إجمالي الإحصائيات',
             style: 'sectionHeader',
             alignment: 'center',
-            margin: [0, 0, 0, 10]
+            margin: [0, 10, 0, 10],
+            fontSize: 14,
+            bold: true,
+            color: '#00796B'
           },
           {
             table: {
-              widths: [165, 165, 165],
+              widths: ['*', '*', '*'], // استخدام * لملء العرض بالتساوي
               body: [
                 [
-                  { text: `إجمالي الأنشطة: ${String(stats.totalActivities || 0)}`, alignment: 'center', fillColor: '#E0F2F1' },
-                  { text: `إجمالي المشاركين: ${String(stats.totalParticipants || 0)}`, alignment: 'center', fillColor: '#E0F2F1' },
-                  { text: `متوسط التفاعل: ${String(stats.avgInteraction || 0)}/10`, alignment: 'center', fillColor: '#E0F2F1' }
+                  { 
+                    text: `إجمالي الأنشطة\n${String(stats.totalActivities || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E0F2F1',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `إجمالي المشاركين\n${String(stats.totalParticipants || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E0F2F1',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `متوسط التفاعل\n${String(stats.avgInteraction || 0)}/10`, 
+                    alignment: 'center', 
+                    fillColor: '#E0F2F1',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  }
                 ]
               ]
             },
-            layout: 'lightHorizontalLines',
-            margin: [0, 0, 0, 15]
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20]
           },
 
           // Activities Table
