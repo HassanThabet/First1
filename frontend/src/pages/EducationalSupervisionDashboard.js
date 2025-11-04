@@ -1,11 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import DashboardLayout from "../components/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { GraduationCap, TrendingUp, Award } from "lucide-react";
+import { Card, CardContent } from "../components/ui/card";
+import EducationalSupervisionCreateReport from "./EducationalSupervisionCreateReport";
+import EducationalSupervisionReportsList from "./EducationalSupervisionReportsList";
+import EducationalSupervisionTeacherProgress from "./EducationalSupervisionTeacherProgress";
 
 const EducationalSupervisionDashboard = () => {
+  const [activeTab, setActiveTab] = useState("create");
+
   return (
-    <DashboardLayout title="لوحة تحكم الإشراف التربوي">
+    <DashboardLayout title="لوحة تحكم الإشراف التربوي - مدارس الفجر الجديد الأهلية">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <Card className="stat-card">
           <CardContent className="p-6">
