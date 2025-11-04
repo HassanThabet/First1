@@ -1666,17 +1666,6 @@ const ChairmanDashboard = () => {
                       </div>
                     )}
                     
-                    {selectedReport.absent_teachers && selectedReport.absent_teachers.length > 0 && (
-                      <div className="p-4 bg-red-50 rounded-lg">
-                        <h4 className="font-semibold text-red-800 mb-2">المعلمون الغائبون:</h4>
-                        <ul className="list-disc list-inside space-y-1">
-                          {selectedReport.absent_teachers.map((at, idx) => (
-                            <li key={idx} className="text-sm">{at}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
                     {selectedReport.covering_teachers && selectedReport.covering_teachers.length > 0 && (
                       <div className="p-4 bg-green-50 rounded-lg">
                         <h4 className="font-semibold text-green-800 mb-2">المعلمون المغطون:</h4>
