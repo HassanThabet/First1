@@ -1141,8 +1141,43 @@ const ChairmanDashboard = () => {
   return (
     <DashboardLayout title="لوحة تحكم رئيس مجلس الإدارة - مدارس الفجر الجديد الأهلية">
       <div className="space-y-6">
-        {/* Filters */}
+        {/* Tabs Navigation */}
         <Card>
+          <CardContent className="p-0">
+            <div className="flex border-b">
+              <button
+                onClick={() => setActiveTab("dashboard")}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                  activeTab === "dashboard"
+                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                📊 لوحة التحكم
+              </button>
+              <button
+                onClick={() => setActiveTab("director-reports")}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                  activeTab === "director-reports"
+                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                📝 تقارير المديرين
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tab Content */}
+        {activeTab === "director-reports" && (
+          <ChairmanDirectorReportsView />
+        )}
+
+        {activeTab === "dashboard" && (
+          <>
+            {/* Filters */}
+            <Card>
           <CardHeader>
             <CardTitle>التصفية</CardTitle>
           </CardHeader>
