@@ -99,21 +99,17 @@ export const createRTLTable = (headers, rows, options = {}) => {
     showRowNumbers = false
   } = options;
 
-  // IMPORTANT: Reverse headers and widths for RTL
-  const reversedHeaders = [...headers].reverse();
-  const reversedWidths = [...widths].reverse();
-
-  // Build headers (reversed for RTL)
-  const tableHeaders = reversedHeaders.map(h => ({
+  // Build headers - no need to reverse with @digicole/pdfmake-rtl
+  const tableHeaders = headers.map(h => ({
     text: h.text,
     style: 'tableHeader',
     alignment: 'center',
     fillColor: headerColor
   }));
 
-  // Add row numbers at the END (rightmost in RTL)
+  // Add row numbers at the START (rightmost in RTL after auto-reverse)
   if (showRowNumbers) {
-    tableHeaders.push({ 
+    tableHeaders.unshift({ 
       text: 'م', 
       style: 'tableHeader', 
       alignment: 'center',
@@ -123,12 +119,9 @@ export const createRTLTable = (headers, rows, options = {}) => {
 
   const tableBody = [tableHeaders];
 
-  // Build rows (reverse each row for RTL)
+  // Build rows - no manual reversal needed with RTL package
   rows.forEach((row, index) => {
-    // Reverse the row array for RTL
-    const reversedRow = [...row].reverse();
-    
-    const tableRow = reversedRow.map(cell => {
+    const tableRow = row.map(cell => {
       if (typeof cell === 'object') {
         return {
           ...cell,
@@ -143,9 +136,9 @@ export const createRTLTable = (headers, rows, options = {}) => {
       };
     });
 
-    // Add row number at the END (rightmost)
+    // Add row number at the START (will be rightmost after RTL processing)
     if (showRowNumbers) {
-      tableRow.push({
+      tableRow.unshift({
         text: (index + 1).toString(),
         alignment: 'center',
         style: 'tableCell'
@@ -155,10 +148,10 @@ export const createRTLTable = (headers, rows, options = {}) => {
     tableBody.push(tableRow);
   });
 
-  // Calculate widths (reversed + row number at end)
-  let finalWidths = reversedWidths;
+  // Calculate widths
+  let finalWidths = widths;
   if (showRowNumbers) {
-    finalWidths = [...reversedWidths, 30];
+    finalWidths = [30, ...widths];
   }
 
   return {
