@@ -1820,6 +1820,18 @@ const DirectorDashboard = () => {
                 </Card>
               )}
 
+              {/* Cooperating Teachers - Show for activities or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-t-4 border-orange-500">
+                  <CardHeader>
+                    <CardTitle className="text-xl">🤝 المعلمون المتعاونون في الأنشطة</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CooperatingTeachersView compact={true} />
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Detailed Reports Section */}
               {showDetailedReports && (
                 <Card>
