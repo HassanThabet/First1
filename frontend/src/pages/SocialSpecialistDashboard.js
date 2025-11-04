@@ -294,7 +294,7 @@ const SocialSpecialistDashboard = () => {
               body: [
                 [
                   { 
-                    text: `إجمالي حالات الطلاب: ${stats.totalCases || 0}`, 
+                    text: `إجمالي حالات الطلاب: ${String(stats.totalCases || 0)}`, 
                     style: 'totalCases',
                     alignment: 'center',
                     fillColor: '#E1BEE7',
