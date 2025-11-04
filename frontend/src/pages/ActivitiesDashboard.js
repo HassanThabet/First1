@@ -513,9 +513,18 @@ const ActivitiesDashboard = () => {
       else if (mergedStartDate && mergedEndDate) filename += `_${mergedStartDate}_${mergedEndDate}`;
       filename += '.pdf';
 
-      // Create and download PDF
-      pdfMake.createPdf(docDefinition).download(filename);
-      toast.success('تم تصدير PDF بنجاح');
+      // Validate docDefinition before creating PDF
+      console.log('🔍 Validating PDF structure...');
+      
+      // Create and download PDF with error boundary
+      try {
+        const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+        pdfDocGenerator.download(filename);
+        toast.success('تم تصدير PDF بنجاح');
+      } catch (pdfError) {
+        console.error('❌ PDF Creation Error:', pdfError);
+        throw pdfError; // Re-throw to be caught by outer catch
+      }
     } catch (error) {
       console.error('PDF Export Error:', error);
       console.error('Error details:', error.message);
