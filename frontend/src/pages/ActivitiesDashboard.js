@@ -256,6 +256,14 @@ const ActivitiesDashboard = () => {
     try {
       const mergedReports = getMergedReports();
       const stats = getMergedStatistics();
+      
+      // Ensure stats is valid
+      if (!stats || typeof stats !== 'object') {
+        console.error('Invalid stats object:', stats);
+        toast.error('خطأ في جلب الإحصائيات');
+        return;
+      }
+      
       let allActivities = mergedReports.flatMap(r => r.activities || []);
 
       // Filter by selected activity if not "all"
