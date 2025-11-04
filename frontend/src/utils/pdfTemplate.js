@@ -99,17 +99,21 @@ export const createRTLTable = (headers, rows, options = {}) => {
     showRowNumbers = false
   } = options;
 
-  // Build headers
-  const tableHeaders = headers.map(h => ({
+  // IMPORTANT: Reverse headers and widths for RTL
+  const reversedHeaders = [...headers].reverse();
+  const reversedWidths = [...widths].reverse();
+
+  // Build headers (reversed for RTL)
+  const tableHeaders = reversedHeaders.map(h => ({
     text: h.text,
     style: 'tableHeader',
     alignment: 'center',
     fillColor: headerColor
   }));
 
-  // Add row numbers if needed
+  // Add row numbers at the END (rightmost in RTL)
   if (showRowNumbers) {
-    tableHeaders.unshift({ 
+    tableHeaders.push({ 
       text: 'م', 
       style: 'tableHeader', 
       alignment: 'center',
@@ -119,9 +123,12 @@ export const createRTLTable = (headers, rows, options = {}) => {
 
   const tableBody = [tableHeaders];
 
-  // Build rows
+  // Build rows (reverse each row for RTL)
   rows.forEach((row, index) => {
-    const tableRow = row.map(cell => {
+    // Reverse the row array for RTL
+    const reversedRow = [...row].reverse();
+    
+    const tableRow = reversedRow.map(cell => {
       if (typeof cell === 'object') {
         return {
           ...cell,
@@ -130,15 +137,15 @@ export const createRTLTable = (headers, rows, options = {}) => {
         };
       }
       return {
-        text: cell,
+        text: String(cell || ''),
         alignment: 'center',
         style: 'tableCell'
       };
     });
 
-    // Add row number
+    // Add row number at the END (rightmost)
     if (showRowNumbers) {
-      tableRow.unshift({
+      tableRow.push({
         text: (index + 1).toString(),
         alignment: 'center',
         style: 'tableCell'
@@ -148,10 +155,10 @@ export const createRTLTable = (headers, rows, options = {}) => {
     tableBody.push(tableRow);
   });
 
-  // Calculate widths
-  let finalWidths = widths;
+  // Calculate widths (reversed + row number at end)
+  let finalWidths = reversedWidths;
   if (showRowNumbers) {
-    finalWidths = [30, ...widths];
+    finalWidths = [...reversedWidths, 30];
   }
 
   return {
