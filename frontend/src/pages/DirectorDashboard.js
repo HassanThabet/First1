@@ -22,6 +22,7 @@ import {
 import DirectorReportForm from "./DirectorReportForm";
 import DirectorReportsList from "./DirectorReportsList";
 import TeacherProgressView from "../components/TeacherProgressView";
+import ActivitySupervisorsView from "../components/ActivitySupervisorsView";
 
 const DirectorDashboard = () => {
   const { user } = useContext(AuthContext);
