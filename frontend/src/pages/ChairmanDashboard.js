@@ -22,6 +22,7 @@ import {
 import ChairmanDirectorReportsView from "../components/ChairmanDirectorReportsView";
 import TeacherProgressView from "../components/TeacherProgressView";
 import ActivitySupervisorsView from "../components/ActivitySupervisorsView";
+import CooperatingTeachersView from "../components/CooperatingTeachersView";
 
 const ChairmanDashboard = () => {
   const { user } = useContext(AuthContext);
