@@ -175,11 +175,10 @@ class DirectorReport(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     branch: str
-    week_start: str
-    week_end: str
-    summary: Optional[str] = None
-    actions_taken: Optional[str] = None
-    recommendations: Optional[str] = None
+    report_date: str  # تاريخ التقرير
+    challenges: Optional[str] = None  # التحديات
+    actions_and_suggestions: Optional[str] = None  # الإجراءات المتخذة والمقترحات
+    notes: Optional[str] = None  # ملاحظات
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: Optional[str] = None
 
