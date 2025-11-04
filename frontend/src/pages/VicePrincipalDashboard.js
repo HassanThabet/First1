@@ -674,7 +674,7 @@ const VicePrincipalDashboard = () => {
       }
       fetchData();
       setActiveTab("reports");
-      setFormData({ problems: [], suggestions: [], week_start: "", week_end: "" });
+      setFormData({ problems: [], suggestions: [], week_start: "", week_end: "", absent_teachers: [] });
     } catch (error) {
       toast.error("فشل إنشاء التقرير");
     } finally {
