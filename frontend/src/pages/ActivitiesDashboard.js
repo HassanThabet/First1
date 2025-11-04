@@ -449,7 +449,9 @@ const ActivitiesDashboard = () => {
       toast.success('تم تصدير PDF بنجاح');
     } catch (error) {
       console.error('PDF Export Error:', error);
-      toast.error('فشل تصدير PDF');
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      toast.error(`فشل تصدير PDF: ${error.message || 'خطأ غير معروف'}`);
     }
   };
 
