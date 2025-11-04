@@ -410,26 +410,50 @@ const SocialSpecialistDashboard = () => {
             margin: [0, 0, 0, 15]
           },
 
-          // Actions Summary - Rebuilt without colSpan
+          // Actions Summary - Full width
           {
             text: 'ملخص الإجراءات',
             style: 'sectionHeader',
             alignment: 'center',
-            margin: [0, 0, 0, 10]
+            margin: [0, 10, 0, 10],
+            fontSize: 14,
+            bold: true,
+            color: '#4CAF50'
           },
           {
             table: {
-              widths: [165, 165, 165],
+              widths: ['*', '*', '*'], // توزيع متساوي على العرض
               body: [
                 [
-                  { text: `التواصل مع الأسر: ${String(stats.totalFamilies || 0)}`, alignment: 'center', fillColor: '#F1F8E9' },
-                  { text: `التحويلات: ${String(stats.totalReferrals || 0)}`, alignment: 'center', fillColor: '#F1F8E9' },
-                  { text: `المتابعات: ${String(stats.totalFollowUps || 0)}`, alignment: 'center', fillColor: '#F1F8E9' }
+                  { 
+                    text: `التواصل مع الأسر\n${String(stats.totalFamilies || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#F1F8E9',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `التحويلات\n${String(stats.totalReferrals || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#F1F8E9',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `المتابعات\n${String(stats.totalFollowUps || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#F1F8E9',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  }
                 ]
               ]
             },
-            layout: 'lightHorizontalLines',
-            margin: [0, 0, 0, 15]
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20]
           },
 
           // Reports Details
