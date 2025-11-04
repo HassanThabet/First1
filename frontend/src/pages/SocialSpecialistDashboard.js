@@ -235,12 +235,23 @@ const SocialSpecialistDashboard = () => {
         periodText = `من ${mergedStartDate} إلى ${mergedEndDate}`;
       }
 
-      // Prepare reports data
+      // Prepare reports data - MUST have exactly 10 columns
       const reportsData = mergedReports.map((report, index) => {
         const total = (report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0);
-        return [
+        
+        // Safe date conversion
+        let dateStr = '-';
+        try {
+          if (report.date) {
+            dateStr = new Date(report.date).toLocaleDateString('ar-SA');
+          }
+        } catch (e) {
+          console.error('Error converting date:', e);
+        }
+        
+        const row = [
           String(index + 1),
-          String(new Date(report.date).toLocaleDateString('ar-SA')),
+          String(dateStr),
           String(total),
           String(report.psychological_cases || 0),
           String(report.academic_cases || 0),
@@ -250,6 +261,15 @@ const SocialSpecialistDashboard = () => {
           String(report.referrals_out || 0),
           String(report.follow_ups || 0)
         ];
+        
+        // Verify row has exactly 10 columns
+        if (row.length !== 10) {
+          console.error('Row has incorrect number of columns:', row.length, 'Expected: 10');
+          while (row.length < 10) row.push('-');
+          if (row.length > 10) row.length = 10;
+        }
+        
+        return row.map(val => String(val || '-'));
       });
 
       // Define PDF document
