@@ -1037,6 +1037,81 @@ const QualityDashboard = () => {
                   </Card>
                   )}
 
+                  {/* Charts Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>📊 الرسوم البيانية والتحليلات</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        {/* Teachers Chart */}
+                        {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                          <div>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين (انقر للتفاصيل)</h3>
+                            <ResponsiveContainer width="100%" height={300}>
+                              <PieChart>
+                                <Pie
+                                  data={getTeachersChartData()}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  label={(entry) => `${entry.name}: ${entry.value}`}
+                                  outerRadius={100}
+                                  fill="#8884d8"
+                                  dataKey="value"
+                                  onClick={(data, index) => {
+                                    const types = ['absent', 'late', 'covering'];
+                                    if (types[index]) {
+                                      handleChartClick(types[index]);
+                                    }
+                                  }}
+                                  style={{ cursor: 'pointer' }}
+                                >
+                                  {getTeachersChartData().map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend onClick={(e) => {
+                                  const name = e.value;
+                                  if (name === 'الغائبون') handleChartClick('absent');
+                                  else if (name === 'المتأخرون') handleChartClick('late');
+                                  else if (name === 'المغطون') handleChartClick('covering');
+                                }} wrapperStyle={{ cursor: 'pointer' }} />
+                              </PieChart>
+                            </ResponsiveContainer>
+                            <div className="text-center mt-4">
+                              <Button
+                                variant="outline"
+                                onClick={() => handleChartClick('absent')}
+                                className="mx-2"
+                              >
+                                👥 عرض قائمة المعلمين الغائبين
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Performance Chart */}
+                        {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                          <div>
+                            <h3 className="text-lg font-semibold mb-4 text-gray-700">معدلات الأداء العام</h3>
+                            <ResponsiveContainer width="100%" height={300}>
+                              <BarChart data={getPerformanceChartData()}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis domain={[0, 10]} />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="value" fill="#3b82f6" name="التقييم" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
                   {/* Overall Summary */}
                   <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
                     <CardContent className="p-6">
