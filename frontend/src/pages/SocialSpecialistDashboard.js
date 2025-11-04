@@ -300,10 +300,12 @@ const SocialSpecialistDashboard = () => {
       // Define PDF document
       const docDefinition = {
         pageSize: 'A4',
-        pageOrientation: 'portrait',
+        pageOrientation: 'landscape', // أفقي لجداول أفضل
+        pageMargins: [40, 60, 40, 60], // هوامش متناسقة
         defaultStyle: {
           font: 'Cairo',
-          alignment: 'right'
+          alignment: 'right',
+          fontSize: 10
         },
         content: [
           // Header
