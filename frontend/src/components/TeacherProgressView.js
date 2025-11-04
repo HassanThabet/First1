@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import pdfMake from "@digicole/pdfmake-rtl";
 import pdfMakeFonts from "../fonts/vfs_fonts";
 
-const TeacherProgressView = ({ branch = null }) => {
+const TeacherProgressView = ({ branch = null, compact = false }) => {
   const [reports, setReports] = useState([]);
   const [teacherProgress, setTeacherProgress] = useState([]);
   const [allTeacherProgress, setAllTeacherProgress] = useState([]);
