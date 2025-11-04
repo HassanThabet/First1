@@ -402,6 +402,7 @@ export default {
   createRTLTable,
   createSection,
   createInfoBox,
+  createStatsGrid,
   createFooter,
   generatePDF,
   pdfStyles
