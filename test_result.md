@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Add PDF export for TeacherProgressView, display cooperating teachers in Director and Chairman dashboards, and include cooperating teachers in PDF exports (only for activities reports)."
+user_problem_statement: "Fix PDF export error in Activities page. Replace teacher evaluation display in PDF with TeacherProgressView format. Add activity filtering to Activities PDF export."
 
 backend:
   - task: "Authentication API endpoints"
