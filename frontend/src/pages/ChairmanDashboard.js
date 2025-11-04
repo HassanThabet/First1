@@ -957,69 +957,50 @@ const ChairmanDashboard = () => {
           content.push(createSection('✅ إحصائيات الجودة', createStatsGrid(qualityStats)));
         }
       }
-    
-    // Detailed Reports Summary
-    if (reports.length > 0) {
-      content.push({
-        text: 'ملخص التقارير التفصيلية',
-        style: 'sectionTitle',
-        margin: [0, 20, 0, 10],
-        pageBreak: 'before'
+      
+      // === القسم 7: ملخص التقارير التفصيلية ===
+      if (reports.length > 0) {
+        const reportsTable = createRTLTable(
+          [
+            { text: 'النوع', width: 80 },
+            { text: 'الموظف', width: '*' },
+            { text: 'التاريخ', width: 100 }
+          ],
+          reports.slice(0, 50).map(report => {
+            const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                    report.type === "supervisor" ? "مشرف" :
+                                    report.type === "activities" ? "أنشطة" :
+                                    report.type === "social" ? "أخصائي" :
+                                    report.type === "quality" ? "جودة" :
+                                    report.type === "educational_supervision" ? "إشراف تربوي" : "";
+            
+            return [
+              reportTypeArabic,
+              report.userName || 'غير محدد',
+              report.date || report.week_start || 'غير محدد'
+            ];
+          }),
+          { showRowNumbers: true }
+        );
+        content.push(createSection(`📋 ملخص التقارير التفصيلية (إجمالي: ${reports.length})`, reportsTable));
+      }
+      
+      // Generate PDF
+      const filename = `تقرير_رئيس_مجلس_الإدارة_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`;
+      
+      generatePDFTemplate(content, filename, {
+        title: 'تقرير رئيس مجلس الإدارة الشامل',
+        orientation: 'portrait',
+        additionalInfo: {
+          leftInfo: `${branchText} | ${timeFilterText} | ${reportTypeText}`
+        }
       });
       
-      content.push({
-        text: `إجمالي عدد التقارير: ${reports.length}`,
-        style: 'infoText',
-        margin: [0, 0, 0, 15]
-      });
-      
-      const reportsTable = createRTLTable(
-        [
-          { text: 'النوع', width: 80 },
-          { text: 'الموظف', width: '*' },
-          { text: 'التاريخ', width: 100 }
-        ],
-        reports.slice(0, 30).map(report => {
-          const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
-                                  report.type === "supervisor" ? "مشرف" :
-                                  report.type === "activities" ? "أنشطة" :
-                                  report.type === "social" ? "أخصائي" :
-                                  report.type === "quality" ? "جودة" : "";
-          
-          return [
-            reportTypeArabic,
-            report.userName || 'غير محدد',
-            report.date || report.week_start || 'غير محدد'
-          ];
-        }),
-        { showRowNumbers: true }
-      );
-      content.push(reportsTable);
+      toast.success("تم تصدير التقرير بنجاح مع جميع المخططات والتفاصيل");
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error("حدث خطأ أثناء إنشاء التقرير");
     }
-    
-    // Footer
-    content.push({
-      text: '* هذا التقرير تم إنشاؤه تلقائياً من نظام إدارة التقارير',
-      style: 'footer',
-      alignment: 'center',
-      margin: [0, 30, 0, 0]
-    });
-
-    const docDefinition = {
-      pageSize: 'A4',
-      pageOrientation: 'portrait',
-      pageMargins: [40, 60, 40, 60],
-      defaultStyle: {
-        font: 'Cairo',
-        fontSize: 11,
-        alignment: 'right'
-      },
-      content: content,
-      styles: pdfStyles
-    };
-
-    pdfMake.createPdf(docDefinition).download(`تقرير_رئيس_مجلس_الإدارة_${new Date().getTime()}.pdf`);
-    toast.success("تم تصدير التقرير بنجاح");
   };
 
   // Calculate overall statistics
