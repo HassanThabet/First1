@@ -418,10 +418,10 @@ const VicePrincipalDashboard = () => {
       const stats = getMergedStatistics();
       const content = [];
 
-      // Statistics Section
-      content.push(createSection('الإحصائيات الإجمالية', {
+      // === القسم 1: الإحصائيات الإجمالية ===
+      content.push(createSection('📊 الإحصائيات الإجمالية', {
         stack: [
-          // First row of stats
+          // First stats table
           createRTLTable(
             [
               { text: 'إجمالي التقارير', width: '*' },
@@ -435,7 +435,7 @@ const VicePrincipalDashboard = () => {
             ]],
             { alternateRowColors: false }
           ),
-          // Second row of stats
+          // Second stats table
           createRTLTable(
             [
               { text: 'الطلاب الغائبون', width: '*' },
@@ -454,18 +454,18 @@ const VicePrincipalDashboard = () => {
         ]
       }));
 
-      // Absent Teachers Section (from VP report)
+      // === القسم 2: غياب المعلمين (من تقرير الوكيل) ===
       if (myReports.length > 0 && myReports[0].absent_teachers && myReports[0].absent_teachers.length > 0) {
         const absentTeachersRows = myReports[0].absent_teachers.map(at => [
           at.teacher || '-',
           { text: `${at.absent_days || 0} ${at.absent_days === 1 ? 'يوم' : 'أيام'}`, style: 'tableCellBold', fillColor: '#fee2e2' }
         ]);
 
-        content.push(createSection('غياب المعلمين', 
+        content.push(createSection('👥 غياب المعلمين', 
           createRTLTable(
             [
               { text: 'اسم المعلم', width: '*' },
-              { text: 'عدد أيام الغياب', width: 120 }
+              { text: 'عدد أيام الغياب', width: 100 }
             ],
             absentTeachersRows,
             { showRowNumbers: true }
@@ -473,14 +473,14 @@ const VicePrincipalDashboard = () => {
         ));
       }
 
-      // Problems Section
+      // === القسم 3: المشاكل والإجراءات ===
       if (myReports.length > 0 && myReports[0].problems && myReports[0].problems.length > 0) {
         const problemsRows = myReports[0].problems.map(p => [
           p.description || '-',
           p.action || '-'
         ]);
 
-        content.push(createSection('المشاكل والملاحظات', 
+        content.push(createSection('⚠️ المشاكل والملاحظات', 
           createRTLTable(
             [
               { text: 'الوصف', width: '*' },
@@ -492,11 +492,11 @@ const VicePrincipalDashboard = () => {
         ));
       }
 
-      // Suggestions Section
+      // === القسم 4: المقترحات ===
       if (myReports.length > 0 && myReports[0].suggestions && myReports[0].suggestions.length > 0) {
         const suggestionsRows = myReports[0].suggestions.map(s => [s]);
 
-        content.push(createSection('المقترحات', 
+        content.push(createSection('💡 المقترحات', 
           createRTLTable(
             [{ text: 'الاقتراح', width: '*' }],
             suggestionsRows,
@@ -505,36 +505,143 @@ const VicePrincipalDashboard = () => {
         ));
       }
 
-      // Detailed Reports Section
+      // === القسم 5: تفاصيل تقارير المشرفين ===
       const reportsRows = supervisorReports.map(report => {
         const reportDate = new Date(report.date);
         const supervisorName = getUserName(report.user_id);
+        
         return [
           supervisorName,
-          reportDate.toLocaleDateString('ar-SA'),
+          reportDate.toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' }),
           String(report.late_teachers?.length || 0),
           String(report.covering_teachers?.length || 0),
           String(report.absent_students_count || 0),
           `${report.student_discipline || 0}/10`,
-          `${report.classroom_cleanliness || 0}/10`
+          `${report.classroom_cleanliness || 0}/10`,
+          `${report.teacher_attendance_rate || 0}/10`,
+          `${report.general_behavior || 0}/10`
         ];
       });
 
-      content.push(createSection(`تفاصيل تقارير المشرفين (${supervisorReports.length})`, 
+      content.push(createSection(`📋 تفاصيل تقارير المشرفين (${supervisorReports.length} تقرير)`, 
         createRTLTable(
           [
-            { text: 'المشرف', width: 80 },
-            { text: 'التاريخ', width: 60 },
-            { text: 'متأخرون', width: 45 },
-            { text: 'مغطون', width: 45 },
-            { text: 'طلاب غائبون', width: 60 },
-            { text: 'الانضباط', width: 50 },
-            { text: 'النظافة', width: 50 }
+            { text: 'المشرف', width: 70 },
+            { text: 'التاريخ', width: 50 },
+            { text: 'متأخرون', width: 40 },
+            { text: 'مغطون', width: 40 },
+            { text: 'طلاب غائبون', width: 50 },
+            { text: 'الانضباط', width: 40 },
+            { text: 'النظافة', width: 40 },
+            { text: 'الحضور', width: 40 },
+            { text: 'السلوك', width: 40 }
           ],
           reportsRows,
           { showRowNumbers: true }
         )
       ));
+
+      // === القسم 6: تفاصيل المعلمين المتأخرين ===
+      const allLateTeachers = [];
+      supervisorReports.forEach(report => {
+        if (report.late_teachers && report.late_teachers.length > 0) {
+          report.late_teachers.forEach(lt => {
+            const supervisorName = getUserName(report.user_id);
+            const teacherName = typeof lt === 'object' ? lt.teacher : lt;
+            const subject = typeof lt === 'object' ? lt.subject : '-';
+            const period = typeof lt === 'object' ? lt.period : '-';
+            allLateTeachers.push([
+              teacherName,
+              subject,
+              period,
+              supervisorName,
+              new Date(report.date).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })
+            ]);
+          });
+        }
+      });
+
+      if (allLateTeachers.length > 0) {
+        content.push(createSection(`🕐 تفاصيل المعلمين المتأخرين (${allLateTeachers.length})`, 
+          createRTLTable(
+            [
+              { text: 'المعلم', width: '*' },
+              { text: 'المادة', width: 70 },
+              { text: 'الحصة', width: 50 },
+              { text: 'المشرف', width: 70 },
+              { text: 'التاريخ', width: 50 }
+            ],
+            allLateTeachers,
+            { showRowNumbers: true, headerColor: '#fff3e0' }
+          )
+        ));
+      }
+
+      // === القسم 7: تفاصيل المعلمين المغطين ===
+      const allCoveringTeachers = [];
+      supervisorReports.forEach(report => {
+        if (report.covering_teachers && report.covering_teachers.length > 0) {
+          report.covering_teachers.forEach(ct => {
+            const supervisorName = getUserName(report.user_id);
+            const teacherName = typeof ct === 'object' ? ct.teacher : ct;
+            const subject = typeof ct === 'object' ? ct.subject : '-';
+            const period = typeof ct === 'object' ? ct.period : '-';
+            allCoveringTeachers.push([
+              teacherName,
+              subject,
+              period,
+              supervisorName,
+              new Date(report.date).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })
+            ]);
+          });
+        }
+      });
+
+      if (allCoveringTeachers.length > 0) {
+        content.push(createSection(`👨‍🏫 تفاصيل المعلمين المغطين (${allCoveringTeachers.length})`, 
+          createRTLTable(
+            [
+              { text: 'المعلم', width: '*' },
+              { text: 'المادة', width: 70 },
+              { text: 'الحصة', width: 50 },
+              { text: 'المشرف', width: 70 },
+              { text: 'التاريخ', width: 50 }
+            ],
+            allCoveringTeachers,
+            { showRowNumbers: true, headerColor: '#e8f5e9' }
+          )
+        ));
+      }
+
+      // === القسم 8: الحوادث والملاحظات ===
+      const allIncidents = [];
+      supervisorReports.forEach(report => {
+        if (report.incidents && report.incidents.length > 0) {
+          report.incidents.forEach(incident => {
+            const supervisorName = getUserName(report.user_id);
+            const incidentText = typeof incident === 'object' ? (incident.description || incident.action || JSON.stringify(incident)) : incident;
+            allIncidents.push([
+              incidentText,
+              supervisorName,
+              new Date(report.date).toLocaleDateString('ar-SA', { day: 'numeric', month: 'short' })
+            ]);
+          });
+        }
+      });
+
+      if (allIncidents.length > 0) {
+        content.push(createSection(`⚡ الحوادث والملاحظات (${allIncidents.length})`, 
+          createRTLTable(
+            [
+              { text: 'الحادثة', width: '*' },
+              { text: 'المشرف', width: 70 },
+              { text: 'التاريخ', width: 50 }
+            ],
+            allIncidents,
+            { showRowNumbers: true, headerColor: '#fef3c7' }
+          )
+        ));
+      }
 
       const filename = `تقرير_الوكيل_${user.branch === 'boys' ? 'بنين' : 'بنات'}_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`;
       
