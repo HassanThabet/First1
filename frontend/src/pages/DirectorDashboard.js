@@ -1813,6 +1813,7 @@ const DirectorDashboard = () => {
                                         {report.type === "activities" && `${report.activities?.length || 0} نشاط`}
                                         {report.type === "social" && `${(report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0)} حالة`}
                                         {report.type === "quality" && `${report.visited_teachers?.length || 0} زيارة`}
+                                        {report.type === "educational_supervision" && `${report.teacher_evaluations?.length || 0} معلم مُقيّم`}
                                       </p>
                                     )}
                                     <div className="mt-3 text-xs text-blue-600 font-medium">
