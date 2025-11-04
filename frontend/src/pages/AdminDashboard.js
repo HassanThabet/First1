@@ -137,6 +137,101 @@ const AdminDashboard = () => {
     }
   };
 
+  // Export teachers to Excel
+  const handleExportTeachers = () => {
+    try {
+      // Prepare data for export
+      const exportData = teachers.length > 0 
+        ? teachers.map(t => ({
+            'الاسم': t.name,
+            'المادة': t.subject,
+            'الفرع': t.branch === 'boys' ? 'البنين' : 'البنات'
+          }))
+        : [
+            { 'الاسم': '', 'المادة': '', 'الفرع': '' },
+            { 'الاسم': 'مثال: محمد أحمد', 'المادة': 'مثال: الرياضيات', 'الفرع': 'البنين أو البنات' }
+          ];
+
+      // Create worksheet
+      const ws = XLSX.utils.json_to_sheet(exportData);
+      
+      // Set column widths
+      ws['!cols'] = [
+        { wch: 30 }, // الاسم
+        { wch: 20 }, // المادة
+        { wch: 15 }  // الفرع
+      ];
+
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "المعلمين");
+
+      // Generate file name
+      const fileName = teachers.length > 0 
+        ? `المعلمين_${new Date().toISOString().split('T')[0]}.xlsx`
+        : 'قالب_المعلمين.xlsx';
+
+      // Download
+      XLSX.writeFile(wb, fileName);
+      toast.success("تم تصدير الملف بنجاح");
+    } catch (error) {
+      console.error("Export error:", error);
+      toast.error("فشل تصدير الملف");
+    }
+  };
+
+  // Import teachers from Excel
+  const handleImportTeachers = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+      if (jsonData.length === 0) {
+        toast.error("الملف فارغ");
+        return;
+      }
+
+      // Transform data
+      const teachersData = jsonData.map(row => ({
+        name: row['الاسم'] || row['name'] || '',
+        subject: row['المادة'] || row['subject'] || '',
+        branch: (row['الفرع'] === 'البنين' || row['branch'] === 'boys') ? 'boys' : 'girls'
+      })).filter(t => t.name && t.subject); // Filter out empty rows
+
+      if (teachersData.length === 0) {
+        toast.error("لا توجد بيانات صالحة في الملف");
+        return;
+      }
+
+      // Send to backend
+      const response = await axios.post(`${API}/teachers/bulk-import`, teachersData);
+      
+      toast.success(response.data.message);
+      if (response.data.errors && response.data.errors.length > 0) {
+        console.error("Import errors:", response.data.errors);
+        toast.warning(`تم الاستيراد مع ${response.data.errors.length} أخطاء. راجع وحدة التحكم.`);
+      }
+      
+      fetchData();
+      
+      // Clear file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      console.error("Import error:", error);
+      toast.error(error.response?.data?.detail || "فشل استيراد الملف");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreateTeacher = async (e) => {
     e.preventDefault();
     setLoading(true);
