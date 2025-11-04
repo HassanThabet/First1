@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Enhance Vice-Principal Excel export to include full supervisor report details with date range filtering, and apply modal view with filtering to all dashboard report pages"
+user_problem_statement: "Fix ActivitySupervisorsView data fetching issue and Activities PDF export errors. Teachers participating in activities (supervisors and cooperating teachers) are not being displayed in Director and Chairman dashboards."
 
 backend:
   - task: "Authentication API endpoints"
