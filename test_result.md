@@ -263,7 +263,7 @@ frontend:
     implemented: true
     working: "NA"
     file: "frontend/src/pages/ActivitiesDashboard.js"
-    stuck_count: 0
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -276,6 +276,12 @@ frontend:
       - working: "NA"
         agent: "user"
         comment: "USER REPORTED: PDF export for activities reports showing errors. Also, teachers participating in activities are not displayed."
+      - working: false
+        agent: "user"
+        comment: "USER REPORTED: PDF export button shows 'فشل تصدير' error"
+      - working: "NA"
+        agent: "main"
+        comment: "ENHANCED: Added better error handling with detailed error messages in console. Ensured all stats values are converted to strings. Added activity filtering feature - users can now filter PDF export by specific activity name in addition to date range filtering."
 
   - task: "ActivitySupervisorsView data fetching"
     implemented: true
