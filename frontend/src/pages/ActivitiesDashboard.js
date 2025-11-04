@@ -383,10 +383,12 @@ const ActivitiesDashboard = () => {
       // Define PDF document
       const docDefinition = {
         pageSize: 'A4',
-        pageOrientation: 'landscape',
+        pageOrientation: 'landscape', // تغيير إلى أفقي للجداول الكبيرة
+        pageMargins: [40, 60, 40, 60], // هوامش متساوية ومريحة
         defaultStyle: {
           font: 'Cairo',
-          alignment: 'right'
+          alignment: 'right',
+          fontSize: 10
         },
         content: [
           // Header
