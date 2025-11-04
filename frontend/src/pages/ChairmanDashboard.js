@@ -21,6 +21,7 @@ import {
 } from "../utils/pdfTemplate";
 import ChairmanDirectorReportsView from "../components/ChairmanDirectorReportsView";
 import TeacherProgressView from "../components/TeacherProgressView";
+import ActivitySupervisorsView from "../components/ActivitySupervisorsView";
 
 const ChairmanDashboard = () => {
   const { user } = useContext(AuthContext);
