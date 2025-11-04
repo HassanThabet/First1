@@ -50,115 +50,83 @@ const ChairmanDirectorReportsView = () => {
     : reports.filter(r => r.branch === branchFilter);
 
   const exportToPDF = (report) => {
-    // Initialize pdfMake fonts
-    if (pdfMakeFonts) {
-      pdfMake.vfs = pdfMakeFonts;
+    try {
+      const reportDate = new Date(report.report_date).toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      const createdDate = new Date(report.created_at).toLocaleDateString('ar-SA', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+      const directorName = getUserName(report.user_id);
+      const branchText = report.branch === 'boys' ? 'البنين' : 'البنات';
+
+      const content = [];
+
+      // === معلومات أساسية ===
+      const infoTable = createRTLTable(
+        [
+          { text: 'البيان', width: '*' },
+          { text: 'القيمة', width: '*' }
+        ],
+        [
+          ['المدير', directorName],
+          ['الفرع', branchText],
+          ['تاريخ التقرير', reportDate],
+          ['تاريخ الإرسال', createdDate]
+        ],
+        { showRowNumbers: false, headerColor: '#dbeafe' }
+      );
+      content.push(createSection('📋 معلومات التقرير', infoTable));
+
+      // === التحديات ===
+      if (report.challenges) {
+        content.push(createSection('⚠️ البند الأول: التحديات', {
+          text: report.challenges,
+          style: 'tableCell',
+          alignment: 'right',
+          margin: [10, 5, 10, 5]
+        }));
+      }
+
+      // === الإجراءات والمقترحات ===
+      if (report.actions_and_suggestions) {
+        content.push(createSection('💡 البند الثاني: الإجراءات المتخذة والمقترحات', {
+          text: report.actions_and_suggestions,
+          style: 'tableCell',
+          alignment: 'right',
+          margin: [10, 5, 10, 5]
+        }));
+      }
+
+      // === الملاحظات ===
+      if (report.notes) {
+        content.push(createSection('📝 البند الثالث: ملاحظات', {
+          text: report.notes,
+          style: 'tableCell',
+          alignment: 'right',
+          margin: [10, 5, 10, 5]
+        }));
+      }
+
+      const filename = `تقرير_مدير_${directorName}_${reportDate.replace(/\//g, '-')}.pdf`;
+      
+      generatePDFTemplate(content, filename, {
+        title: 'تقرير المدير',
+        orientation: 'portrait',
+        additionalInfo: {
+          leftInfo: `${branchText} | ${reportDate}`
+        }
+      });
+
+      toast.success("تم تصدير تقرير المدير بنجاح");
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error("حدث خطأ أثناء إنشاء التقرير");
     }
-    
-    pdfMake.fonts = {
-      Cairo: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
-      },
-      Roboto: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
-      },
-      Nillima: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
-      }
-    };
-
-    const reportDate = new Date(report.report_date).toLocaleDateString('ar-SA');
-    const createdDate = new Date(report.created_at).toLocaleDateString('ar-SA');
-    const directorName = getUserName(report.user_id);
-
-    const docDefinition = {
-      pageSize: 'A4',
-      pageOrientation: 'portrait',
-      pageMargins: [40, 60, 40, 60],
-      defaultStyle: {
-        font: 'Cairo',
-        fontSize: 12,
-        direction: 'rtl',
-        alignment: 'right'
-      },
-      content: [
-        {
-          text: 'تقرير المدير',
-          style: 'header',
-          alignment: 'center',
-          margin: [0, 0, 0, 20]
-        },
-        {
-          text: `المدير: ${directorName}`,
-          margin: [0, 0, 0, 5]
-        },
-        {
-          text: `الفرع: ${report.branch === 'boys' ? 'البنين' : 'البنات'}`,
-          margin: [0, 0, 0, 10]
-        },
-        {
-          text: `تاريخ التقرير: ${reportDate}`,
-          margin: [0, 0, 0, 20]
-        },
-        {
-          text: 'البند الأول: التحديات',
-          style: 'sectionHeader',
-          margin: [0, 10, 0, 5]
-        },
-        {
-          text: report.challenges || 'لا يوجد',
-          margin: [0, 0, 0, 15]
-        },
-        {
-          text: 'البند الثاني: الإجراءات المتخذة والمقترحات',
-          style: 'sectionHeader',
-          margin: [0, 10, 0, 5]
-        },
-        {
-          text: report.actions_and_suggestions || 'لا يوجد',
-          margin: [0, 0, 0, 15]
-        },
-        {
-          text: 'البند الثالث: ملاحظات',
-          style: 'sectionHeader',
-          margin: [0, 10, 0, 5]
-        },
-        {
-          text: report.notes || 'لا يوجد',
-          margin: [0, 0, 0, 20]
-        },
-        {
-          text: `تاريخ الإرسال: ${createdDate}`,
-          fontSize: 10,
-          color: '#666',
-          margin: [0, 20, 0, 0]
-        }
-      ],
-      styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          color: '#1e40af'
-        },
-        sectionHeader: {
-          fontSize: 14,
-          bold: true,
-          color: '#2563eb'
-        }
-      }
-    };
-
-    pdfMake.createPdf(docDefinition).download(`تقرير_مدير_${directorName}_${reportDate}.pdf`);
-    toast.success("تم تصدير التقرير بنجاح");
   };
 
   const formatDate = (dateString) => {
