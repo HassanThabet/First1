@@ -1131,7 +1131,7 @@ const ChairmanDashboard = () => {
       // Generate PDF
       const filename = `تقرير_رئيس_مجلس_الإدارة_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`;
       
-      generatePDFTemplate(content, filename, {
+      generatePDF(content, filename, {
         title: 'تقرير رئيس مجلس الإدارة الشامل',
         orientation: 'portrait',
         additionalInfo: {
