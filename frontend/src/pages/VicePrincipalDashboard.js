@@ -688,7 +688,8 @@ const VicePrincipalDashboard = () => {
       problems: report.problems || [],
       suggestions: report.suggestions || [],
       week_start: report.week_start,
-      week_end: report.week_end
+      week_end: report.week_end,
+      absent_teachers: report.absent_teachers || []
     });
     setActiveTab("create");
   };
