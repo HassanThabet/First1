@@ -1221,6 +1221,7 @@ const ChairmanDashboard = () => {
                       <SelectItem value="activities">الأنشطة</SelectItem>
                       <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
                       <SelectItem value="quality">الجودة</SelectItem>
+                      <SelectItem value="educational_supervision">الإشراف التربوي</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
