@@ -2,14 +2,21 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { API, AuthContext } from "../App";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, FileText } from "lucide-react";
+import { toast } from "sonner";
+import pdfMake from "@digicole/pdfmake-rtl";
+import pdfMakeFonts from "../fonts/vfs_fonts";
 
 const EducationalSupervisionTeacherProgress = () => {
   const { user } = useContext(AuthContext);
   const [reports, setReports] = useState([]);
   const [teacherProgress, setTeacherProgress] = useState([]);
+  const [allTeacherProgress, setAllTeacherProgress] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTeacher, setSelectedTeacher] = useState("all");
 
   useEffect(() => {
     fetchReportsAndCalculateProgress();
