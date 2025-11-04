@@ -224,6 +224,15 @@ const SocialSpecialistDashboard = () => {
     try {
       const mergedReports = getMergedReports();
       const stats = getMergedStatistics();
+      
+      // Ensure stats is valid
+      if (!stats || typeof stats !== 'object') {
+        console.error('Invalid stats object:', stats);
+        toast.error('خطأ في جلب الإحصائيات');
+        return;
+      }
+      
+      console.log('📊 Stats object:', stats);
 
       // Prepare period text
       let periodText = '';
