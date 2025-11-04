@@ -1000,22 +1000,38 @@ const ChairmanDashboard = () => {
       
       // جدول المعلمين المشاركين في الأنشطة - يظهر فقط في: جميع التقارير، الأنشطة
       if (reportTypeFilter === 'all' || reportTypeFilter === 'activities') {
-        // TODO: Implement getActivitySupervisorTeachers function
-        // const activitySupervisorTeachers = getActivitySupervisorTeachers();
-        // if (activitySupervisorTeachers.length > 0) {
-        //   const activityTeachersTable = createRTLTable(
-        //     [
-        //       { text: 'اسم المعلم', width: '*' },
-        //       { text: 'عدد الأنشطة', width: 100 }
-        //     ],
-        //     activitySupervisorTeachers.slice(0, 20).map(teacher => [
-        //       teacher.name,
-        //       teacher.count.toString()
-        //     ]),
-        //     { showRowNumbers: true, headerColor: '#e9d5ff' }
-        //   );
-        //   content.push(createSection(`🎯 المعلمون المشاركون في الأنشطة (${activitySupervisorTeachers.length} معلم)`, activityTeachersTable));
-        // }
+        const activityTeachers = getAggregatedActivityTeachers();
+        if (activityTeachers.length > 0) {
+          const activityTeachersTable = createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد الأنشطة', width: 100 }
+            ],
+            activityTeachers.slice(0, 20).map(teacher => [
+              teacher.name,
+              teacher.count.toString()
+            ]),
+            { showRowNumbers: true, headerColor: '#e9d5ff' }
+          );
+          content.push(createSection(`🎯 المعلمون المشرفون على الأنشطة (${activityTeachers.length} معلم)`, activityTeachersTable));
+        }
+
+        // جدول المعلمين المتعاونين في الأنشطة
+        const cooperatingTeachers = getCooperatingTeachers();
+        if (cooperatingTeachers.length > 0) {
+          const cooperatingTeachersTable = createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد الأنشطة', width: 100 }
+            ],
+            cooperatingTeachers.slice(0, 20).map(teacher => [
+              teacher.name,
+              teacher.count.toString()
+            ]),
+            { showRowNumbers: true, headerColor: '#fed7aa' }
+          );
+          content.push(createSection(`🤝 المعلمون المتعاونون في الأنشطة (${cooperatingTeachers.length} معلم)`, cooperatingTeachersTable));
+        }
       }
       
       // جدول تقييم تحسن المعلمين (من الإشراف التربوي)
