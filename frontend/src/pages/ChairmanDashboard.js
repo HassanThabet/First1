@@ -844,28 +844,65 @@ const ChairmanDashboard = () => {
       ];
       
       content.push(createSection('📊 الإحصائيات العامة', createStatsGrid(overallStats)));
-    
-    // Performance Table
-    content.push({
-      text: 'مؤشرات الأداء',
-      style: 'sectionTitle',
-      margin: [0, 20, 0, 10]
-    });
-    
-    const performanceTable = createRTLTable(
-      [
-        { text: 'المؤشر', width: '*' },
-        { text: 'القيمة', width: 80 }
-      ],
-      [
-        ['انضباط الطلاب', `${stats.avgDiscipline}/10`],
-        ['نظافة الفصول', `${stats.avgCleanliness}/10`],
-        ['التزام المعلمين', `${stats.avgAttendance}/10`],
-        ['السلوك العام', `${stats.avgBehavior}/10`]
-      ],
-      { showRowNumbers: false }
-    );
-    content.push(performanceTable);
+      
+      // === القسم 2: مؤشرات الأداء ===
+      const performanceTable = createRTLTable(
+        [
+          { text: 'المؤشر', width: '*' },
+          { text: 'القيمة', width: 80 }
+        ],
+        [
+          ['انضباط الطلاب', `${stats.avgDiscipline}/10`],
+          ['نظافة الفصول', `${stats.avgCleanliness}/10`],
+          ['التزام المعلمين', `${stats.avgAttendance}/10`],
+          ['السلوك العام', `${stats.avgBehavior}/10`]
+        ],
+        { showRowNumbers: false }
+      );
+      content.push(createSection('📈 مؤشرات الأداء', performanceTable));
+      
+      // === القسم 3: المخططات البيانية ===
+      toast.info("جاري التقاط المخططات...");
+      
+      // Capture Teachers Chart
+      const teachersChartImage = await captureChartAsImage('#chairman-teachers-chart');
+      if (teachersChartImage) {
+        content.push(createSection('📊 توزيع حالات المعلمين', 
+          createChartImage(teachersChartImage, { width: 450, height: 250 })
+        ));
+      }
+      
+      // Capture Performance Chart
+      const performanceChartImage = await captureChartAsImage('#chairman-performance-chart');
+      if (performanceChartImage) {
+        content.push(createSection('📈 متوسط الأداء العام', 
+          createChartImage(performanceChartImage, { width: 450, height: 250 })
+        ));
+      }
+      
+      // Capture Absent Teachers Chart
+      const absentChartImage = await captureChartAsImage('#chairman-absent-teachers-chart');
+      if (absentChartImage) {
+        content.push(createSection('📉 تفاصيل غياب المعلمين', 
+          createChartImage(absentChartImage, { width: 450, height: 250 })
+        ));
+      }
+      
+      // Capture Activities Chart
+      const activitiesChartImage = await captureChartAsImage('#chairman-activities-chart');
+      if (activitiesChartImage) {
+        content.push(createSection('🎯 إحصائيات الأنشطة', 
+          createChartImage(activitiesChartImage, { width: 450, height: 250 })
+        ));
+      }
+      
+      // Capture Social Cases Chart
+      const socialChartImage = await captureChartAsImage('#chairman-social-chart');
+      if (socialChartImage) {
+        content.push(createSection('👥 توزيع حالات الأخصائي الاجتماعي', 
+          createChartImage(socialChartImage, { width: 450, height: 250 })
+        ));
+      }
     
     // Activities Statistics (if applicable)
     if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
