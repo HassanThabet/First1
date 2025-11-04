@@ -1033,51 +1033,98 @@ const DirectorDashboard = () => {
         }
       }
       
-      // جدول تقييم تحسن المعلمين (من الإشراف التربوي)
+      // جدول تقييم تحسن المعلمين (من الإشراف التربوي) - نفس عرض TeacherProgressView
       if ((reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && educationalSupervisionReports.length > 0) {
-        const teacherEvaluations = [];
+        // Group evaluations by teacher like TeacherProgressView does
+        const teacherMap = {};
+        
         educationalSupervisionReports.forEach(report => {
-          if (report.teacher_evaluations && Array.isArray(report.teacher_evaluations)) {
-            report.teacher_evaluations.forEach(evaluation => {
-              const existing = teacherEvaluations.find(t => t.teacherName === evaluation.teacher_name);
-              if (existing) {
-                existing.evaluations.push({
-                  date: report.report_date,
-                  weeklyPerformance: evaluation.weekly_performance,
-                  strategies: evaluation.strategies_used,
-                  strengths: evaluation.strengths,
-                  supportAreas: evaluation.support_areas
-                });
-              } else {
-                teacherEvaluations.push({
-                  teacherName: evaluation.teacher_name,
-                  evaluations: [{
-                    date: report.report_date,
-                    weeklyPerformance: evaluation.weekly_performance,
-                    strategies: evaluation.strategies_used,
-                    strengths: evaluation.strengths,
-                    supportAreas: evaluation.support_areas
-                  }]
-                });
-              }
+          report.teacher_evaluations?.forEach(eval_item => {
+            if (!teacherMap[eval_item.teacher_id]) {
+              teacherMap[eval_item.teacher_id] = {
+                teacher_id: eval_item.teacher_id,
+                teacher_name: eval_item.teacher_name,
+                evaluations: []
+              };
+            }
+            
+            teacherMap[eval_item.teacher_id].evaluations.push({
+              date: report.date,
+              planning: eval_item.planning || 0,
+              performance: eval_item.performance || 0,
+              time_management: eval_item.time_management || 0,
+              goal_achievement: eval_item.goal_achievement || 0,
+              average: ((eval_item.planning + eval_item.performance + eval_item.time_management + eval_item.goal_achievement) / 4) || 0
             });
-          }
+          });
+        });
+
+        const teacherProgress = Object.values(teacherMap).map(teacher => {
+          // Sort evaluations by date
+          teacher.evaluations.sort((a, b) => new Date(a.date) - new Date(b.date));
+          
+          const firstEval = teacher.evaluations[0]?.average || 0;
+          const lastEval = teacher.evaluations[teacher.evaluations.length - 1]?.average || 0;
+          const improvement = lastEval - firstEval;
+          
+          return {
+            ...teacher,
+            firstEval,
+            lastEval,
+            improvement,
+            trend: improvement > 0 ? 'up' : improvement < 0 ? 'down' : 'stable'
+          };
         });
         
-        if (teacherEvaluations.length > 0) {
-          const evaluationRows = teacherEvaluations.slice(0, 30).map(teacher => {
-            const evals = teacher.evaluations;
-            const firstEval = evals[0]?.weeklyPerformance || 0;
-            const lastEval = evals[evals.length - 1]?.weeklyPerformance || 0;
-            const improvement = lastEval - firstEval;
-            const status = improvement > 0 ? '✅ تحسن' : improvement < 0 ? '⚠️ تراجع' : '➖ مستقر';
+        if (teacherProgress.length > 0) {
+          // Summary section
+          content.push({
+            text: 'ملخص تقييم تحسن المعلمين',
+            style: 'sectionHeader',
+            margin: [0, 10, 0, 10]
+          });
+          
+          content.push({
+            columns: [
+              {
+                width: '33%',
+                stack: [
+                  { text: 'معلمون محسّنون', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
+                  { text: teacherProgress.filter(t => t.trend === 'up').length.toString(), fontSize: 20, bold: true, color: '#16a34a' }
+                ],
+                alignment: 'center'
+              },
+              {
+                width: '34%',
+                stack: [
+                  { text: 'معلمون مستقرون', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
+                  { text: teacherProgress.filter(t => t.trend === 'stable').length.toString(), fontSize: 20, bold: true, color: '#ca8a04' }
+                ],
+                alignment: 'center'
+              },
+              {
+                width: '33%',
+                stack: [
+                  { text: 'يحتاجون دعم', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
+                  { text: teacherProgress.filter(t => t.trend === 'down').length.toString(), fontSize: 20, bold: true, color: '#dc2626' }
+                ],
+                alignment: 'center'
+              }
+            ],
+            margin: [0, 0, 0, 15]
+          });
+
+          // Teacher progress table with detailed info
+          const evaluationRows = teacherProgress.map(teacher => {
+            const status = teacher.trend === 'up' ? '✅ تحسن' : teacher.trend === 'down' ? '⚠️ تراجع' : '➖ مستقر';
+            const improvementText = teacher.improvement > 0 ? '+' + teacher.improvement.toFixed(1) : teacher.improvement.toFixed(1);
             
             return [
-              teacher.teacherName,
-              evals.length.toString(),
-              firstEval + '/10',
-              lastEval + '/10',
-              improvement > 0 ? '+' + improvement.toFixed(1) : improvement.toFixed(1),
+              teacher.teacher_name,
+              teacher.evaluations.length.toString(),
+              teacher.firstEval.toFixed(1) + '/10',
+              teacher.lastEval.toFixed(1) + '/10',
+              improvementText,
               status
             ];
           });
@@ -1085,16 +1132,16 @@ const DirectorDashboard = () => {
           const teacherEvalTable = createRTLTable(
             [
               { text: 'اسم المعلم', width: '*' },
-              { text: 'عدد التقييمات', width: 60 },
-              { text: 'أول تقييم', width: 50 },
-              { text: 'آخر تقييم', width: 50 },
-              { text: 'التحسن', width: 50 },
+              { text: 'عدد التقييمات', width: 70 },
+              { text: 'أول تقييم', width: 60 },
+              { text: 'آخر تقييم', width: 60 },
+              { text: 'التحسن', width: 60 },
               { text: 'الحالة', width: 70 }
             ],
             evaluationRows,
             { showRowNumbers: true, headerColor: '#dbeafe' }
           );
-          content.push(createSection(`📈 تقييم تحسن المعلمين (${teacherEvaluations.length} معلم)`, teacherEvalTable));
+          content.push(teacherEvalTable);
         }
       }
       
