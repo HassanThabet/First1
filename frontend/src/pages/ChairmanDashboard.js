@@ -903,75 +903,60 @@ const ChairmanDashboard = () => {
           createChartImage(socialChartImage, { width: 450, height: 250 })
         ));
       }
-    
-    // Activities Statistics (if applicable)
-    if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
-      if (stats.activitiesReportsCount > 0) {
-        content.push({
-          text: 'إحصائيات الأنشطة',
-          style: 'sectionTitle',
-          margin: [0, 20, 0, 10]
-        });
-        
-        const activitiesStats = [
-          { label: 'إجمالي الأنشطة', value: stats.totalActivities.toString(), color: '#dbeafe' },
-          { label: 'إجمالي المشاركين', value: stats.totalActivitiesParticipants.toString(), color: '#dbeafe' },
-          { label: 'متوسط التفاعل', value: `${stats.avgActivitiesInteraction}/10`, color: '#d1fae5' }
-        ];
-        content.push(createStatsGrid(activitiesStats));
+      
+      // === القسم 4: تفاصيل الأنشطة ===
+      if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
+        if (stats.activitiesReportsCount > 0) {
+          const activitiesStats = [
+            { label: 'إجمالي الأنشطة', value: stats.totalActivities.toString(), color: '#dbeafe' },
+            { label: 'إجمالي المشاركين', value: stats.totalActivitiesParticipants.toString(), color: '#e9d5ff' },
+            { label: 'متوسط التفاعل', value: `${stats.avgActivitiesInteraction}/10`, color: '#d1fae5' }
+          ];
+          content.push(createSection('🎯 تفاصيل الأنشطة', createStatsGrid(activitiesStats)));
+        }
       }
-    }
-    
-    // Social Specialist Statistics (if applicable)
-    if (reportTypeFilter === "all" || reportTypeFilter === "social") {
-      if (stats.socialReportsCount > 0) {
-        content.push({
-          text: 'إحصائيات الأخصائي الاجتماعي',
-          style: 'sectionTitle',
-          margin: [0, 20, 0, 10]
-        });
-        
-        const socialStatsTable = createRTLTable(
-          [
-            { text: 'نوع الحالة', width: '*' },
-            { text: 'العدد', width: 80 }
-          ],
-          [
-            ['حالات نفسية', stats.totalPsychologicalCases.toString()],
-            ['حالات أكاديمية', stats.totalAcademicCases.toString()],
-            ['حالات سلوكية', stats.totalBehavioralCases.toString()],
-            [{ text: 'إجمالي الحالات', bold: true }, { text: stats.totalStudentCases.toString(), bold: true, fillColor: '#dbeafe' }]
-          ],
-          { showRowNumbers: false }
-        );
-        content.push(socialStatsTable);
-        
-        content.push({
-          columns: [
-            { text: `إجمالي الجلسات: ${stats.totalSessions}`, style: 'infoText', width: '*', alignment: 'right' },
-            { text: `التواصل مع الأسر: ${stats.totalFamilyContacts}`, style: 'infoText', width: '*', alignment: 'left' }
-          ],
-          margin: [0, 10, 0, 0]
-        });
+      
+      // === القسم 5: تفاصيل الأخصائي الاجتماعي ===
+      if (reportTypeFilter === "all" || reportTypeFilter === "social") {
+        if (stats.socialReportsCount > 0) {
+          const socialStatsTable = createRTLTable(
+            [
+              { text: 'نوع الحالة', width: '*' },
+              { text: 'العدد', width: 80 }
+            ],
+            [
+              ['حالات نفسية', stats.totalPsychologicalCases.toString()],
+              ['حالات أكاديمية', stats.totalAcademicCases.toString()],
+              ['حالات سلوكية', stats.totalBehavioralCases.toString()],
+              [{ text: 'إجمالي الحالات', bold: true }, { text: stats.totalStudentCases.toString(), bold: true, fillColor: '#dbeafe' }]
+            ],
+            { showRowNumbers: false }
+          );
+          content.push(createSection('👥 إحصائيات الأخصائي الاجتماعي', {
+            stack: [
+              socialStatsTable,
+              {
+                columns: [
+                  { text: `إجمالي الجلسات: ${stats.totalSessions}`, style: 'infoText', width: '*', alignment: 'right' },
+                  { text: `التواصل مع الأسر: ${stats.totalFamilyContacts}`, style: 'infoText', width: '*', alignment: 'left' }
+                ],
+                margin: [0, 10, 0, 0]
+              }
+            ]
+          }));
+        }
       }
-    }
-    
-    // Quality Statistics (if applicable)
-    if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
-      if (stats.qualityReportsCount > 0) {
-        content.push({
-          text: 'إحصائيات الجودة',
-          style: 'sectionTitle',
-          margin: [0, 20, 0, 10]
-        });
-        
-        const qualityStats = [
-          { label: 'إجمالي الزيارات', value: stats.totalQualityVisits.toString(), color: '#dbeafe' },
-          { label: 'متوسط الأداء التدريسي', value: `${stats.avgQualityTeachingRate}/10`, color: '#d1fae5' }
-        ];
-        content.push(createStatsGrid(qualityStats));
+      
+      // === القسم 6: تفاصيل الجودة ===
+      if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
+        if (stats.qualityReportsCount > 0) {
+          const qualityStats = [
+            { label: 'إجمالي الزيارات', value: stats.totalQualityVisits.toString(), color: '#dbeafe' },
+            { label: 'متوسط الأداء التدريسي', value: `${stats.avgQualityTeachingRate}/10`, color: '#d1fae5' }
+          ];
+          content.push(createSection('✅ إحصائيات الجودة', createStatsGrid(qualityStats)));
+        }
       }
-    }
     
     // Detailed Reports Summary
     if (reports.length > 0) {
