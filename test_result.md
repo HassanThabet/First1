@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix PDF export error in Activities page. Replace teacher evaluation display in PDF with TeacherProgressView format. Add activity filtering to Activities PDF export."
+user_problem_statement: "Fix '_minWidth' error in PDF export for Activities and Social Specialist dashboards - table column mismatch causing pdfMake to fail."
 
 backend:
   - task: "Authentication API endpoints"
