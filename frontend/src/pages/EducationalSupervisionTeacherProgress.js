@@ -327,9 +327,38 @@ const EducationalSupervisionTeacherProgress = () => {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">تقييم تحسن المعلمين</h2>
         <div className="text-sm text-gray-600">
-          عدد المعلمين المقيّمين: {teacherProgress.length}
+          عدد المعلمين المقيّمين: {allTeacherProgress.length}
         </div>
       </div>
+
+      {/* Filter */}
+      {allTeacherProgress.length > 0 && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-4">
+              <Label className="font-semibold">تصفية حسب المعلم:</Label>
+              <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
+                <SelectTrigger className="w-64">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">جميع المعلمين</SelectItem>
+                  {allTeacherProgress.map((teacher) => (
+                    <SelectItem key={teacher.teacher_id} value={teacher.teacher_id}>
+                      {teacher.teacher_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedTeacher === "all" && (
+                <span className="text-sm text-gray-600">
+                  (عرض {teacherProgress.length} معلم)
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {teacherProgress.length === 0 ? (
         <Card>
