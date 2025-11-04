@@ -468,6 +468,136 @@ const ActivitiesDashboard = () => {
                 return rowIndex === 0 ? '#4DB6AC' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
               }
             }
+          },
+
+          // Supervisors Summary Table
+          {
+            text: 'المعلمون المشرفون على الأنشطة',
+            style: 'sectionHeader',
+            margin: [0, 15, 0, 10],
+            pageBreak: 'before' // Start on new page
+          },
+          {
+            table: {
+              headerRows: 1,
+              widths: [30, 200, 80],
+              body: (() => {
+                // Aggregate supervisors
+                const supervisorsMap = {};
+                
+                allActivities.forEach(activity => {
+                  if (activity.supervisors && Array.isArray(activity.supervisors)) {
+                    activity.supervisors.forEach(teacherId => {
+                      const teacher = teachers.find(t => t.id === teacherId);
+                      const name = teacher ? teacher.name : teacherId;
+                      if (name && name !== teacherId) {
+                        supervisorsMap[name] = (supervisorsMap[name] || 0) + 1;
+                      }
+                    });
+                  }
+                });
+
+                const supervisorsList = Object.entries(supervisorsMap)
+                  .map(([name, count]) => ({ name, count }))
+                  .sort((a, b) => b.count - a.count);
+
+                const rows = [
+                  [
+                    { text: '#', style: 'tableHeader', alignment: 'center', fillColor: '#9C27B0' },
+                    { text: 'اسم المعلم', style: 'tableHeader', alignment: 'center', fillColor: '#9C27B0' },
+                    { text: 'عدد الأنشطة', style: 'tableHeader', alignment: 'center', fillColor: '#9C27B0' }
+                  ]
+                ];
+
+                if (supervisorsList.length === 0) {
+                  rows.push([
+                    { text: '-', colSpan: 3, alignment: 'center' },
+                    {},
+                    {}
+                  ]);
+                } else {
+                  supervisorsList.forEach((supervisor, index) => {
+                    rows.push([
+                      { text: String(index + 1), alignment: 'center' },
+                      { text: supervisor.name, alignment: 'right' },
+                      { text: String(supervisor.count), alignment: 'center', bold: true, color: '#9C27B0' }
+                    ]);
+                  });
+                }
+
+                return rows;
+              })()
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#9C27B0' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            },
+            margin: [0, 0, 0, 15]
+          },
+
+          // Cooperating Teachers Summary Table
+          {
+            text: 'المعلمون المتعاونون في الأنشطة',
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            table: {
+              headerRows: 1,
+              widths: [30, 200, 80],
+              body: (() => {
+                // Aggregate cooperating teachers
+                const cooperatingMap = {};
+                
+                allActivities.forEach(activity => {
+                  if (activity.cooperating_teachers && Array.isArray(activity.cooperating_teachers)) {
+                    activity.cooperating_teachers.forEach(teacherId => {
+                      const teacher = teachers.find(t => t.id === teacherId);
+                      const name = teacher ? teacher.name : teacherId;
+                      if (name && name !== teacherId) {
+                        cooperatingMap[name] = (cooperatingMap[name] || 0) + 1;
+                      }
+                    });
+                  }
+                });
+
+                const cooperatingList = Object.entries(cooperatingMap)
+                  .map(([name, count]) => ({ name, count }))
+                  .sort((a, b) => b.count - a.count);
+
+                const rows = [
+                  [
+                    { text: '#', style: 'tableHeader', alignment: 'center', fillColor: '#FF9800' },
+                    { text: 'اسم المعلم', style: 'tableHeader', alignment: 'center', fillColor: '#FF9800' },
+                    { text: 'عدد الأنشطة', style: 'tableHeader', alignment: 'center', fillColor: '#FF9800' }
+                  ]
+                ];
+
+                if (cooperatingList.length === 0) {
+                  rows.push([
+                    { text: '-', colSpan: 3, alignment: 'center' },
+                    {},
+                    {}
+                  ]);
+                } else {
+                  cooperatingList.forEach((teacher, index) => {
+                    rows.push([
+                      { text: String(index + 1), alignment: 'center' },
+                      { text: teacher.name, alignment: 'right' },
+                      { text: String(teacher.count), alignment: 'center', bold: true, color: '#FF9800' }
+                    ]);
+                  });
+                }
+
+                return rows;
+              })()
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#FF9800' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            }
           }
         ],
         styles: {
