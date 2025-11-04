@@ -1734,7 +1734,7 @@ const DirectorDashboard = () => {
                     
                     {/* Social Cases Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
-                      <div>
+                      <div id="director-social-chart">
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات الأخصائي الاجتماعي</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <PieChart>
