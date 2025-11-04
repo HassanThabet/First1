@@ -1654,7 +1654,7 @@ const DirectorDashboard = () => {
                     
                     {/* Absent Teachers Detailed Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "supervisor" || reportTypeFilter === "vice_principal") && (
-                      <div>
+                      <div id="director-absent-teachers-chart">
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">تفاصيل غياب المعلمين (عدد الأيام)</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={getAggregatedAbsentTeachers().slice(0, 10)}>
