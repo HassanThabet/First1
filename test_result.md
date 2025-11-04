@@ -345,6 +345,12 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🔧 FIXED CRITICAL PDF EXPORT BUG: Corrected font loading error 'File Cairo-Regular.ttf not found in virtual file system'. Root cause identified: ChairmanDashboard.js, DirectorDashboard.js, and QualityDashboard.js were incorrectly trying to access fonts via nested path 'pdfMakeFonts.pdfMake.vfs' when vfs_fonts.js exports the font object directly. Fixed by changing to direct assignment 'pdfMake.vfs = pdfMakeFonts' in all three files. PDF export should now work correctly with Arabic RTL support."
+      - working: "NA"
+        agent: "main"
+        comment: "✅ CHAIRMAN DASHBOARD PDF COMPLETE: Successfully implemented comprehensive PDF export with html2canvas chart integration and detailed teacher tables (absent, late, covering teachers with names and counts). Added teacher evaluation details from educational supervision reports."
+      - working: "NA"
+        agent: "main"
+        comment: "🚀 DIRECTOR DASHBOARD PDF ENHANCEMENT IN PROGRESS (Step 3): Enhanced DirectorDashboard.js exportToPDF function to match ChairmanDashboard enhancements. Added: 1) Detailed teacher tables (absent teachers with days/counts, late teachers with times, covering teachers with subjects, activity supervisor teachers), 2) Teacher evaluation progress table from educational supervision reports showing first/last evaluation scores and improvement status, 3) Detailed sections for Activities, Social Specialist, and Quality statistics. Ready for testing."
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
