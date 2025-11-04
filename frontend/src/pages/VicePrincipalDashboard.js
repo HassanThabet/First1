@@ -819,7 +819,7 @@ const VicePrincipalDashboard = () => {
                             <SelectItem key={teacher.id} value={teacher.name}>{teacher.name}</SelectItem>
                           ))
                         ) : (
-                          <SelectItem value="" disabled>لا توجد معلمين متاحين</SelectItem>
+                          <div className="p-2 text-sm text-gray-500 text-center">لا توجد معلمين متاحين</div>
                         )}
                       </SelectContent>
                     </Select>
