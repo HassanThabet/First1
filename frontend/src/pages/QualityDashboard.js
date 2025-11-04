@@ -1777,6 +1777,10 @@ const QualityDashboard = () => {
             })()}
           </div>
         </TabsContent>
+
+        <TabsContent value="teacher-progress">
+          <TeacherProgressView />
+        </TabsContent>
       </Tabs>
 
       {/* Detailed Report Modal for Statistics Tab */}
