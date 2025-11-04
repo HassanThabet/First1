@@ -444,8 +444,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Director Dashboard with modal view and filtering"
-    - "Interactive teacher lists in charts"
+    - "Director Dashboard PDF Export Enhancement"
+    - "Comprehensive PDF with charts and detailed teacher tables"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
