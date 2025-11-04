@@ -779,8 +779,8 @@ const ChairmanDashboard = () => {
   // Generate PDF Export with improved RTL formatting
   const exportToPDF = () => {
     // Initialize pdfMake fonts for this export
-    if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
-      pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+    if (pdfMakeFonts) {
+      pdfMake.vfs = pdfMakeFonts;
     }
     
     // Define fonts with Cairo as default
