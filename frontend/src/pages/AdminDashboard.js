@@ -486,6 +486,7 @@ const AdminDashboard = () => {
                     </form>
                   </DialogContent>
                 </Dialog>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
