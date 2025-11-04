@@ -1391,6 +1391,26 @@ const VicePrincipalDashboard = () => {
                       </div>
                     </div>
                   )}
+                  
+                  {selectedMyReport.absent_teachers && selectedMyReport.absent_teachers.length > 0 && (
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">
+                        غياب المعلمين ({selectedMyReport.absent_teachers.length})
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedMyReport.absent_teachers.map((at, i) => (
+                          <div key={i} className="p-3 bg-red-50 rounded-lg border border-red-200">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-gray-800">{at.teacher}</span>
+                              <span className="text-sm bg-red-600 text-white px-3 py-1 rounded-full">
+                                {at.absent_days} {at.absent_days === 1 ? 'يوم' : 'أيام'}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </DialogContent>
