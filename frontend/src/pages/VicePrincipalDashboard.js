@@ -633,6 +633,24 @@ const VicePrincipalDashboard = () => {
     setFormData({ ...formData, suggestions: updated });
   };
 
+  const addAbsentTeacher = () => {
+    setFormData({
+      ...formData,
+      absent_teachers: [...formData.absent_teachers, { teacher: "", absent_days: 0 }]
+    });
+  };
+
+  const removeAbsentTeacher = (index) => {
+    const updated = formData.absent_teachers.filter((_, i) => i !== index);
+    setFormData({ ...formData, absent_teachers: updated });
+  };
+
+  const updateAbsentTeacher = (index, field, value) => {
+    const updated = [...formData.absent_teachers];
+    updated[index][field] = value;
+    setFormData({ ...formData, absent_teachers: updated });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
