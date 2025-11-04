@@ -11,12 +11,13 @@ import { toast } from "sonner";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import pdfMake from "@digicole/pdfmake-rtl";
 import pdfMakeFonts from "../fonts/vfs_fonts";
-import { createRTLTable, createStatsGrid, pdfStyles } from "../utils/pdfConfig";
 import { 
   createSection, 
   createChartImage, 
   captureChartAsImage, 
-  generatePDF as generatePDFTemplate 
+  generatePDF as generatePDFTemplate,
+  createRTLTable,
+  createStatsGrid
 } from "../utils/pdfTemplate";
 import ChairmanDirectorReportsView from "../components/ChairmanDirectorReportsView";
 import TeacherProgressView from "../components/TeacherProgressView";
