@@ -187,12 +187,30 @@ const QualityDashboard = () => {
     let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
     let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
     let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
+    let filteredVPReports = filterReportsByTimeOnly([...vicePrincipalReports]);
 
     // Supervisor statistics
     const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
-    const totalAbsentTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
+    // Get absent teachers from VP reports instead of supervisor reports
+    const totalAbsentTeachers = filteredVPReports.reduce((sum, r) => {
+      if (r.absent_teachers && Array.isArray(r.absent_teachers)) {
+        return sum + r.absent_teachers.length;
+      }
+      return sum;
+    }, 0);
     const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
     const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+    const totalAbsentStudents = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
+
+    // Calculate averages
+    const avgDiscipline = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.student_discipline || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgCleanliness = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.classroom_cleanliness || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgAttendance = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.teacher_attendance_rate || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgBehavior = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.general_behavior || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
 
     // Activities statistics
     const totalActivities = filteredActivitiesReports.reduce((sum, r) => sum + (r.activities?.length || 0), 0);
@@ -216,6 +234,11 @@ const QualityDashboard = () => {
       totalAbsentTeachers,
       totalCoveringTeachers,
       totalIncidents,
+      totalAbsentStudents,
+      avgDiscipline,
+      avgCleanliness,
+      avgAttendance,
+      avgBehavior,
       totalActivities,
       totalActivitiesParticipants,
       totalStudentCases,
