@@ -996,7 +996,24 @@ const DirectorDashboard = () => {
             ]),
             { showRowNumbers: true, headerColor: '#e9d5ff' }
           );
-          content.push(createSection(`🎯 المعلمون المشاركون في الأنشطة (${activityTeachers.length} معلم)`, activityTeachersTable));
+          content.push(createSection(`🎯 المعلمون المشرفون على الأنشطة (${activityTeachers.length} معلم)`, activityTeachersTable));
+        }
+
+        // جدول المعلمين المتعاونين في الأنشطة
+        const cooperatingTeachers = getCooperatingTeachers();
+        if (cooperatingTeachers.length > 0) {
+          const cooperatingTeachersTable = createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد الأنشطة', width: 100 }
+            ],
+            cooperatingTeachers.slice(0, 20).map(teacher => [
+              teacher.name,
+              teacher.count.toString()
+            ]),
+            { showRowNumbers: true, headerColor: '#fed7aa' }
+          );
+          content.push(createSection(`🤝 المعلمون المتعاونون في الأنشطة (${cooperatingTeachers.length} معلم)`, cooperatingTeachersTable));
         }
       }
       
