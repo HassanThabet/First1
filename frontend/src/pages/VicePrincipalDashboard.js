@@ -800,6 +800,44 @@ const VicePrincipalDashboard = () => {
               </CardContent>
             </Card>
 
+            {/* Absent Teachers */}
+            <Card>
+              <CardHeader>
+                <CardTitle>غياب المعلمين</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.absent_teachers.map((at, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <Select value={at.teacher} onValueChange={(value) => updateAbsentTeacher(index, "teacher", value)}>
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="اختر المعلم" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teachers.map(teacher => (
+                          <SelectItem key={teacher.id} value={teacher.name}>{teacher.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      type="number"
+                      placeholder="عدد الأيام"
+                      min="0"
+                      max="5"
+                      value={at.absent_days}
+                      onChange={(e) => updateAbsentTeacher(index, "absent_days", parseInt(e.target.value) || 0)}
+                      className="w-32"
+                    />
+                    <Button type="button" variant="destructive" size="icon" onClick={() => removeAbsentTeacher(index)}>
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" onClick={addAbsentTeacher} className="w-full">
+                  <Plus className="w-4 h-4 ml-2" /> إضافة معلم غائب
+                </Button>
+              </CardContent>
+            </Card>
+
             <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-cyan-500 to-blue-600">
               {loading ? "جاري الإرسال..." : editingReport ? "تحديث التقرير" : "إرسال التقرير"}
             </Button>
