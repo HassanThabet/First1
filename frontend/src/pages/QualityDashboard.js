@@ -15,6 +15,7 @@ import { Eye, FileText, BarChart3 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import pdfMake from "@digicole/pdfmake-rtl";
 import pdfMakeFonts from "../fonts/vfs_fonts";
+import TeacherProgressView from "../components/TeacherProgressView";
 
 const QualityDashboard = () => {
   const { user } = useContext(AuthContext);
