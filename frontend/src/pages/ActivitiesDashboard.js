@@ -271,6 +271,8 @@ const ActivitiesDashboard = () => {
         toast.error('لا توجد أنشطة لتصديرها');
         return;
       }
+      
+      console.log('📊 Exporting activities:', allActivities.length);
 
       // Prepare period text
       let periodText = '';
