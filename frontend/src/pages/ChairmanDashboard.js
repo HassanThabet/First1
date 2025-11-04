@@ -763,7 +763,7 @@ const ChairmanDashboard = () => {
     ];
   };
 
-  // Generate PDF Export
+  // Generate PDF Export with improved RTL formatting
   const exportToPDF = () => {
     // Initialize pdfMake fonts for this export
     if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
@@ -774,12 +774,6 @@ const ChairmanDashboard = () => {
           bold: 'Cairo-Regular.ttf',
           italics: 'Cairo-Regular.ttf',
           bolditalics: 'Cairo-Regular.ttf'
-        },
-        Roboto: {
-          normal: 'Roboto-Regular.ttf',
-          bold: 'Roboto-Medium.ttf',
-          italics: 'Roboto-Italic.ttf',
-          bolditalics: 'Roboto-MediumItalic.ttf'
         }
       };
     }
@@ -799,6 +793,225 @@ const ChairmanDashboard = () => {
                           reportTypeFilter === "activities" ? "تقارير الأنشطة" :
                           reportTypeFilter === "social" ? "تقارير الأخصائي الاجتماعي" :
                           reportTypeFilter === "quality" ? "تقارير الجودة" : "";
+    
+    const branchText = branchFilter === "all" ? "جميع الفروع" :
+                       branchFilter === "boys" ? "فرع البنين" :
+                       branchFilter === "girls" ? "فرع البنات" : "";
+
+    const content = [];
+    
+    // Header
+    content.push({
+      text: 'مدارس الفجر الجديد الأهلية',
+      style: 'schoolName',
+      alignment: 'center',
+      margin: [0, 0, 0, 10]
+    });
+    
+    content.push({
+      text: 'تقرير رئيس مجلس الإدارة الشامل',
+      style: 'reportTitle',
+      alignment: 'center',
+      margin: [0, 0, 0, 10]
+    });
+    
+    // Report Info
+    content.push({
+      columns: [
+        {
+          text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}`,
+          style: 'infoText',
+          alignment: 'right',
+          width: '*'
+        },
+        {
+          text: `${reportTypeText}`,
+          style: 'infoText',
+          alignment: 'center',
+          width: '*'
+        }
+      ],
+      margin: [0, 0, 0, 5]
+    });
+    
+    content.push({
+      columns: [
+        {
+          text: `${timeFilterText}`,
+          style: 'infoText',
+          alignment: 'right',
+          width: '*'
+        },
+        {
+          text: `${branchText}`,
+          style: 'infoText',
+          alignment: 'left',
+          width: '*'
+        }
+      ],
+      margin: [0, 0, 0, 20]
+    });
+    
+    // Overall Statistics Grid
+    content.push({
+      text: 'الإحصائيات العامة',
+      style: 'sectionTitle',
+      margin: [0, 10, 0, 15]
+    });
+    
+    const overallStats = [
+      { label: 'إجمالي التقارير', value: stats.totalAllReports.toString(), color: '#dbeafe' },
+      { label: 'المعلمون الغائبون', value: stats.totalAbsentTeachers.toString(), color: '#fee2e2' },
+      { label: 'المعلمون المتأخرون', value: stats.totalLateTeachers.toString(), color: '#fed7aa' },
+      { label: 'المعلمون المغطون', value: stats.totalCoveringTeachers.toString(), color: '#d1fae5' },
+      { label: 'الطلاب الغائبون', value: stats.totalAbsentStudents.toString(), color: '#fce7f3' },
+      { label: 'الحوادث المسجلة', value: stats.totalIncidents.toString(), color: '#fee2e2' }
+    ];
+    
+    content.push(createStatsGrid(overallStats));
+    
+    // Performance Table
+    content.push({
+      text: 'مؤشرات الأداء',
+      style: 'sectionTitle',
+      margin: [0, 20, 0, 10]
+    });
+    
+    const performanceTable = createRTLTable(
+      [
+        { text: 'المؤشر', width: '*' },
+        { text: 'القيمة', width: 80 }
+      ],
+      [
+        ['انضباط الطلاب', `${stats.avgDiscipline}/10`],
+        ['نظافة الفصول', `${stats.avgCleanliness}/10`],
+        ['التزام المعلمين', `${stats.avgAttendance}/10`],
+        ['السلوك العام', `${stats.avgBehavior}/10`]
+      ],
+      { showRowNumbers: false }
+    );
+    content.push(performanceTable);
+    
+    // Activities Statistics (if applicable)
+    if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
+      if (stats.activitiesReportsCount > 0) {
+        content.push({
+          text: 'إحصائيات الأنشطة',
+          style: 'sectionTitle',
+          margin: [0, 20, 0, 10]
+        });
+        
+        const activitiesStats = [
+          { label: 'إجمالي الأنشطة', value: stats.totalActivities.toString(), color: '#dbeafe' },
+          { label: 'إجمالي المشاركين', value: stats.totalActivitiesParticipants.toString(), color: '#dbeafe' },
+          { label: 'متوسط التفاعل', value: `${stats.avgActivitiesInteraction}/10`, color: '#d1fae5' }
+        ];
+        content.push(createStatsGrid(activitiesStats));
+      }
+    }
+    
+    // Social Specialist Statistics (if applicable)
+    if (reportTypeFilter === "all" || reportTypeFilter === "social") {
+      if (stats.socialReportsCount > 0) {
+        content.push({
+          text: 'إحصائيات الأخصائي الاجتماعي',
+          style: 'sectionTitle',
+          margin: [0, 20, 0, 10]
+        });
+        
+        const socialStatsTable = createRTLTable(
+          [
+            { text: 'نوع الحالة', width: '*' },
+            { text: 'العدد', width: 80 }
+          ],
+          [
+            ['حالات نفسية', stats.totalPsychologicalCases.toString()],
+            ['حالات أكاديمية', stats.totalAcademicCases.toString()],
+            ['حالات سلوكية', stats.totalBehavioralCases.toString()],
+            [{ text: 'إجمالي الحالات', bold: true }, { text: stats.totalStudentCases.toString(), bold: true, fillColor: '#dbeafe' }]
+          ],
+          { showRowNumbers: false }
+        );
+        content.push(socialStatsTable);
+        
+        content.push({
+          columns: [
+            { text: `إجمالي الجلسات: ${stats.totalSessions}`, style: 'infoText', width: '*', alignment: 'right' },
+            { text: `التواصل مع الأسر: ${stats.totalFamilyContacts}`, style: 'infoText', width: '*', alignment: 'left' }
+          ],
+          margin: [0, 10, 0, 0]
+        });
+      }
+    }
+    
+    // Quality Statistics (if applicable)
+    if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
+      if (stats.qualityReportsCount > 0) {
+        content.push({
+          text: 'إحصائيات الجودة',
+          style: 'sectionTitle',
+          margin: [0, 20, 0, 10]
+        });
+        
+        const qualityStats = [
+          { label: 'إجمالي الزيارات', value: stats.totalQualityVisits.toString(), color: '#dbeafe' },
+          { label: 'متوسط الأداء التدريسي', value: `${stats.avgQualityTeachingRate}/10`, color: '#d1fae5' }
+        ];
+        content.push(createStatsGrid(qualityStats));
+      }
+    }
+    
+    // Detailed Reports Summary
+    if (reports.length > 0) {
+      content.push({
+        text: 'ملخص التقارير التفصيلية',
+        style: 'sectionTitle',
+        margin: [0, 20, 0, 10],
+        pageBreak: 'before'
+      });
+      
+      content.push({
+        text: `إجمالي عدد التقارير: ${reports.length}`,
+        style: 'infoText',
+        margin: [0, 0, 0, 15]
+      });
+      
+      const reportsTable = createRTLTable(
+        [
+          { text: 'النوع', width: 80 },
+          { text: 'الموظف', width: '*' },
+          { text: 'التاريخ', width: 100 }
+        ],
+        reports.slice(0, 30).map(report => {
+          const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                  report.type === "supervisor" ? "مشرف" :
+                                  report.type === "activities" ? "أنشطة" :
+                                  report.type === "social" ? "أخصائي" :
+                                  report.type === "quality" ? "جودة" : "";
+          
+          return [
+            reportTypeArabic,
+            report.userName || 'غير محدد',
+            report.date || report.week_start || 'غير محدد'
+          ];
+        }),
+        { showRowNumbers: true }
+      );
+      content.push(reportsTable);
+    }
+    
+    // Footer
+    content.push({
+      text: '* هذا التقرير تم إنشاؤه تلقائياً من نظام إدارة التقارير',
+      style: 'footer',
+      alignment: 'center',
+      margin: [0, 30, 0, 0]
+    });
 
     const docDefinition = {
       pageSize: 'A4',
@@ -806,234 +1019,14 @@ const ChairmanDashboard = () => {
       pageMargins: [40, 60, 40, 60],
       defaultStyle: {
         font: 'Cairo',
-        fontSize: 11
+        fontSize: 11,
+        alignment: 'right'
       },
-      content: [
-        {
-          text: 'مدارس الفجر الجديد الأهلية',
-          style: 'header',
-          alignment: 'center',
-          margin: [0, 0, 0, 10]
-        },
-        {
-          text: 'تقرير رئيس مجلس الإدارة الشامل',
-          style: 'subheader',
-          alignment: 'center',
-          margin: [0, 0, 0, 5]
-        },
-        {
-          text: `${reportTypeText} - ${timeFilterText}`,
-          style: 'info',
-          alignment: 'center',
-          margin: [0, 0, 0, 20]
-        },
-        {
-          text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-EG')}`,
-          style: 'info',
-          alignment: 'center',
-          margin: [0, 0, 0, 20]
-        },
-        
-        // Statistics Section
-        {
-          text: 'الإحصائيات العامة',
-          style: 'sectionHeader',
-          margin: [0, 10, 0, 10]
-        },
-        {
-          table: {
-            widths: ['*', '*', '*'],
-            body: [
-              [
-                { text: 'المعلمون الغائبون', style: 'tableHeader' },
-                { text: 'المعلمون المتأخرون', style: 'tableHeader' },
-                { text: 'المعلمون المغطون', style: 'tableHeader' }
-              ],
-              [
-                { text: stats.totalAbsentTeachers.toString(), alignment: 'center' },
-                { text: stats.totalLateTeachers.toString(), alignment: 'center' },
-                { text: stats.totalCoveringTeachers.toString(), alignment: 'center' }
-              ]
-            ]
-          },
-          margin: [0, 0, 0, 10]
-        },
-        {
-          table: {
-            widths: ['*', '*', '*', '*'],
-            body: [
-              [
-                { text: 'انضباط الطلاب', style: 'tableHeader' },
-                { text: 'نظافة الفصول', style: 'tableHeader' },
-                { text: 'التزام المعلمين', style: 'tableHeader' },
-                { text: 'السلوك العام', style: 'tableHeader' }
-              ],
-              [
-                { text: `${stats.avgDiscipline}/10`, alignment: 'center' },
-                { text: `${stats.avgCleanliness}/10`, alignment: 'center' },
-                { text: `${stats.avgAttendance}/10`, alignment: 'center' },
-                { text: `${stats.avgBehavior}/10`, alignment: 'center' }
-              ]
-            ]
-          },
-          margin: [0, 0, 0, 10]
-        },
-        
-        // Activities Statistics
-        (reportTypeFilter === "all" || reportTypeFilter === "activities") ? {
-          text: 'إحصائيات الأنشطة',
-          style: 'sectionHeader',
-          margin: [0, 15, 0, 10]
-        } : {},
-        (reportTypeFilter === "all" || reportTypeFilter === "activities") ? {
-          table: {
-            widths: ['*', '*', '*'],
-            body: [
-              [
-                { text: 'إجمالي الأنشطة', style: 'tableHeader' },
-                { text: 'إجمالي المشاركين', style: 'tableHeader' },
-                { text: 'متوسط التفاعل', style: 'tableHeader' }
-              ],
-              [
-                { text: stats.totalActivities.toString(), alignment: 'center' },
-                { text: stats.totalActivitiesParticipants.toString(), alignment: 'center' },
-                { text: `${stats.avgActivitiesInteraction}/10`, alignment: 'center' }
-              ]
-            ]
-          },
-          margin: [0, 0, 0, 10]
-        } : {},
-        
-        // Social Specialist Statistics
-        (reportTypeFilter === "all" || reportTypeFilter === "social") ? {
-          text: 'إحصائيات الأخصائي الاجتماعي',
-          style: 'sectionHeader',
-          margin: [0, 15, 0, 10]
-        } : {},
-        (reportTypeFilter === "all" || reportTypeFilter === "social") ? {
-          table: {
-            widths: ['*', '*', '*', '*'],
-            body: [
-              [
-                { text: 'حالات نفسية', style: 'tableHeader' },
-                { text: 'حالات أكاديمية', style: 'tableHeader' },
-                { text: 'حالات سلوكية', style: 'tableHeader' },
-                { text: 'إجمالي الحالات', style: 'tableHeader' }
-              ],
-              [
-                { text: stats.totalPsychologicalCases.toString(), alignment: 'center' },
-                { text: stats.totalAcademicCases.toString(), alignment: 'center' },
-                { text: stats.totalBehavioralCases.toString(), alignment: 'center' },
-                { text: stats.totalStudentCases.toString(), alignment: 'center' }
-              ]
-            ]
-          },
-          margin: [0, 0, 0, 10]
-        } : {},
-        
-        // Quality Statistics
-        (reportTypeFilter === "all" || reportTypeFilter === "quality") ? {
-          text: 'إحصائيات الجودة',
-          style: 'sectionHeader',
-          margin: [0, 15, 0, 10]
-        } : {},
-        (reportTypeFilter === "all" || reportTypeFilter === "quality") ? {
-          table: {
-            widths: ['*', '*'],
-            body: [
-              [
-                { text: 'إجمالي الزيارات', style: 'tableHeader' },
-                { text: 'متوسط الأداء التدريسي', style: 'tableHeader' }
-              ],
-              [
-                { text: stats.totalQualityVisits.toString(), alignment: 'center' },
-                { text: `${stats.avgQualityTeachingRate}/10`, alignment: 'center' }
-              ]
-            ]
-          },
-          margin: [0, 0, 0, 10]
-        } : {},
-        
-        // Detailed Reports
-        {
-          text: 'التقارير التفصيلية',
-          style: 'sectionHeader',
-          margin: [0, 20, 0, 10],
-          pageBreak: 'before'
-        },
-        {
-          text: `إجمالي عدد التقارير: ${reports.length}`,
-          style: 'info',
-          margin: [0, 0, 0, 10]
-        },
-        ...reports.slice(0, 20).map((report, index) => {
-          const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
-                                  report.type === "supervisor" ? "مشرف" :
-                                  report.type === "activities" ? "أنشطة" :
-                                  report.type === "social" ? "أخصائي اجتماعي" :
-                                  report.type === "quality" ? "جودة" : "";
-          
-          return {
-            stack: [
-              {
-                text: `${index + 1}. ${reportTypeArabic} - ${report.userName}`,
-                style: 'reportTitle',
-                margin: [0, 10, 0, 5]
-              },
-              {
-                text: `التاريخ: ${report.date || report.week_start || 'غير محدد'}`,
-                style: 'reportInfo'
-              },
-              report.notes ? {
-                text: `ملاحظات: ${report.notes}`,
-                style: 'reportInfo',
-                margin: [0, 5, 0, 0]
-              } : {}
-            ],
-            margin: [0, 0, 0, 10]
-          };
-        })
-      ],
-      styles: {
-        header: {
-          fontSize: 20,
-          bold: true,
-          color: '#1e40af'
-        },
-        subheader: {
-          fontSize: 16,
-          bold: true,
-          color: '#3b82f6'
-        },
-        sectionHeader: {
-          fontSize: 14,
-          bold: true,
-          color: '#1e40af',
-          decoration: 'underline'
-        },
-        info: {
-          fontSize: 10,
-          color: '#666666'
-        },
-        tableHeader: {
-          fillColor: '#dbeafe',
-          bold: true,
-          alignment: 'center',
-          fontSize: 10
-        },
-        reportTitle: {
-          fontSize: 11,
-          bold: true,
-          color: '#1e40af'
-        },
-        reportInfo: {
-          fontSize: 9,
-          color: '#666666'
-        }
-      }
+      content: content,
+      styles: pdfStyles
     };
 
-    pdfMake.createPdf(docDefinition).download(`تقرير_المدير_${new Date().getTime()}.pdf`);
+    pdfMake.createPdf(docDefinition).download(`تقرير_رئيس_مجلس_الإدارة_${new Date().getTime()}.pdf`);
     toast.success("تم تصدير التقرير بنجاح");
   };
 
