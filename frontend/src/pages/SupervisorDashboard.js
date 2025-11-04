@@ -548,50 +548,6 @@ const SupervisorDashboard = () => {
               </CardContent>
             </Card>
 
-            {/* Absent Teachers */}
-            <Card>
-              <CardHeader>
-                <CardTitle>غياب المعلمين</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {formData.absent_teachers.map((at, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <Select value={at.subject} onValueChange={(value) => updateAbsentTeacher(index, "subject", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المادة" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {subjects.map(subject => (
-                          <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Select value={at.teacher} onValueChange={(value) => updateAbsentTeacher(index, "teacher", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="اختر المعلم" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {teachers.filter(t => t.subject === at.subject).map(teacher => (
-                          <SelectItem key={teacher.id} value={teacher.name}>{teacher.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      placeholder="رقم الحصة"
-                      value={at.period}
-                      onChange={(e) => updateAbsentTeacher(index, "period", e.target.value)}
-                    />
-                    <Button type="button" variant="destructive" size="icon" onClick={() => removeAbsentTeacher(index)}>
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addAbsentTeacher} className="w-full mt-2">
-                  <Plus className="w-4 h-4 ml-2" /> إضافة معلم غائب
-                </Button>
-              </CardContent>
-            </Card>
-
             {/* Covering Teachers */}
             <Card>
               <CardHeader>
