@@ -388,15 +388,22 @@ const QualityDashboard = () => {
     // Initialize pdfMake fonts
     if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
       pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
-      pdfMake.fonts = {
-        Cairo: {
-          normal: 'Cairo-Regular.ttf',
-          bold: 'Cairo-Regular.ttf',
-          italics: 'Cairo-Regular.ttf',
-          bolditalics: 'Cairo-Regular.ttf'
-        }
-      };
     }
+    
+    pdfMake.fonts = {
+      Cairo: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      },
+      Roboto: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      }
+    };
 
     // Build table headers based on type
     const tableHeaders = [
