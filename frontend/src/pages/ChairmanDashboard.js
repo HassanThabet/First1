@@ -361,7 +361,7 @@ const ChairmanDashboard = () => {
       } else if (teachersListData.type === 'covering') {
         row.push({ text: teacher.count.toString(), alignment: 'center', style: 'tableCell' });
         row.push({ 
-          text: (teacher.subjects && teacher.subjects.length > 0) ? teacher.subjects.join(', ') : '-', 
+          text: (teacher.subjects && Array.isArray(teacher.subjects) && teacher.subjects.length > 0) ? teacher.subjects.join(', ') : (typeof teacher.subjects === 'string' ? teacher.subjects : '-'), 
           alignment: 'center', 
           style: 'tableCell' 
         });
