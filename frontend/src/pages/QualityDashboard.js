@@ -1333,6 +1333,89 @@ const QualityDashboard = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Teachers List Modal */}
+      <Dialog open={showTeachersListModal} onOpenChange={setShowTeachersListModal}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">{teachersListData.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {teachersListData.teachers.length > 0 ? (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse border border-gray-300">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-4 py-2 text-center">#</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">اسم المعلم</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          {teachersListData.type === 'late' ? 'عدد مرات التأخير' :
+                           teachersListData.type === 'absent' ? 'عدد التقارير' :
+                           teachersListData.type === 'covering' ? 'عدد الحصص المغطاة' :
+                           teachersListData.type === 'activity' ? 'عدد الأنشطة' : 'عدد المرات'}
+                        </th>
+                        {teachersListData.type === 'late' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">مجموع الدقائق</th>
+                        )}
+                        {teachersListData.type === 'absent' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">إجمالي أيام الغياب</th>
+                        )}
+                        {teachersListData.type === 'covering' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">المواد</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teachersListData.teachers.map((teacher, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="border border-gray-300 px-4 py-2 text-center text-sm">
+                            {index + 1}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center text-sm font-semibold">
+                            {teacher.name}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center text-sm">
+                            <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold">
+                              {teacher.count}
+                            </span>
+                          </td>
+                          {teachersListData.type === 'late' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center">
+                              <span className="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-bold">
+                                {teacher.totalMinutes} دقيقة
+                              </span>
+                            </td>
+                          )}
+                          {teachersListData.type === 'absent' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center">
+                              <span className="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full font-bold">
+                                {teacher.totalDays || 0} {teacher.totalDays === 1 ? 'يوم' : 'أيام'}
+                              </span>
+                            </td>
+                          )}
+                          {teachersListData.type === 'covering' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center text-xs">
+                              {teacher.subjects && teacher.subjects.length > 0 ? teacher.subjects.join(', ') : '-'}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <DialogFooter>
+                  <Button onClick={exportTeachersListToPDF} variant="outline">
+                    تصدير إلى PDF
+                  </Button>
+                </DialogFooter>
+              </>
+            ) : (
+              <p className="text-center text-gray-500 py-8">لا توجد بيانات متاحة</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </DashboardLayout>
   );
 };
