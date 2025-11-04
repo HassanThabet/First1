@@ -357,6 +357,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🔧 FIXED PDF EXPORT BUGS: 1) ChairmanDashboard.js - Fixed function name mismatch. Was importing 'generatePDF as generatePDFTemplate' and calling generatePDFTemplate, changed to just import and use 'generatePDF', 2) TeacherProgressView.js - Fixed document structure error. Was pushing styles object into content array (lines 269-275) which caused 'Unrecognized document structure'. Removed duplicate styles from content.push() - styles are already properly defined in docDefinition. Both issues were causing the same error as previously fixed in DirectorDashboard. Ready for testing."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 FIXED TypeError IN CHAIRMAN DASHBOARD PDF: Fixed 'TypeError: teacher.subjects.slice(...).join is not a function' error. Root cause: teacher.subjects can be either a string or an array. When it's a string, .slice() returns a string, and strings don't have .join() method. Added Array.isArray() checks in two locations (lines 360 and 957) to handle both cases: if array, use .slice().join(); if string, use as-is; otherwise default to '-'. Ready for testing."
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
