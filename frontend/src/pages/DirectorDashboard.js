@@ -1770,13 +1770,15 @@ const DirectorDashboard = () => {
                                                       report.type === "supervisor" ? "مشرف" :
                                                       report.type === "activities" ? "أنشطة" :
                                                       report.type === "social" ? "أخصائي اجتماعي" :
-                                                      report.type === "quality" ? "جودة" : "";
+                                                      report.type === "quality" ? "جودة" :
+                                                      report.type === "educational_supervision" ? "إشراف تربوي" : "";
                               
                               const bgColor = report.type === "vice_principal" ? "from-blue-50 to-blue-100 border-blue-500" :
                                             report.type === "supervisor" ? "from-purple-50 to-purple-100 border-purple-500" :
                                             report.type === "activities" ? "from-indigo-50 to-indigo-100 border-indigo-500" :
                                             report.type === "social" ? "from-green-50 to-green-100 border-green-500" :
-                                            report.type === "quality" ? "from-orange-50 to-orange-100 border-orange-500" : "";
+                                            report.type === "quality" ? "from-orange-50 to-orange-100 border-orange-500" :
+                                            report.type === "educational_supervision" ? "from-cyan-50 to-cyan-100 border-cyan-500" : "";
                               
                               return (
                                 <Card 
