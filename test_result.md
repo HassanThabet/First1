@@ -263,7 +263,7 @@ frontend:
     implemented: true
     working: "NA"
     file: "frontend/src/pages/ActivitiesDashboard.js"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
     needs_retesting: true
     status_history:
@@ -282,6 +282,27 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "ENHANCED: Added better error handling with detailed error messages in console. Ensured all stats values are converted to strings. Added activity filtering feature - users can now filter PDF export by specific activity name in addition to date range filtering."
+      - working: false
+        agent: "user"
+        comment: "USER REPORTED: Still error in PDF export (Activities and Social Specialist pages)"
+      - working: "NA"
+        agent: "main"
+        comment: "DEEP FIX: Wrapped all data processing in try-catch blocks. Added .map(val => String(val)) to ensure ALL row values are strings. Safe extraction for supervisors, cooperating_teachers, and dates. This should handle any edge cases causing PDF generation failures."
+
+  - task: "Arabic PDF Export for Social Specialist Dashboard"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/SocialSpecialistDashboard.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "USER REPORTED: Error in PDF export"
+      - working: "NA"
+        agent: "main"
+        comment: "FIXED: Added detailed error logging with stack trace. Converted all stats values to strings using String() wrapper to prevent undefined/null issues in PDF table cells. This ensures clean data for pdfMake table generation."
 
   - task: "ActivitySupervisorsView data fetching"
     implemented: true
