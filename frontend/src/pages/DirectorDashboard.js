@@ -229,6 +229,32 @@ const DirectorDashboard = () => {
       .sort((a, b) => b.count - a.count);
   };
 
+  // Get cooperating teachers from activities
+  const getCooperatingTeachers = () => {
+    const filtered = filterReportsByTimeAndBranch([...activitiesReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.activities && Array.isArray(report.activities)) {
+        report.activities.forEach(activity => {
+          if (activity.cooperating_teachers && Array.isArray(activity.cooperating_teachers)) {
+            activity.cooperating_teachers.forEach(teacherId => {
+              // Find teacher name from teachers list
+              const teacher = teachers.find(t => t.id === teacherId);
+              if (teacher && teacher.name) {
+                teachersMap[teacher.name] = (teachersMap[teacher.name] || 0) + 1;
+              }
+            });
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count);
+  };
+
   // Helper function to filter by time and branch
   const filterReportsByTimeAndBranch = (reports) => {
     console.log("🔍 filterReportsByTimeAndBranch called with", reports.length, "reports");
