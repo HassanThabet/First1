@@ -888,36 +888,53 @@ const DirectorDashboard = () => {
         content.push(createSection('👥 توزيع حالات الأخصائي الاجتماعي', createChartImage(socialChartImage, { width: 450, height: 250 })));
       }
       
-      // Continue with the rest (similar to ChairmanDashboard)
-      
-      const Cairo = {
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
-      },
-      Roboto: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
-      },
-      Nillima: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
+      // === القسم 4: تفاصيل التقارير ===
+      if (reports.length > 0) {
+        const reportsTable = createRTLTable(
+          [
+            { text: 'النوع', width: 80 },
+            { text: 'الموظف', width: '*' },
+            { text: 'التاريخ', width: 100 }
+          ],
+          reports.slice(0, 50).map(report => {
+            const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                    report.type === "supervisor" ? "مشرف" :
+                                    report.type === "activities" ? "أنشطة" :
+                                    report.type === "social" ? "أخصائي" :
+                                    report.type === "quality" ? "جودة" :
+                                    report.type === "educational_supervision" ? "إشراف تربوي" : "";
+            
+            return [
+              reportTypeArabic,
+              report.userName || 'غير محدد',
+              report.date || report.week_start || 'غير محدد'
+            ];
+          }),
+          { showRowNumbers: true }
+        );
+        content.push(createSection(`📋 ملخص التقارير التفصيلية (إجمالي: ${reports.length})`, reportsTable));
       }
-    };
-    
-    const stats = getOverallStatistics();
-    const reports = getDetailedReports();
-    
-    const timeFilterText = timeFilter === "daily" ? "اليوم" : 
-                          timeFilter === "weekly" ? "هذا الأسبوع" : 
-                          timeFilter === "monthly" ? "هذا الشهر" :
-                          timeFilter === "custom" && customStartDate && customEndDate ? 
-                            `من ${customStartDate} إلى ${customEndDate}` : "جميع الفترات";
-    
-    const reportTypeText = reportTypeFilter === "all" ? "جميع التقارير" :
+      
+      // Generate PDF
+      const filename = `تقرير_المدير_${user.branch === 'boys' ? 'بنين' : 'بنات'}_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`;
+      
+      generatePDFTemplate(content, filename, {
+        title: 'تقرير المدير الشامل',
+        orientation: 'portrait',
+        additionalInfo: {
+          leftInfo: `${branchText} | ${timeFilterText} | ${reportTypeText}`
+        }
+      });
+      
+      toast.success("تم تصدير التقرير بنجاح مع جميع المخططات والتفاصيل");
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error("حدث خطأ أثناء إنشاء التقرير");
+    }
+  };
+  
+  const OLD_exportToPDF_BACKUP = () => {
+    const timeFilterText = timeFilter === "daily" ? "اليوم" :
                           reportTypeFilter === "vice_principal" ? "تقارير الوكلاء" :
                           reportTypeFilter === "supervisor" ? "تقارير المشرفين" :
                           reportTypeFilter === "activities" ? "تقارير الأنشطة" :
