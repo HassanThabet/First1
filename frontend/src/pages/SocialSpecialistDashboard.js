@@ -456,28 +456,30 @@ const SocialSpecialistDashboard = () => {
             margin: [0, 0, 0, 20]
           },
 
-          // Reports Details
+          // Reports Details - Optimized for landscape
           {
             text: `تفاصيل التقارير (${stats.totalReports || 0})`,
             style: 'sectionHeader',
-            margin: [0, 0, 0, 10]
+            margin: [0, 0, 0, 10],
+            fontSize: 14,
+            bold: true
           },
           {
             table: {
               headerRows: 1,
-              widths: [20, 50, 35, 35, 35, 35, 35, 35, 35, 35],
+              widths: [30, 70, 55, 55, 55, 55, 55, 55, 55, 55], // محسّنة للصفحة الأفقية
               body: [
                 [
-                  { text: '#', style: 'tableHeader' },
-                  { text: 'التاريخ', style: 'tableHeader' },
-                  { text: 'المجموع', style: 'tableHeader' },
-                  { text: 'نفسية', style: 'tableHeader' },
-                  { text: 'أكاديمية', style: 'tableHeader' },
-                  { text: 'سلوكية', style: 'tableHeader' },
-                  { text: 'جلسات', style: 'tableHeader' },
-                  { text: 'أسر', style: 'tableHeader' },
-                  { text: 'تحويلات', style: 'tableHeader' },
-                  { text: 'متابعات', style: 'tableHeader' }
+                  { text: '#', style: 'tableHeader', fontSize: 9 },
+                  { text: 'التاريخ', style: 'tableHeader', fontSize: 9 },
+                  { text: 'المجموع', style: 'tableHeader', fontSize: 9 },
+                  { text: 'نفسية', style: 'tableHeader', fontSize: 9 },
+                  { text: 'أكاديمية', style: 'tableHeader', fontSize: 9 },
+                  { text: 'سلوكية', style: 'tableHeader', fontSize: 9 },
+                  { text: 'جلسات', style: 'tableHeader', fontSize: 9 },
+                  { text: 'أسر', style: 'tableHeader', fontSize: 9 },
+                  { text: 'تحويلات', style: 'tableHeader', fontSize: 9 },
+                  { text: 'متابعات', style: 'tableHeader', fontSize: 9 }
                 ],
                 ...reportsData
               ]
