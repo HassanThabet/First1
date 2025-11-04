@@ -70,6 +70,7 @@ const ChairmanDashboard = () => {
       
       console.log("✅ Data fetched successfully:");
       console.log("Users:", usersRes.data.length);
+      console.log("Teachers:", teachersRes.data.length);
       console.log("Supervisor reports:", supervisorRes.data.length);
       console.log("Activities reports:", activitiesRes.data.length);
       console.log("Social reports:", socialRes.data.length);
@@ -78,6 +79,7 @@ const ChairmanDashboard = () => {
       console.log("Educational Supervision reports:", eduSupRes.data.length);
       
       setUsers(usersRes.data);
+      setTeachers(teachersRes.data);
       setSupervisorReports(supervisorRes.data);
       setActivitiesReports(activitiesRes.data);
       setSocialReports(socialRes.data);
