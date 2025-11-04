@@ -1810,6 +1810,18 @@ const ChairmanDashboard = () => {
                 </Card>
               )}
 
+              {/* Activity Supervisors - Show for activities or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg text-gray-800">🎯 المعلمون المشرفون على الأنشطة</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ActivitySupervisorsView compact={true} />
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Detailed Reports Section */}
               {showDetailedReports && (
                 <Card>
