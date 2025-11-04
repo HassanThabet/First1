@@ -1197,6 +1197,16 @@ const DirectorDashboard = () => {
               >
                 📄 تقاريري
               </button>
+              <button
+                onClick={() => setActiveTab("teacher-progress")}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                  activeTab === "teacher-progress"
+                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                📈 تقييم تحسن المعلمين
+              </button>
             </div>
           </CardContent>
         </Card>
@@ -1208,6 +1218,10 @@ const DirectorDashboard = () => {
 
         {activeTab === "my-reports" && (
           <DirectorReportsList />
+        )}
+
+        {activeTab === "teacher-progress" && (
+          <TeacherProgressView branch={user.branch} />
         )}
 
         {activeTab === "dashboard" && (
