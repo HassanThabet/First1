@@ -418,7 +418,7 @@ const ActivitiesDashboard = () => {
           // Statistics Box
           {
             table: {
-              widths: ['*', '*', '*'],
+              widths: [165, 165, 165], // Fixed widths instead of '*'
               body: [
                 [
                   { text: 'إجمالي الإحصائيات', colSpan: 3, style: 'tableHeader', alignment: 'center' },
