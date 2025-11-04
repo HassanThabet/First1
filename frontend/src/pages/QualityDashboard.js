@@ -233,6 +233,181 @@ const QualityDashboard = () => {
     };
   };
 
+  // Get aggregated teachers from reports
+  const getAggregatedAbsentTeachers = () => {
+    const filtered = filterReportsByTimeOnly([...vicePrincipalReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.absent_teachers && Array.isArray(report.absent_teachers)) {
+        report.absent_teachers.forEach(teacher => {
+          const name = typeof teacher === 'string' ? teacher : teacher.teacher;
+          const days = typeof teacher === 'object' ? (teacher.absent_days || 0) : 0;
+          if (name) {
+            if (!teachersMap[name]) {
+              teachersMap[name] = { count: 0, totalDays: 0 };
+            }
+            teachersMap[name].count += 1;
+            teachersMap[name].totalDays += days;
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, data]) => ({ name, count: data.count, totalDays: data.totalDays }))
+      .sort((a, b) => b.totalDays - a.totalDays);
+  };
+
+  const getAggregatedLateTeachers = () => {
+    const filtered = filterReportsByTimeOnly([...supervisorReports]);
+    const teachersMap = {};
+    
+    filtered.forEach(report => {
+      if (report.late_teachers && Array.isArray(report.late_teachers)) {
+        report.late_teachers.forEach(teacher => {
+          const name = typeof teacher === 'string' ? teacher : teacher.teacher;
+          const minutes = typeof teacher === 'object' ? (teacher.minutes_late || 0) : 0;
+          if (name) {
+            if (!teachersMap[name]) {
+              teachersMap[name] = { count: 0, totalMinutes: 0 };
+            }
+            teachersMap[name].count += 1;
+            teachersMap[name].totalMinutes += minutes;
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, data]) => ({ name, count: data.count, totalMinutes: data.totalMinutes }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  const getAggregatedCoveringTeachers = () => {
+    const filtered = filterReportsByTimeOnly([...supervisorReports]);
+    const teachersMap = {};
+    const subjectsMap = {};
+    
+    filtered.forEach(report => {
+      if (report.covering_teachers && Array.isArray(report.covering_teachers)) {
+        report.covering_teachers.forEach(teacher => {
+          const name = typeof teacher === 'object' ? teacher.teacher : teacher;
+          const subject = typeof teacher === 'object' ? teacher.subject : '';
+          if (name) {
+            teachersMap[name] = (teachersMap[name] || 0) + 1;
+            if (subject) {
+              if (!subjectsMap[name]) subjectsMap[name] = [];
+              if (!subjectsMap[name].includes(subject)) {
+                subjectsMap[name].push(subject);
+              }
+            }
+          }
+        });
+      }
+    });
+    
+    return Object.entries(teachersMap)
+      .map(([name, count]) => ({ 
+        name, 
+        count,
+        subjects: subjectsMap[name] || []
+      }))
+      .sort((a, b) => b.count - a.count);
+  };
+
+  // Chart data functions
+  const getTeachersChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الغائبون', value: stats.totalAbsentTeachers, fill: '#ef4444' },
+      { name: 'المتأخرون', value: stats.totalLateTeachers, fill: '#f97316' },
+      { name: 'المغطون', value: stats.totalCoveringTeachers, fill: '#22c55e' }
+    ];
+  };
+
+  const getPerformanceChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'انضباط الطلاب', value: parseFloat(stats.avgDiscipline) },
+      { name: 'نظافة الفصول', value: parseFloat(stats.avgCleanliness) },
+      { name: 'التزام المعلمين', value: parseFloat(stats.avgAttendance) },
+      { name: 'السلوك العام', value: parseFloat(stats.avgBehavior) }
+    ];
+  };
+
+  // Handle chart click to show teachers list
+  const handleChartClick = (type) => {
+    let teachers = [];
+    let title = "";
+    
+    if (type === 'absent') {
+      teachers = getAggregatedAbsentTeachers();
+      title = "قائمة المعلمين الغائبين";
+    } else if (type === 'late') {
+      teachers = getAggregatedLateTeachers();
+      title = "قائمة المعلمين المتأخرين";
+    } else if (type === 'covering') {
+      teachers = getAggregatedCoveringTeachers();
+      title = "قائمة المعلمين المغطين";
+    }
+    
+    setTeachersListData({ title, teachers, type });
+    setShowTeachersListModal(true);
+  };
+
+  const exportTeachersListToPDF = () => {
+    if (!pdfMakeFonts || !pdfMakeFonts.pdfMake || !pdfMakeFonts.pdfMake.vfs) {
+      toast.error("خطأ في تحميل الخطوط العربية");
+      return;
+    }
+    pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+
+    const tableBody = [
+      [
+        { text: '#', style: 'tableHeader', alignment: 'center' },
+        { text: 'اسم المعلم', style: 'tableHeader', alignment: 'center' },
+        { text: teachersListData.type === 'late' ? 'عدد مرات التأخير' : 
+                 teachersListData.type === 'absent' ? 'عدد التقارير' : 'عدد الحصص', 
+          style: 'tableHeader', alignment: 'center' }
+      ]
+    ];
+
+    teachersListData.teachers.forEach((teacher, index) => {
+      tableBody.push([
+        { text: (index + 1).toString(), alignment: 'center' },
+        { text: teacher.name, alignment: 'center' },
+        { text: teacher.count.toString(), alignment: 'center' }
+      ]);
+    });
+
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      content: [
+        { text: teachersListData.title, style: 'header', alignment: 'center', margin: [0, 0, 0, 20] },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['10%', '60%', '30%'],
+            body: tableBody
+          },
+          layout: {
+            fillColor: (rowIndex) => (rowIndex === 0) ? '#cccccc' : null
+          }
+        }
+      ],
+      styles: {
+        header: { fontSize: 18, bold: true },
+        tableHeader: { bold: true, fontSize: 12 }
+      },
+      defaultStyle: { font: 'Cairo', fontSize: 10 }
+    };
+
+    pdfMake.createPdf(docDefinition).download(`${teachersListData.title}.pdf`);
+    toast.success("تم تصدير القائمة بنجاح");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
