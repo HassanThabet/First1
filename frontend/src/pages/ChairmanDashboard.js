@@ -807,129 +807,43 @@ const ChairmanDashboard = () => {
 
   // Generate PDF Export with charts and comprehensive data
   const exportToPDF = async () => {
-    // Initialize pdfMake fonts for this export
-    if (pdfMakeFonts) {
-      pdfMake.vfs = pdfMakeFonts;
-    }
-    
-    // Define fonts with Cairo as default
-    pdfMake.fonts = {
-      Cairo: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
-      },
-      Roboto: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
-      },
-      Nillima: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
-        italics: 'Cairo-Regular.ttf',
-        bolditalics: 'Cairo-Regular.ttf'
-      }
-    };
-    
-    const stats = getOverallStatistics();
-    const reports = getDetailedReports();
-    
-    const timeFilterText = timeFilter === "daily" ? "اليوم" : 
-                          timeFilter === "weekly" ? "هذا الأسبوع" : 
-                          timeFilter === "monthly" ? "هذا الشهر" :
-                          timeFilter === "custom" && customStartDate && customEndDate ? 
-                            `من ${customStartDate} إلى ${customEndDate}` : "جميع الفترات";
-    
-    const reportTypeText = reportTypeFilter === "all" ? "جميع التقارير" :
-                          reportTypeFilter === "vice_principal" ? "تقارير الوكلاء" :
-                          reportTypeFilter === "supervisor" ? "تقارير المشرفين" :
-                          reportTypeFilter === "activities" ? "تقارير الأنشطة" :
-                          reportTypeFilter === "social" ? "تقارير الأخصائي الاجتماعي" :
-                          reportTypeFilter === "quality" ? "تقارير الجودة" : "";
-    
-    const branchText = branchFilter === "all" ? "جميع الفروع" :
-                       branchFilter === "boys" ? "فرع البنين" :
-                       branchFilter === "girls" ? "فرع البنات" : "";
+    try {
+      toast.info("جاري إنشاء التقرير...");
+      
+      const stats = getOverallStatistics();
+      const reports = getDetailedReports();
+      
+      const timeFilterText = timeFilter === "daily" ? "اليوم" : 
+                            timeFilter === "weekly" ? "هذا الأسبوع" : 
+                            timeFilter === "monthly" ? "هذا الشهر" :
+                            timeFilter === "custom" && customStartDate && customEndDate ? 
+                              `من ${customStartDate} إلى ${customEndDate}` : "جميع الفترات";
+      
+      const reportTypeText = reportTypeFilter === "all" ? "جميع التقارير" :
+                            reportTypeFilter === "vice_principal" ? "تقارير الوكلاء" :
+                            reportTypeFilter === "supervisor" ? "تقارير المشرفين" :
+                            reportTypeFilter === "activities" ? "تقارير الأنشطة" :
+                            reportTypeFilter === "social" ? "تقارير الأخصائي الاجتماعي" :
+                            reportTypeFilter === "quality" ? "تقارير الجودة" :
+                            reportTypeFilter === "educational_supervision" ? "تقارير الإشراف التربوي" : "";
+      
+      const branchText = branchFilter === "all" ? "جميع الفروع" :
+                         branchFilter === "boys" ? "فرع البنين" :
+                         branchFilter === "girls" ? "فرع البنات" : "";
 
-    const content = [];
-    
-    // Header
-    content.push({
-      text: 'مدارس الفجر الجديد الأهلية',
-      style: 'schoolName',
-      alignment: 'center',
-      margin: [0, 0, 0, 10]
-    });
-    
-    content.push({
-      text: 'تقرير رئيس مجلس الإدارة الشامل',
-      style: 'reportTitle',
-      alignment: 'center',
-      margin: [0, 0, 0, 10]
-    });
-    
-    // Report Info
-    content.push({
-      columns: [
-        {
-          text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}`,
-          style: 'infoText',
-          alignment: 'right',
-          width: '*'
-        },
-        {
-          text: `${reportTypeText}`,
-          style: 'infoText',
-          alignment: 'center',
-          width: '*'
-        }
-      ],
-      margin: [0, 0, 0, 5]
-    });
-    
-    content.push({
-      columns: [
-        {
-          text: `${timeFilterText}`,
-          style: 'infoText',
-          alignment: 'right',
-          width: '*'
-        },
-        {
-          text: `${branchText}`,
-          style: 'infoText',
-          alignment: 'left',
-          width: '*'
-        }
-      ],
-      margin: [0, 0, 0, 20]
-    });
-    
-    // Overall Statistics Grid
-    content.push({
-      text: 'الإحصائيات العامة',
-      style: 'sectionTitle',
-      margin: [0, 10, 0, 15]
-    });
-    
-    const overallStats = [
-      { label: 'إجمالي التقارير', value: stats.totalAllReports.toString(), color: '#dbeafe' },
-      { label: 'المعلمون الغائبون', value: stats.totalAbsentTeachers.toString(), color: '#fee2e2' },
-      { label: 'المعلمون المتأخرون', value: stats.totalLateTeachers.toString(), color: '#fed7aa' },
-      { label: 'المعلمون المغطون', value: stats.totalCoveringTeachers.toString(), color: '#d1fae5' },
-      { label: 'الطلاب الغائبون', value: stats.totalAbsentStudents.toString(), color: '#fce7f3' },
-      { label: 'الحوادث المسجلة', value: stats.totalIncidents.toString(), color: '#fee2e2' }
-    ];
-    
-    content.push(createStatsGrid(overallStats));
+      const content = [];
+      
+      // === القسم 1: الإحصائيات الإجمالية ===
+      const overallStats = [
+        { label: 'إجمالي التقارير', value: stats.totalAllReports.toString(), color: '#dbeafe' },
+        { label: 'المعلمون الغائبون', value: stats.totalAbsentTeachers.toString(), color: '#fee2e2' },
+        { label: 'المعلمون المتأخرون', value: stats.totalLateTeachers.toString(), color: '#fed7aa' },
+        { label: 'المعلمون المغطون', value: stats.totalCoveringTeachers.toString(), color: '#d1fae5' },
+        { label: 'الطلاب الغائبون', value: stats.totalAbsentStudents.toString(), color: '#fce7f3' },
+        { label: 'الحوادث المسجلة', value: stats.totalIncidents.toString(), color: '#fee2e2' }
+      ];
+      
+      content.push(createSection('📊 الإحصائيات العامة', createStatsGrid(overallStats)));
     
     // Performance Table
     content.push({
