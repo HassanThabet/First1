@@ -2194,60 +2194,12 @@ const ChairmanDashboard = () => {
                   </div>
                 )}
                 
-                {/* Educational Supervision Report Details */}
+                {/* Educational Supervision Report Details - Using TeacherProgressView */}
                 {selectedReport.type === "educational_supervision" && selectedReport.teacher_evaluations && (
                   <div className="space-y-4">
                     <div className="bg-cyan-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-cyan-800 mb-3">تقييمات المعلمين ({selectedReport.teacher_evaluations.length})</h4>
-                      
-                      {selectedReport.teacher_evaluations.map((eval_item, idx) => (
-                        <div key={idx} className="mb-4 p-4 bg-white rounded-lg border-2 border-cyan-200">
-                          <h5 className="font-bold text-lg text-gray-900 mb-3">
-                            {eval_item.teacher_name}
-                            <span className="text-sm text-gray-600 mr-3">
-                              (المتوسط: {((eval_item.planning + eval_item.performance + eval_item.time_management + eval_item.goal_achievement) / 4).toFixed(1)}/10)
-                            </span>
-                          </h5>
-                          
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-                            <div className="bg-blue-50 p-2 rounded text-center">
-                              <p className="text-xs text-gray-600">التخطيط</p>
-                              <p className="text-xl font-bold text-blue-600">{eval_item.planning}/10</p>
-                            </div>
-                            <div className="bg-green-50 p-2 rounded text-center">
-                              <p className="text-xs text-gray-600">الأداء</p>
-                              <p className="text-xl font-bold text-green-600">{eval_item.performance}/10</p>
-                            </div>
-                            <div className="bg-purple-50 p-2 rounded text-center">
-                              <p className="text-xs text-gray-600">إدارة الوقت</p>
-                              <p className="text-xl font-bold text-purple-600">{eval_item.time_management}/10</p>
-                            </div>
-                            <div className="bg-orange-50 p-2 rounded text-center">
-                              <p className="text-xs text-gray-600">تحقيق الأهداف</p>
-                              <p className="text-xl font-bold text-orange-600">{eval_item.goal_achievement}/10</p>
-                            </div>
-                          </div>
-                          
-                          <div className="bg-green-50 p-3 rounded-lg mb-2">
-                            <p className="text-xs font-semibold text-gray-700 mb-1">استخدام الاستراتيجيات:</p>
-                            <p className="text-sm">{eval_item.uses_strategies === "yes" ? "✅ نعم" : "❌ لا"}</p>
-                            {eval_item.strategies_notes && (
-                              <p className="text-xs text-gray-600 mt-1">ملاحظات: {eval_item.strategies_notes}</p>
-                            )}
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="bg-green-50 p-3 rounded-lg">
-                              <p className="text-xs font-semibold text-green-800 mb-1">نقاط القوة:</p>
-                              <p className="text-sm text-gray-700">{eval_item.strengths}</p>
-                            </div>
-                            <div className="bg-orange-50 p-3 rounded-lg">
-                              <p className="text-xs font-semibold text-orange-800 mb-1">نقاط التطوير:</p>
-                              <p className="text-sm text-gray-700">{eval_item.needs_support}</p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                      <h4 className="font-semibold text-cyan-800 mb-3">تقييم تحسين المعلمين</h4>
+                      <TeacherProgressView compact={false} />
                     </div>
                   </div>
                 )}
