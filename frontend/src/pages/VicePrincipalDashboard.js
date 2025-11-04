@@ -52,7 +52,7 @@ const VicePrincipalDashboard = () => {
         axios.get(`${API}/reports/supervisor`),
         axios.get(`${API}/reports/vice-principal`),
         axios.get(`${API}/users`),
-        axios.get(`${API}/teachers?branch=${user.branch}`)
+        user?.branch ? axios.get(`${API}/teachers?branch=${user.branch}`) : Promise.resolve({ data: [] })
       ]);
       
       // Filter supervisor reports to only show reports from supervisors assigned to this VP
