@@ -542,10 +542,17 @@ const ChairmanDashboard = () => {
     let filteredActivitiesReports = filterReportsByTimeAndBranch([...activitiesReports]);
     let filteredSocialReports = filterReportsByTimeAndBranch([...socialReports]);
     let filteredQualityReports = filterReportsByTimeAndBranch([...qualityReports]);
+    let filteredVPReports = filterReportsByTimeAndBranch([...vicePrincipalReports]);
 
     // Supervisor statistics
     const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
-    const totalAbsentTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_teachers?.length || 0), 0);
+    // Get absent teachers from VP reports instead of supervisor reports
+    const totalAbsentTeachers = filteredVPReports.reduce((sum, r) => {
+      if (r.absent_teachers && Array.isArray(r.absent_teachers)) {
+        return sum + r.absent_teachers.length;
+      }
+      return sum;
+    }, 0);
     const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
     const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
     const totalAbsentStudents = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
