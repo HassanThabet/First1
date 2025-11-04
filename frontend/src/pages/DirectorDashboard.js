@@ -284,48 +284,100 @@ const DirectorDashboard = () => {
       };
     }
 
-    const tableBody = [
-      [
-        { text: 'الاسم', style: 'tableHeader' },
-        { text: teachersListData.type === 'late' ? 'عدد المرات' : 
-                teachersListData.type === 'covering' ? 'عدد الحصص' : 
-                teachersListData.type === 'activity' ? 'عدد الأنشطة' : 'عدد المرات', 
-          style: 'tableHeader' },
-        ...(teachersListData.type === 'late' ? [{ text: 'مجموع الدقائق', style: 'tableHeader' }] : []),
-        ...(teachersListData.type === 'covering' ? [{ text: 'المواد', style: 'tableHeader' }] : [])
-      ]
+    // Build table headers based on type
+    const tableHeaders = [
+      { text: 'م', style: 'tableHeader', alignment: 'center' },
+      { text: 'اسم المعلم', style: 'tableHeader', alignment: 'center' }
     ];
 
+    if (teachersListData.type === 'absent') {
+      tableHeaders.push({ text: 'عدد التقارير', style: 'tableHeader', alignment: 'center' });
+      tableHeaders.push({ text: 'إجمالي أيام الغياب', style: 'tableHeader', alignment: 'center' });
+    } else if (teachersListData.type === 'late') {
+      tableHeaders.push({ text: 'عدد مرات التأخير', style: 'tableHeader', alignment: 'center' });
+      tableHeaders.push({ text: 'مجموع الدقائق', style: 'tableHeader', alignment: 'center' });
+    } else if (teachersListData.type === 'covering') {
+      tableHeaders.push({ text: 'عدد الحصص المغطاة', style: 'tableHeader', alignment: 'center' });
+      tableHeaders.push({ text: 'المواد', style: 'tableHeader', alignment: 'center' });
+    } else if (teachersListData.type === 'activity') {
+      tableHeaders.push({ text: 'عدد الأنشطة', style: 'tableHeader', alignment: 'center' });
+    } else {
+      tableHeaders.push({ text: 'عدد المرات', style: 'tableHeader', alignment: 'center' });
+    }
+
+    const tableBody = [tableHeaders];
+
+    // Build table rows
     teachersListData.teachers.forEach((teacher, index) => {
       const row = [
-        { text: teacher.name, alignment: 'center' },
-        { text: teacher.count.toString(), alignment: 'center' }
+        { text: (index + 1).toString(), alignment: 'center', style: 'tableCell' },
+        { text: teacher.name, alignment: 'center', style: 'tableCell' }
       ];
       
-      if (teachersListData.type === 'late') {
-        row.push({ text: teacher.totalMinutes.toString(), alignment: 'center' });
+      if (teachersListData.type === 'absent') {
+        row.push({ text: teacher.count.toString(), alignment: 'center', style: 'tableCell' });
+        row.push({ 
+          text: `${teacher.totalDays || 0} ${(teacher.totalDays === 1) ? 'يوم' : 'أيام'}`, 
+          alignment: 'center', 
+          style: 'tableCellBold',
+          fillColor: '#fee2e2'
+        });
+      } else if (teachersListData.type === 'late') {
+        row.push({ text: teacher.count.toString(), alignment: 'center', style: 'tableCell' });
+        row.push({ 
+          text: `${teacher.totalMinutes || 0} دقيقة`, 
+          alignment: 'center', 
+          style: 'tableCellBold',
+          fillColor: '#fed7aa'
+        });
       } else if (teachersListData.type === 'covering') {
-        row.push({ text: teacher.subjects || '-', alignment: 'center' });
+        row.push({ text: teacher.count.toString(), alignment: 'center', style: 'tableCell' });
+        row.push({ 
+          text: (teacher.subjects && teacher.subjects.length > 0) ? teacher.subjects.join(', ') : '-', 
+          alignment: 'center', 
+          style: 'tableCell' 
+        });
+      } else if (teachersListData.type === 'activity') {
+        row.push({ text: teacher.count.toString(), alignment: 'center', style: 'tableCell' });
+      } else {
+        row.push({ text: teacher.count.toString(), alignment: 'center', style: 'tableCell' });
       }
       
       tableBody.push(row);
     });
 
+    // Calculate column widths
+    let columnWidths;
+    if (teachersListData.type === 'absent' || teachersListData.type === 'late') {
+      columnWidths = [30, '*', 80, 100];
+    } else if (teachersListData.type === 'covering') {
+      columnWidths = [30, '*', 80, 120];
+    } else {
+      columnWidths = [30, '*', 80];
+    }
+
     const docDefinition = {
       pageSize: 'A4',
       pageOrientation: 'portrait',
-      pageMargins: [40, 60, 40, 60],
+      pageMargins: [40, 80, 40, 60],
       defaultStyle: {
         font: 'Cairo',
-        fontSize: 11
+        fontSize: 11,
+        alignment: 'right'
+      },
+      header: {
+        columns: [
+          {
+            text: 'مدارس الفجر الجديد الأهلية',
+            alignment: 'center',
+            fontSize: 18,
+            bold: true,
+            color: '#1e40af',
+            margin: [0, 30, 0, 0]
+          }
+        ]
       },
       content: [
-        {
-          text: 'مدارس الفجر الجديد الأهلية',
-          style: 'header',
-          alignment: 'center',
-          margin: [0, 0, 0, 10]
-        },
         {
           text: teachersListData.title,
           style: 'subheader',
@@ -333,52 +385,99 @@ const DirectorDashboard = () => {
           margin: [0, 0, 0, 10]
         },
         {
-          text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-EG')}`,
-          style: 'info',
-          alignment: 'center',
-          margin: [0, 0, 0, 20]
-        },
-        {
-          text: `إجمالي عدد المعلمين: ${teachersListData.teachers.length}`,
-          style: 'info',
-          alignment: 'center',
+          columns: [
+            {
+              text: `تاريخ الإصدار: ${new Date().toLocaleDateString('ar-SA', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}`,
+              style: 'info',
+              alignment: 'right',
+              width: '*'
+            },
+            {
+              text: `إجمالي عدد المعلمين: ${teachersListData.teachers.length}`,
+              style: 'info',
+              alignment: 'left',
+              width: '*'
+            }
+          ],
           margin: [0, 0, 0, 20]
         },
         {
           table: {
-            widths: teachersListData.type === 'late' || teachersListData.type === 'covering' ? 
-                    ['*', 'auto', 'auto'] : ['*', 'auto'],
-            body: tableBody
+            headerRows: 1,
+            widths: columnWidths,
+            body: tableBody,
+            dontBreakRows: true
           },
-          margin: [0, 0, 0, 10]
+          layout: {
+            fillColor: function (rowIndex, node, columnIndex) {
+              if (rowIndex === 0) {
+                return '#dbeafe';
+              }
+              return (rowIndex % 2 === 0) ? '#f9fafb' : null;
+            },
+            hLineWidth: function (i, node) {
+              return 0.5;
+            },
+            vLineWidth: function (i, node) {
+              return 0.5;
+            },
+            hLineColor: function (i, node) {
+              return '#d1d5db';
+            },
+            vLineColor: function (i, node) {
+              return '#d1d5db';
+            },
+            paddingLeft: function(i, node) { return 8; },
+            paddingRight: function(i, node) { return 8; },
+            paddingTop: function(i, node) { return 6; },
+            paddingBottom: function(i, node) { return 6; }
+          },
+          margin: [0, 0, 0, 20]
+        },
+        {
+          text: '* هذا التقرير تم إنشاؤه تلقائياً من نظام إدارة التقارير',
+          style: 'footer',
+          alignment: 'center'
         }
       ],
       styles: {
-        header: {
-          fontSize: 18,
-          bold: true,
-          color: '#1e40af'
-        },
         subheader: {
-          fontSize: 14,
+          fontSize: 16,
           bold: true,
           color: '#3b82f6'
         },
         info: {
-          fontSize: 10,
+          fontSize: 9,
           color: '#666666'
         },
         tableHeader: {
-          fillColor: '#dbeafe',
           bold: true,
           alignment: 'center',
+          fontSize: 11,
+          color: '#1e40af'
+        },
+        tableCell: {
           fontSize: 10
+        },
+        tableCellBold: {
+          fontSize: 10,
+          bold: true
+        },
+        footer: {
+          fontSize: 8,
+          color: '#999999',
+          italics: true
         }
       }
     };
 
-    pdfMake.createPdf(docDefinition).download(`${teachersListData.title}_${new Date().getTime()}.pdf`);
-    toast.success("تم تصدير القائمة بنجاح");
+    pdfMake.createPdf(docDefinition).download(`${teachersListData.title}_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`);
+    toast.success("تم تصدير التقرير بنجاح");
   };
 
   // Helper function to filter reports by time only
