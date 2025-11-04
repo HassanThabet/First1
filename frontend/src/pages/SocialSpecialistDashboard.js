@@ -335,7 +335,7 @@ const SocialSpecialistDashboard = () => {
           // Total Cases Box
           {
             table: {
-              widths: ['*'],
+              widths: [500], // Fixed width instead of '*'
               body: [
                 [
                   { 
@@ -355,7 +355,7 @@ const SocialSpecialistDashboard = () => {
           // Cases Distribution
           {
             table: {
-              widths: ['*', '*', '*', '*'],
+              widths: [125, 125, 125, 125], // Fixed widths instead of '*'
               body: [
                 [
                   { text: 'توزيع الحالات', colSpan: 4, style: 'tableHeader', alignment: 'center' },
@@ -382,7 +382,7 @@ const SocialSpecialistDashboard = () => {
           // Actions Summary
           {
             table: {
-              widths: ['*', '*', '*'],
+              widths: [165, 165, 165], // Fixed widths instead of '*'
               body: [
                 [
                   { text: 'ملخص الإجراءات', colSpan: 3, style: 'tableHeader', alignment: 'center' },
