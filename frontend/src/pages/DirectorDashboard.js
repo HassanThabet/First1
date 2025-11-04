@@ -1113,7 +1113,7 @@ const DirectorDashboard = () => {
       // Generate PDF
       const filename = `تقرير_المدير_${user.branch === 'boys' ? 'بنين' : 'بنات'}_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`;
       
-      generatePDFTemplate(content, filename, {
+      generatePDF(content, filename, {
         title: 'تقرير المدير الشامل',
         orientation: 'portrait',
         additionalInfo: {
