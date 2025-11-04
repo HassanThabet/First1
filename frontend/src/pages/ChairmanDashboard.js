@@ -1823,6 +1823,18 @@ const ChairmanDashboard = () => {
                 </Card>
               )}
 
+              {/* Cooperating Teachers - Show for activities or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg text-gray-800">🤝 المعلمون المتعاونون في الأنشطة</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CooperatingTeachersView compact={true} />
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Detailed Reports Section */}
               {showDetailedReports && (
                 <Card>
