@@ -19,11 +19,11 @@ const ActivitySupervisorsView = ({ compact = false }) => {
       // Fetch activities reports and teachers
       const [activitiesRes, teachersRes] = await Promise.all([
         axios.get(`${API}/reports/activities`),
-        axios.get(`${API}/users`)
+        axios.get(`${API}/teachers`)
       ]);
 
       const activities = activitiesRes.data;
-      const teachers = teachersRes.data.filter(u => u.role === 'teacher');
+      const teachers = teachersRes.data;
 
       // Create a map to count activities per teacher
       const supervisorMap = new Map();
