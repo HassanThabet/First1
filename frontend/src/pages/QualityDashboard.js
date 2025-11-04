@@ -1026,6 +1026,19 @@ const QualityDashboard = () => {
               </CardContent>
             </Card>
 
+            {/* Toggle Button for Detailed Reports */}
+            <Card>
+              <CardContent className="p-4">
+                <Button 
+                  onClick={() => setShowDetailedReports(!showDetailedReports)}
+                  variant="outline"
+                  className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
+                >
+                  {showDetailedReports ? "إخفاء التقارير التفصيلية" : "عرض التقارير التفصيلية"}
+                </Button>
+              </CardContent>
+            </Card>
+
             {(() => {
               const stats = getOverallStatistics();
               return (
