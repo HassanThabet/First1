@@ -79,8 +79,9 @@ const QualityDashboard = () => {
 
   const fetchAllData = async () => {
     try {
-      const [usersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes, eduSupRes] = await Promise.all([
+      const [usersRes, teachersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes, eduSupRes] = await Promise.all([
         axios.get(`${API}/users`),
+        axios.get(`${API}/teachers`),
         axios.get(`${API}/reports/supervisor`),
         axios.get(`${API}/reports/activities`),
         axios.get(`${API}/reports/social-specialist`),
@@ -90,6 +91,7 @@ const QualityDashboard = () => {
       ]);
       
       setUsers(usersRes.data);
+      setTeachers(teachersRes.data);
       setSupervisorReports(supervisorRes.data);
       setActivitiesReports(activitiesRes.data);
       setSocialReports(socialRes.data);
