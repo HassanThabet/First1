@@ -164,24 +164,6 @@ const SupervisorDashboard = () => {
     setFormData({ ...formData, incidents: updated });
   };
 
-  const addAbsentTeacher = () => {
-    setFormData({
-      ...formData,
-      absent_teachers: [...formData.absent_teachers, { subject: "", teacher: "", period: "" }]
-    });
-  };
-
-  const removeAbsentTeacher = (index) => {
-    const updated = formData.absent_teachers.filter((_, i) => i !== index);
-    setFormData({ ...formData, absent_teachers: updated });
-  };
-
-  const updateAbsentTeacher = (index, field, value) => {
-    const updated = [...formData.absent_teachers];
-    updated[index][field] = value;
-    setFormData({ ...formData, absent_teachers: updated });
-  };
-
   const addCoveringTeacher = () => {
     setFormData({
       ...formData,
