@@ -366,6 +366,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "✅ UI ENHANCEMENTS - CONDITIONAL VIEWS ADDED: Created new ActivitySupervisorsView component and integrated it into ChairmanDashboard and DirectorDashboard. Now: 1) When reportTypeFilter is 'educational_supervision' or 'all' → TeacherProgressView (تقييم تحسين المعلمين) is displayed showing teacher evaluation progress with first/last scores, 2) When reportTypeFilter is 'activities' or 'all' → ActivitySupervisorsView (المعلمون المشرفون على الأنشطة) is displayed showing teachers supervising activities with activity counts. ActivitySupervisorsView fetches data from activities reports, aggregates supervisors from all activities, and displays them in a table with activity counts. Both views have compact mode for dashboard and full mode when clicked."
+      - working: "NA"
+        agent: "main"
+        comment: "✅ REPLACED OLD EVALUATION VIEW WITH TEACHERPROGRESSVIEW: In both ChairmanDashboard and DirectorDashboard, replaced the old detailed teacher evaluations display (which showed individual scores per evaluation) in the report modal with the new TeacherProgressView component. Now when clicking on an educational supervision report, users see the comprehensive TeacherProgressView showing teacher progress over time with first/last evaluation scores and improvement status, instead of the old detailed breakdown of individual evaluation scores. This provides a more unified and comprehensive view of teacher progress across all evaluations."
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
