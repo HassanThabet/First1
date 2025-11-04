@@ -287,28 +287,59 @@ const ActivitiesDashboard = () => {
         periodText += ` - ${selectedActivity}`;
       }
 
-      // Prepare activities table data
+      // Prepare activities table data with safe data handling
       const activitiesData = allActivities.map((activity, index) => {
-        const supervisors = activity.supervisors && Array.isArray(activity.supervisors) && activity.supervisors.length > 0 
-          ? activity.supervisors.map(id => getTeacherName(id)).filter(name => name && name !== id).join(', ') || '-'
-          : activity.supervisor || '-';
+        // Safely get supervisors
+        let supervisors = '-';
+        try {
+          if (activity.supervisors && Array.isArray(activity.supervisors) && activity.supervisors.length > 0) {
+            const names = activity.supervisors
+              .map(id => getTeacherName(id))
+              .filter(name => name && name !== id && typeof name === 'string');
+            supervisors = names.length > 0 ? names.join(', ') : '-';
+          } else if (activity.supervisor) {
+            supervisors = String(activity.supervisor);
+          }
+        } catch (e) {
+          console.error('Error processing supervisors:', e);
+        }
 
-        const cooperatingTeachers = activity.cooperating_teachers && Array.isArray(activity.cooperating_teachers) && activity.cooperating_teachers.length > 0
-          ? activity.cooperating_teachers.map(id => getTeacherName(id)).filter(name => name && name !== id).join(', ') || '-'
-          : '-';
+        // Safely get cooperating teachers
+        let cooperatingTeachers = '-';
+        try {
+          if (activity.cooperating_teachers && Array.isArray(activity.cooperating_teachers) && activity.cooperating_teachers.length > 0) {
+            const names = activity.cooperating_teachers
+              .map(id => getTeacherName(id))
+              .filter(name => name && name !== id && typeof name === 'string');
+            cooperatingTeachers = names.length > 0 ? names.join(', ') : '-';
+          }
+        } catch (e) {
+          console.error('Error processing cooperating_teachers:', e);
+        }
 
+        // Safely get date
+        let dateStr = '-';
+        try {
+          if (activity.date) {
+            dateStr = new Date(activity.date).toLocaleDateString('ar-SA');
+          }
+        } catch (e) {
+          console.error('Error processing date:', e);
+        }
+
+        // Return row with all values as strings
         return [
           String(index + 1),
           String(activity.name || activity.activity_name || '-'),
-          String(activity.date ? new Date(activity.date).toLocaleDateString('ar-SA') : '-'),
+          dateStr,
           String(activity.type || '-'),
-          String(supervisors),
-          String(cooperatingTeachers),
+          supervisors,
+          cooperatingTeachers,
           String(activity.target_group || '-'),
           String(activity.participants_count || 0),
-          String(`${activity.interaction_rate || 0}/10`),
+          String(activity.interaction_rate || 0) + '/10',
           String(activity.educational_impact || '-')
-        ];
+        ].map(val => String(val)); // Ensure all values are strings
       });
 
       // Define PDF document
