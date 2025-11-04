@@ -34,6 +34,7 @@ const ActivitiesDashboard = () => {
   const [mergedPeriod, setMergedPeriod] = useState("weekly"); // weekly or monthly
   const [mergedStartDate, setMergedStartDate] = useState("");
   const [mergedEndDate, setMergedEndDate] = useState("");
+  const [selectedActivity, setSelectedActivity] = useState("all"); // للفلترة حسب النشاط
 
   const [activities, setActivities] = useState([{
     name: "",
