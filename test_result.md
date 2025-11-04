@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix ActivitySupervisorsView data fetching issue and Activities PDF export errors. Teachers participating in activities (supervisors and cooperating teachers) are not being displayed in Director and Chairman dashboards."
+user_problem_statement: "Add PDF export for TeacherProgressView, display cooperating teachers in Director and Chairman dashboards, and include cooperating teachers in PDF exports (only for activities reports)."
 
 backend:
   - task: "Authentication API endpoints"
