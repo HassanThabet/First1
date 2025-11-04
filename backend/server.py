@@ -113,6 +113,7 @@ class VicePrincipalReport(BaseModel):
     week_end: str
     problems: List[Dict[str, str]] = []
     suggestions: List[str] = []
+    absent_teachers: List[Dict[str, Any]] = []  # {teacher: str, absent_days: int}
     supervisor_reports: List[str] = []  # IDs of supervisor reports
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: Optional[str] = None
