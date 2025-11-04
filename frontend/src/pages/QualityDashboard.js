@@ -268,6 +268,22 @@ const QualityDashboard = () => {
       })];
     }
     
+    if (reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") {
+      const filtered = filterReportsByTimeOnly([...educationalSupervisionReports]);
+      const eduSupFiltered = selectedSpecificEmployee === "all" 
+        ? filtered 
+        : filtered.filter(r => r.user_id === selectedSpecificEmployee);
+      
+      allReports = [...allReports, ...eduSupFiltered.map(r => {
+        const user = users.find(u => u.id === r.user_id);
+        return {
+          ...r,
+          type: "educational_supervision",
+          userName: user ? (user.full_name || user.username) : "غير معروف"
+        };
+      })];
+    }
+    
     return allReports.sort((a, b) => {
       const dateA = new Date(a.date || a.week_start);
       const dateB = new Date(b.date || b.week_start);
