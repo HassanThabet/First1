@@ -1740,15 +1740,27 @@ const ChairmanDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Teacher Progress Evaluation - Compact View */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg text-gray-800">📈 تقييم تحسن المعلمين</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <TeacherProgressView compact={true} />
-                </CardContent>
-              </Card>
+              {/* Teacher Progress Evaluation - Compact View - Only show for educational_supervision or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && (
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-lg text-gray-800">📈 تقييم تحسن المعلمين</CardTitle>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setActiveTab("teacher-progress")}
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        عرض التفاصيل الكاملة →
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <TeacherProgressView compact={true} />
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Detailed Reports Section */}
               {showDetailedReports && (
