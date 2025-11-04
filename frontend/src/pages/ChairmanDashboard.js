@@ -768,15 +768,23 @@ const ChairmanDashboard = () => {
     // Initialize pdfMake fonts for this export
     if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
       pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
-      pdfMake.fonts = {
-        Cairo: {
-          normal: 'Cairo-Regular.ttf',
-          bold: 'Cairo-Regular.ttf',
-          italics: 'Cairo-Regular.ttf',
-          bolditalics: 'Cairo-Regular.ttf'
-        }
-      };
     }
+    
+    // Define fonts with Cairo as default
+    pdfMake.fonts = {
+      Cairo: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      },
+      Roboto: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      }
+    };
     
     const stats = getOverallStatistics();
     const reports = getDetailedReports();
