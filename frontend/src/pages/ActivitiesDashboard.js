@@ -255,7 +255,13 @@ const ActivitiesDashboard = () => {
     try {
       const mergedReports = getMergedReports();
       const stats = getMergedStatistics();
-      const allActivities = mergedReports.flatMap(r => r.activities);
+      const allActivities = mergedReports.flatMap(r => r.activities || []);
+
+      // Check if there are activities to export
+      if (allActivities.length === 0) {
+        toast.error('لا توجد أنشطة لتصديرها');
+        return;
+      }
 
       // Prepare period text
       let periodText = '';
@@ -269,18 +275,18 @@ const ActivitiesDashboard = () => {
 
       // Prepare activities table data
       const activitiesData = allActivities.map((activity, index) => {
-        const supervisors = activity.supervisors && activity.supervisors.length > 0 
-          ? activity.supervisors.map(id => getTeacherName(id)).filter(name => name).join(', ') || '-'
+        const supervisors = activity.supervisors && Array.isArray(activity.supervisors) && activity.supervisors.length > 0 
+          ? activity.supervisors.map(id => getTeacherName(id)).filter(name => name && name !== id).join(', ') || '-'
           : activity.supervisor || '-';
 
-        const cooperatingTeachers = activity.cooperating_teachers && activity.cooperating_teachers.length > 0
-          ? activity.cooperating_teachers.map(id => getTeacherName(id)).filter(name => name).join(', ') || '-'
+        const cooperatingTeachers = activity.cooperating_teachers && Array.isArray(activity.cooperating_teachers) && activity.cooperating_teachers.length > 0
+          ? activity.cooperating_teachers.map(id => getTeacherName(id)).filter(name => name && name !== id).join(', ') || '-'
           : '-';
 
         return [
           String(index + 1),
-          String(activity.name || '-'),
-          String(new Date(activity.date).toLocaleDateString('ar-SA')),
+          String(activity.name || activity.activity_name || '-'),
+          String(activity.date ? new Date(activity.date).toLocaleDateString('ar-SA') : '-'),
           String(activity.type || '-'),
           String(supervisors),
           String(cooperatingTeachers),
