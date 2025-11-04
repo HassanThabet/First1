@@ -46,13 +46,14 @@ const ChairmanDashboard = () => {
   const fetchAllData = async () => {
     try {
       console.log("🔄 Fetching all data...");
-      const [usersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes] = await Promise.all([
+      const [usersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes, eduSupRes] = await Promise.all([
         axios.get(`${API}/users`),
         axios.get(`${API}/reports/supervisor`),
         axios.get(`${API}/reports/activities`),
         axios.get(`${API}/reports/social-specialist`),
         axios.get(`${API}/reports/quality`),
-        axios.get(`${API}/reports/vice-principal`)
+        axios.get(`${API}/reports/vice-principal`),
+        axios.get(`${API}/reports/educational-supervision`)
       ]);
       
       console.log("✅ Data fetched successfully:");
@@ -62,6 +63,7 @@ const ChairmanDashboard = () => {
       console.log("Social reports:", socialRes.data.length);
       console.log("Quality reports:", qualityRes.data.length);
       console.log("VP reports:", vpRes.data.length);
+      console.log("Educational Supervision reports:", eduSupRes.data.length);
       
       setUsers(usersRes.data);
       setSupervisorReports(supervisorRes.data);
@@ -69,6 +71,7 @@ const ChairmanDashboard = () => {
       setSocialReports(socialRes.data);
       setQualityReports(qualityRes.data);
       setVicePrincipalReports(vpRes.data);
+      setEducationalSupervisionReports(eduSupRes.data);
     } catch (error) {
       console.error("❌ Failed to fetch data:", error);
       toast.error("فشل تحميل البيانات");
