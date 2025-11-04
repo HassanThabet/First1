@@ -34,6 +34,9 @@ const QualityDashboard = () => {
   const [customEndDate, setCustomEndDate] = useState("");
   const [reportTypeFilter, setReportTypeFilter] = useState("all");
   const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all");
+  const [showDetailedReports, setShowDetailedReports] = useState(false);
+  const [showTeachersListModal, setShowTeachersListModal] = useState(false);
+  const [teachersListData, setTeachersListData] = useState({ title: "", teachers: [], type: "" });
   
   const [loading, setLoading] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
