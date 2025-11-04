@@ -957,7 +957,7 @@ const ChairmanDashboard = () => {
           coveringTeachers.slice(0, 20).map(teacher => [
             teacher.name,
             teacher.count.toString(),
-            teacher.subjects && teacher.subjects.length > 0 ? teacher.subjects.slice(0, 3).join(', ') : '-'
+            teacher.subjects && Array.isArray(teacher.subjects) && teacher.subjects.length > 0 ? teacher.subjects.slice(0, 3).join(', ') : (typeof teacher.subjects === 'string' ? teacher.subjects : '-')
           ]),
           { showRowNumbers: true, headerColor: '#d1fae5' }
         );
