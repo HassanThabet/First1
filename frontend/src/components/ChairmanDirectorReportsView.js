@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Button } from "../components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../components/ui/dialog";
 import { toast } from "sonner";
-import pdfMake from "@digicole/pdfmake-rtl";
-import pdfMakeFonts from "../fonts/vfs_fonts";
+import { 
+  createSection, 
+  createRTLTable, 
+  generatePDF as generatePDFTemplate 
+} from "../utils/pdfTemplate";
 
 const ChairmanDirectorReportsView = () => {
   const [reports, setReports] = useState([]);
