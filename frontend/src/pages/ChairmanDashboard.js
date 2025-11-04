@@ -1920,6 +1920,13 @@ const ChairmanDashboard = () => {
                               </span>
                             </td>
                           )}
+                          {teachersListData.type === 'absent' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center">
+                              <span className="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full font-bold">
+                                {teacher.totalDays || 0} {teacher.totalDays === 1 ? 'يوم' : 'أيام'}
+                              </span>
+                            </td>
+                          )}
                           {teachersListData.type === 'covering' && (
                             <td className="border border-gray-300 px-4 py-2 text-center text-sm">
                               {teacher.subjects || '-'}
