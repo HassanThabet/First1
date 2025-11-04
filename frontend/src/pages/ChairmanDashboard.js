@@ -12,9 +12,11 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Cart
 import pdfMake from "@digicole/pdfmake-rtl";
 import pdfMakeFonts from "../fonts/vfs_fonts";
 import { createRTLTable, createStatsGrid, generatePDF, pdfStyles } from "../utils/pdfTemplate";
+import ChairmanDirectorReportsView from "../components/ChairmanDirectorReportsView";
 
 const ChairmanDashboard = () => {
   const { user } = useContext(AuthContext);
+  const [activeTab, setActiveTab] = useState("dashboard");
   
   // For statistics
   const [supervisorReports, setSupervisorReports] = useState([]);
