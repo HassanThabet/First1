@@ -1807,6 +1807,18 @@ const DirectorDashboard = () => {
                 </Card>
               )}
 
+              {/* Activity Supervisors - Show for activities or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-t-4 border-purple-500">
+                  <CardHeader>
+                    <CardTitle className="text-xl">🎯 المعلمون المشرفون على الأنشطة</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ActivitySupervisorsView compact={true} />
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Detailed Reports Section */}
               {showDetailedReports && (
                 <Card>
