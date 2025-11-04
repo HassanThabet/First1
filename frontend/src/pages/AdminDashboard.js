@@ -113,6 +113,28 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (!newPassword || newPassword.length < 4) {
+      toast.error("كلمة المرور يجب أن تكون 4 أحرف على الأقل");
+      return;
+    }
+    setLoading(true);
+    try {
+      await axios.put(`${API}/users/${selectedUserForPassword.id}`, {
+        password: newPassword
+      });
+      toast.success("تم تغيير كلمة المرور بنجاح");
+      setPasswordDialogOpen(false);
+      setSelectedUserForPassword(null);
+      setNewPassword("");
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "فشل تغيير كلمة المرور");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCreateTeacher = async (e) => {
     e.preventDefault();
     setLoading(true);
