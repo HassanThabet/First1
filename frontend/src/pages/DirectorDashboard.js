@@ -1886,11 +1886,15 @@ const DirectorDashboard = () => {
                         <th className="border border-gray-300 px-4 py-2 text-center">اسم المعلم</th>
                         <th className="border border-gray-300 px-4 py-2 text-center">
                           {teachersListData.type === 'late' ? 'عدد مرات التأخير' :
+                           teachersListData.type === 'absent' ? 'عدد التقارير' :
                            teachersListData.type === 'covering' ? 'عدد الحصص المغطاة' :
                            teachersListData.type === 'activity' ? 'عدد الأنشطة' : 'عدد المرات'}
                         </th>
                         {teachersListData.type === 'late' && (
                           <th className="border border-gray-300 px-4 py-2 text-center">مجموع الدقائق</th>
+                        )}
+                        {teachersListData.type === 'absent' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">إجمالي أيام الغياب</th>
                         )}
                         {teachersListData.type === 'covering' && (
                           <th className="border border-gray-300 px-4 py-2 text-center">المواد</th>
