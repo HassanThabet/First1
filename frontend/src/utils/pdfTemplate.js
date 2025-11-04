@@ -297,8 +297,19 @@ export const pdfStyles = {
     color: '#374151'
   },
   infoBoxValue: {
-    fontSize: 11,
-    color: '#1f2937'
+    fontSize: 12,
+    bold: true,
+    color: '#1e40af'
+  },
+  statLabel: {
+    fontSize: 10,
+    bold: true,
+    color: '#374151'
+  },
+  statValue: {
+    fontSize: 16,
+    bold: true,
+    color: '#1e40af'
   },
   tableHeader: {
     bold: true,
