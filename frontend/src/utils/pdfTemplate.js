@@ -485,5 +485,7 @@ export default {
   createStatsGrid,
   createFooter,
   generatePDF,
+  captureChartAsImage,
+  createChartImage,
   pdfStyles
 };
