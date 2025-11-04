@@ -447,6 +447,56 @@ const AdminDashboard = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Password Change Dialog */}
+          <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>تغيير كلمة المرور</DialogTitle>
+              </DialogHeader>
+              {selectedUserForPassword && (
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <div className="p-4 bg-blue-50 rounded-lg">
+                    <p className="text-sm">
+                      <strong>المستخدم:</strong> {selectedUserForPassword.username}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <strong>الدور:</strong> {roleNames[selectedUserForPassword.role]}
+                    </p>
+                  </div>
+                  <div>
+                    <Label>كلمة المرور الجديدة</Label>
+                    <Input
+                      type="password"
+                      placeholder="أدخل كلمة المرور الجديدة"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={4}
+                      autoFocus
+                    />
+                    <p className="text-xs text-gray-500 mt-1">يجب أن تحتوي على 4 أحرف على الأقل</p>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setPasswordDialogOpen(false);
+                        setSelectedUserForPassword(null);
+                        setNewPassword("");
+                      }}
+                    >
+                      إلغاء
+                    </Button>
+                    <Button type="submit" disabled={loading}>
+                      {loading ? "جاري التحديث..." : "تغيير كلمة المرور"}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </DialogContent>
+          </Dialog>
         </TabsContent>
 
         {/* Teachers Tab */}
