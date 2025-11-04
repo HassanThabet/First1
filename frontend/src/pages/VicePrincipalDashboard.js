@@ -813,9 +813,13 @@ const VicePrincipalDashboard = () => {
                         <SelectValue placeholder="اختر المعلم" />
                       </SelectTrigger>
                       <SelectContent>
-                        {teachers.map(teacher => (
-                          <SelectItem key={teacher.id} value={teacher.name}>{teacher.name}</SelectItem>
-                        ))}
+                        {teachers && teachers.length > 0 ? (
+                          teachers.map(teacher => (
+                            <SelectItem key={teacher.id} value={teacher.name}>{teacher.name}</SelectItem>
+                          ))
+                        ) : (
+                          <SelectItem value="" disabled>لا توجد معلمين متاحين</SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
                     <Input
