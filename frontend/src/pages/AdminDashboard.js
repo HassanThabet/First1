@@ -416,13 +416,28 @@ const AdminDashboard = () => {
                           });
                           setDialogOpen(true);
                         }}
+                        title="تعديل المستخدم"
                       >
                         <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-blue-600 hover:text-blue-700"
+                        onClick={() => {
+                          setSelectedUserForPassword(user);
+                          setNewPassword("");
+                          setPasswordDialogOpen(true);
+                        }}
+                        title="تغيير كلمة المرور"
+                      >
+                        <Key className="w-4 h-4" />
                       </Button>
                       <Button
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDeleteUser(user.id)}
+                        title="حذف المستخدم"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
