@@ -890,78 +890,86 @@ const DirectorDashboard = () => {
       
       // === القسم 3.1: جداول تفصيلية للمعلمين ===
       
-      // جدول المعلمين الغائبين
-      const absentTeachers = getAggregatedAbsentTeachers();
-      if (absentTeachers.length > 0) {
-        const absentTeachersTable = createRTLTable(
-          [
-            { text: 'اسم المعلم', width: '*' },
-            { text: 'عدد أيام الغياب', width: 80 },
-            { text: 'عدد التقارير', width: 80 }
-          ],
-          absentTeachers.slice(0, 20).map(teacher => [
-            teacher.name,
-            teacher.totalDays.toString(),
-            teacher.count.toString()
-          ]),
-          { showRowNumbers: true, headerColor: '#fee2e2' }
-        );
-        content.push(createSection(`👤 المعلمون الغائبون (${absentTeachers.length} معلم)`, absentTeachersTable));
+      // جدول المعلمين الغائبين - يظهر فقط في: جميع التقارير، الوكيل، المشرفين
+      if (reportTypeFilter === 'all' || reportTypeFilter === 'vice_principal' || reportTypeFilter === 'supervisor') {
+        const absentTeachers = getAggregatedAbsentTeachers();
+        if (absentTeachers.length > 0) {
+          const absentTeachersTable = createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد أيام الغياب', width: 80 },
+              { text: 'عدد التقارير', width: 80 }
+            ],
+            absentTeachers.slice(0, 20).map(teacher => [
+              teacher.name,
+              teacher.totalDays.toString(),
+              teacher.count.toString()
+            ]),
+            { showRowNumbers: true, headerColor: '#fee2e2' }
+          );
+          content.push(createSection(`👤 المعلمون الغائبون (${absentTeachers.length} معلم)`, absentTeachersTable));
+        }
       }
       
-      // جدول المعلمين المتأخرين
-      const lateTeachers = getAggregatedLateTeachers();
-      if (lateTeachers.length > 0) {
-        const lateTeachersTable = createRTLTable(
-          [
-            { text: 'اسم المعلم', width: '*' },
-            { text: 'عدد مرات التأخير', width: 80 },
-            { text: 'إجمالي الدقائق', width: 80 }
-          ],
-          lateTeachers.slice(0, 20).map(teacher => [
-            teacher.name,
-            teacher.count.toString(),
-            teacher.totalMinutes ? teacher.totalMinutes.toString() + ' دقيقة' : '-'
-          ]),
-          { showRowNumbers: true, headerColor: '#fed7aa' }
-        );
-        content.push(createSection(`⏰ المعلمون المتأخرون (${lateTeachers.length} معلم)`, lateTeachersTable));
+      // جدول المعلمين المتأخرين - يظهر فقط في: جميع التقارير، الوكيل، المشرفين
+      if (reportTypeFilter === 'all' || reportTypeFilter === 'vice_principal' || reportTypeFilter === 'supervisor') {
+        const lateTeachers = getAggregatedLateTeachers();
+        if (lateTeachers.length > 0) {
+          const lateTeachersTable = createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد مرات التأخير', width: 80 },
+              { text: 'إجمالي الدقائق', width: 80 }
+            ],
+            lateTeachers.slice(0, 20).map(teacher => [
+              teacher.name,
+              teacher.count.toString(),
+              teacher.totalMinutes ? teacher.totalMinutes.toString() + ' دقيقة' : '-'
+            ]),
+            { showRowNumbers: true, headerColor: '#fed7aa' }
+          );
+          content.push(createSection(`⏰ المعلمون المتأخرون (${lateTeachers.length} معلم)`, lateTeachersTable));
+        }
       }
       
-      // جدول المعلمين المغطين
-      const coveringTeachers = getAggregatedCoveringTeachers();
-      if (coveringTeachers.length > 0) {
-        const coveringTeachersTable = createRTLTable(
-          [
-            { text: 'اسم المعلم', width: '*' },
-            { text: 'عدد الحصص المغطاة', width: 80 },
-            { text: 'المواد', width: 120 }
-          ],
-          coveringTeachers.slice(0, 20).map(teacher => [
-            teacher.name,
-            teacher.count.toString(),
-            teacher.subjects && Array.isArray(teacher.subjects) && teacher.subjects.length > 0 ? teacher.subjects.slice(0, 3).join(', ') : '-'
-          ]),
-          { showRowNumbers: true, headerColor: '#d1fae5' }
-        );
-        content.push(createSection(`📚 المعلمون المغطون (${coveringTeachers.length} معلم)`, coveringTeachersTable));
+      // جدول المعلمين المغطين - يظهر فقط في: جميع التقارير، الوكيل، المشرفين
+      if (reportTypeFilter === 'all' || reportTypeFilter === 'vice_principal' || reportTypeFilter === 'supervisor') {
+        const coveringTeachers = getAggregatedCoveringTeachers();
+        if (coveringTeachers.length > 0) {
+          const coveringTeachersTable = createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد الحصص المغطاة', width: 80 },
+              { text: 'المواد', width: 120 }
+            ],
+            coveringTeachers.slice(0, 20).map(teacher => [
+              teacher.name,
+              teacher.count.toString(),
+              teacher.subjects && Array.isArray(teacher.subjects) && teacher.subjects.length > 0 ? teacher.subjects.slice(0, 3).join(', ') : '-'
+            ]),
+            { showRowNumbers: true, headerColor: '#d1fae5' }
+          );
+          content.push(createSection(`📚 المعلمون المغطون (${coveringTeachers.length} معلم)`, coveringTeachersTable));
+        }
       }
       
-      // جدول المعلمين المشاركين في الأنشطة
-      const activityTeachers = getAggregatedActivityTeachers();
-      if (activityTeachers.length > 0) {
-        const activityTeachersTable = createRTLTable(
-          [
-            { text: 'اسم المعلم', width: '*' },
-            { text: 'عدد الأنشطة', width: 100 }
-          ],
-          activityTeachers.slice(0, 20).map(teacher => [
-            teacher.name,
-            teacher.count.toString()
-          ]),
-          { showRowNumbers: true, headerColor: '#e9d5ff' }
-        );
-        content.push(createSection(`🎯 المعلمون المشاركون في الأنشطة (${activityTeachers.length} معلم)`, activityTeachersTable));
+      // جدول المعلمين المشاركين في الأنشطة - يظهر فقط في: جميع التقارير، الأنشطة
+      if (reportTypeFilter === 'all' || reportTypeFilter === 'activities') {
+        const activityTeachers = getAggregatedActivityTeachers();
+        if (activityTeachers.length > 0) {
+          const activityTeachersTable = createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد الأنشطة', width: 100 }
+            ],
+            activityTeachers.slice(0, 20).map(teacher => [
+              teacher.name,
+              teacher.count.toString()
+            ]),
+            { showRowNumbers: true, headerColor: '#e9d5ff' }
+          );
+          content.push(createSection(`🎯 المعلمون المشاركون في الأنشطة (${activityTeachers.length} معلم)`, activityTeachersTable));
+        }
       }
       
       // جدول تقييم تحسن المعلمين (من الإشراف التربوي)
