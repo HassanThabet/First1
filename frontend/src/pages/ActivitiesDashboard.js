@@ -275,7 +275,7 @@ const ActivitiesDashboard = () => {
       console.log('📊 Exporting activities:', allActivities.length);
 
       // Prepare period text
-      let periodText = '';
+      let periodText = 'تقرير الأنشطة';
       if (mergedPeriod === 'weekly') {
         periodText = 'تقرير أسبوعي';
       } else if (mergedPeriod === 'monthly') {
@@ -288,6 +288,8 @@ const ActivitiesDashboard = () => {
       if (selectedActivity !== "all") {
         periodText += ` - ${selectedActivity}`;
       }
+      
+      console.log('📄 Period text:', periodText);
 
       // Prepare activities table data with safe data handling
       const activitiesData = allActivities.map((activity, index) => {
