@@ -1121,7 +1121,7 @@ const DirectorDashboard = () => {
         }
       });
       
-      toast.success("تم تصدير التقرير بنجاح مع جميع المخططات والتفاصيل");
+      toast.success("تم تصدير التقرير الشامل بنجاح مع جميع المخططات والتفاصيل الكاملة");
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast.error("حدث خطأ أثناء إنشاء التقرير");
