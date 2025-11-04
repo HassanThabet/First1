@@ -502,13 +502,16 @@ const ActivitiesDashboard = () => {
           {
             text: 'المعلمون المشرفون على الأنشطة',
             style: 'sectionHeader',
-            margin: [0, 15, 0, 10],
-            pageBreak: 'before' // Start on new page
+            margin: [0, 20, 0, 15],
+            pageBreak: 'before', // Start on new page
+            fontSize: 14,
+            bold: true,
+            color: '#9C27B0'
           },
           {
             table: {
               headerRows: 1,
-              widths: [30, 200, 80],
+              widths: [50, '*', 100], // استخدام * لملء العرض المتبقي
               body: (() => {
                 // Aggregate supervisors
                 const supervisorsMap = {};
