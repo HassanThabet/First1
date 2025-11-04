@@ -241,7 +241,6 @@ const SupervisorDashboard = () => {
       general_behavior: report.general_behavior,
       general_notes: report.general_notes || "",
       incidents: report.incidents || [],
-      absent_teachers: report.absent_teachers || [],
       covering_teachers: report.covering_teachers || [],
       absent_students_count: report.absent_students_count || 0
     });
