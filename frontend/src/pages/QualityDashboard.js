@@ -386,8 +386,8 @@ const QualityDashboard = () => {
     }
 
     // Initialize pdfMake fonts
-    if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
-      pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+    if (pdfMakeFonts) {
+      pdfMake.vfs = pdfMakeFonts;
     }
     
     pdfMake.fonts = {
