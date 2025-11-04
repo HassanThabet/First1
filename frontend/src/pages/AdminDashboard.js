@@ -601,17 +601,49 @@ const AdminDashboard = () => {
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>إدارة المعلمين</CardTitle>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button onClick={() => {
-                      setEditingItem(null);
-                      setTeacherForm({ name: "", subject: "", branch: "boys" });
-                    }}>
-                      <Plus className="w-4 h-4 ml-2" />
-                      إضافة معلم
-                    </Button>
-                  </DialogTrigger>
+                <CardTitle>إدارة المعلمين ({teachers.length})</CardTitle>
+                <div className="flex gap-2">
+                  {/* Hidden file input for import */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={handleImportTeachers}
+                    style={{ display: 'none' }}
+                  />
+                  
+                  {/* Export Button */}
+                  <Button
+                    onClick={handleExportTeachers}
+                    variant="outline"
+                    className="text-green-600 hover:text-green-700"
+                  >
+                    <Download className="w-4 h-4 ml-2" />
+                    تصدير Excel
+                  </Button>
+                  
+                  {/* Import Button */}
+                  <Button
+                    onClick={() => fileInputRef.current?.click()}
+                    variant="outline"
+                    className="text-blue-600 hover:text-blue-700"
+                    disabled={loading}
+                  >
+                    <Upload className="w-4 h-4 ml-2" />
+                    {loading ? "جاري الاستيراد..." : "استيراد Excel"}
+                  </Button>
+                  
+                  {/* Add Teacher Button */}
+                  <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button onClick={() => {
+                        setEditingItem(null);
+                        setTeacherForm({ name: "", subject: "", branch: "boys" });
+                      }}>
+                        <Plus className="w-4 h-4 ml-2" />
+                        إضافة معلم
+                      </Button>
+                    </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>{editingItem ? "تعديل معلم" : "إضافة معلم جديد"}</DialogTitle>
