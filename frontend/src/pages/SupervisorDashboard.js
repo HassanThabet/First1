@@ -48,7 +48,6 @@ const SupervisorDashboard = () => {
     general_behavior: 10,
     general_notes: "",
     incidents: [],
-    absent_teachers: [],
     covering_teachers: [],
     absent_students_count: 0
   });
