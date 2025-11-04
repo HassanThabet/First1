@@ -10,60 +10,58 @@ const EducationalSupervisionDashboard = () => {
 
   return (
     <DashboardLayout title="لوحة تحكم الإشراف التربوي - مدارس الفجر الجديد الأهلية">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card className="stat-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">عدد المعلمين</p>
-                <h3 className="text-3xl font-bold text-cyan-600">45</h3>
-              </div>
-              <GraduationCap className="w-12 h-12 text-cyan-500 opacity-20" />
+      <div className="space-y-6">
+        {/* Tabs Navigation */}
+        <Card>
+          <CardContent className="p-0">
+            <div className="flex border-b">
+              <button
+                onClick={() => setActiveTab("create")}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                  activeTab === "create"
+                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                ✍️ إنشاء تقرير تقييم
+              </button>
+              <button
+                onClick={() => setActiveTab("reports")}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                  activeTab === "reports"
+                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                📄 تقاريري
+              </button>
+              <button
+                onClick={() => setActiveTab("progress")}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                  activeTab === "progress"
+                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                📈 تقييم تحسن المعلمين
+              </button>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="stat-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">معدل الأداء</p>
-                <h3 className="text-3xl font-bold text-green-600">8.8/10</h3>
-              </div>
-              <TrendingUp className="w-12 h-12 text-green-500 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
+        {/* Tab Content */}
+        {activeTab === "create" && (
+          <EducationalSupervisionCreateReport onReportCreated={() => setActiveTab("reports")} />
+        )}
 
-        <Card className="stat-card">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">التقييمات</p>
-                <h3 className="text-3xl font-bold text-blue-600">120</h3>
-              </div>
-              <Award className="w-12 h-12 text-blue-500 opacity-20" />
-            </div>
-          </CardContent>
-        </Card>
+        {activeTab === "reports" && (
+          <EducationalSupervisionReportsList />
+        )}
+
+        {activeTab === "progress" && (
+          <EducationalSupervisionTeacherProgress />
+        )}
       </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>تقييم أداء المعلمين</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-12">
-            <GraduationCap className="w-24 h-24 mx-auto text-gray-300 mb-4" />
-            <h3 className="text-xl font-semibold text-gray-700 mb-2">
-              نظام تقييم المعلمين
-            </h3>
-            <p className="text-gray-600">
-              يمكنك تقييم أداء المعلمين وإضافة التقارير ونقاط القوة والتطوير
-            </p>
-          </div>
-        </CardContent>
-      </Card>
     </DashboardLayout>
   );
 };
