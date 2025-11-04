@@ -358,8 +358,13 @@ async def update_user(user_id: str, user_data: dict, current_user: dict = Depend
     if current_user["role"] != "admin":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
+    # If password is provided and not empty, hash it; otherwise remove it from update
     if "password" in user_data:
-        user_data["password"] = hash_password(user_data["password"])
+        if user_data["password"] and user_data["password"].strip():
+            user_data["password"] = hash_password(user_data["password"])
+        else:
+            # Remove password from update if it's empty
+            del user_data["password"]
     
     await db.users.update_one({"id": user_id}, {"$set": user_data})
     return {"message": "تم تحديث المستخدم بنجاح"}
