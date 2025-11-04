@@ -315,6 +315,81 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
     );
   }
 
+  // Compact view for dashboard
+  if (compact) {
+    return (
+      <div className="space-y-4">
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+            <CardContent className="p-4">
+              <div className="text-xs text-gray-700 mb-1">معلمون محسّنون</div>
+              <div className="text-2xl font-bold text-green-700">
+                {allTeacherProgress.filter(t => t.trend === "up").length}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-l-4 border-yellow-500">
+            <CardContent className="p-4">
+              <div className="text-xs text-gray-700 mb-1">معلمون مستقرون</div>
+              <div className="text-2xl font-bold text-yellow-700">
+                {allTeacherProgress.filter(t => t.trend === "stable").length}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+            <CardContent className="p-4">
+              <div className="text-xs text-gray-700 mb-1">يحتاجون دعم</div>
+              <div className="text-2xl font-bold text-red-700">
+                {allTeacherProgress.filter(t => t.trend === "down").length}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Top 3 Teachers */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {allTeacherProgress.slice(0, 3).map((teacher) => (
+            <Card key={teacher.teacher_id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-bold text-sm">{teacher.teacher_name}</h4>
+                  <div className="flex items-center gap-1">
+                    {teacher.trend === "up" && <TrendingUp className="w-4 h-4 text-green-600" />}
+                    {teacher.trend === "down" && <TrendingDown className="w-4 h-4 text-red-600" />}
+                    {teacher.trend === "stable" && <Minus className="w-4 h-4 text-yellow-600" />}
+                    <span className={`text-sm font-bold ${
+                      teacher.trend === "up" ? "text-green-600" : 
+                      teacher.trend === "down" ? "text-red-600" : 
+                      "text-yellow-600"
+                    }`}>
+                      {teacher.improvement > 0 ? "+" : ""}{teacher.improvement}%
+                    </span>
+                  </div>
+                </div>
+                <div className="h-20">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={teacher.evaluations}>
+                      <Line type="monotone" dataKey="average" stroke="#2563eb" strokeWidth={2} dot={false} />
+                      <YAxis domain={[0, 10]} hide />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex justify-between text-xs mt-2">
+                  <span className="text-gray-600">أول: {teacher.firstAverage}/10</span>
+                  <span className="text-gray-900 font-bold">حالي: {teacher.currentAverage}/10</span>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Full view
   return (
     <div className="space-y-6">
       {/* Filter and Export */}
