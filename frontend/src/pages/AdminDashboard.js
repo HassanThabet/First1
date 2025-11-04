@@ -25,6 +25,7 @@ const AdminDashboard = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [selectedUserForPassword, setSelectedUserForPassword] = useState(null);
   const [newPassword, setNewPassword] = useState("");
+  const fileInputRef = useRef(null);
 
   // Form states
   const [userForm, setUserForm] = useState({
