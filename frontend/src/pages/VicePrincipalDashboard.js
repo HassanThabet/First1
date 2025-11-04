@@ -37,7 +37,8 @@ const VicePrincipalDashboard = () => {
     problems: [],
     suggestions: [],
     week_start: "",
-    week_end: ""
+    week_end: "",
+    absent_teachers: [] // {teacher: "", absent_days: 0}
   });
 
   useEffect(() => {
