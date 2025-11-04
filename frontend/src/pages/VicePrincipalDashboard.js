@@ -416,184 +416,136 @@ const VicePrincipalDashboard = () => {
       }
 
       const stats = getMergedStatistics();
+      const content = [];
 
-      // Prepare period text
-      let periodText = 'جميع التقارير';
-      
-      // Prepare detailed reports data
-      const reportsData = supervisorReports.map((report, index) => {
+      // Statistics Section
+      content.push(createSection('الإحصائيات الإجمالية', {
+        stack: [
+          // First row of stats
+          createRTLTable(
+            [
+              { text: 'إجمالي التقارير', width: '*' },
+              { text: 'المعلمون المتأخرون', width: '*' },
+              { text: 'المعلمون المغطون', width: '*' }
+            ],
+            [[
+              { text: String(stats.totalReports), style: 'tableCellBold', fillColor: '#e3f2fd' },
+              { text: String(stats.totalLateTeachers), style: 'tableCellBold', fillColor: '#fff3e0' },
+              { text: String(stats.totalCoveringTeachers), style: 'tableCellBold', fillColor: '#e8f5e9' }
+            ]],
+            { alternateRowColors: false }
+          ),
+          // Second row of stats
+          createRTLTable(
+            [
+              { text: 'الطلاب الغائبون', width: '*' },
+              { text: 'متوسط الانضباط', width: '*' },
+              { text: 'متوسط النظافة', width: '*' },
+              { text: 'متوسط الحضور', width: '*' }
+            ],
+            [[
+              { text: String(stats.totalAbsentStudents), style: 'tableCellBold', fillColor: '#fce4ec' },
+              { text: `${stats.avgDiscipline}/10`, style: 'tableCellBold', fillColor: '#f3e5f5' },
+              { text: `${stats.avgCleanliness}/10`, style: 'tableCellBold', fillColor: '#e0f2f1' },
+              { text: `${stats.avgAttendance}%`, style: 'tableCellBold', fillColor: '#e1f5fe' }
+            ]],
+            { alternateRowColors: false }
+          )
+        ]
+      }));
+
+      // Absent Teachers Section (from VP report)
+      if (myReports.length > 0 && myReports[0].absent_teachers && myReports[0].absent_teachers.length > 0) {
+        const absentTeachersRows = myReports[0].absent_teachers.map(at => [
+          at.teacher || '-',
+          { text: `${at.absent_days || 0} ${at.absent_days === 1 ? 'يوم' : 'أيام'}`, style: 'tableCellBold', fillColor: '#fee2e2' }
+        ]);
+
+        content.push(createSection('غياب المعلمين', 
+          createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد أيام الغياب', width: 120 }
+            ],
+            absentTeachersRows,
+            { showRowNumbers: true }
+          )
+        ));
+      }
+
+      // Problems Section
+      if (myReports.length > 0 && myReports[0].problems && myReports[0].problems.length > 0) {
+        const problemsRows = myReports[0].problems.map(p => [
+          p.description || '-',
+          p.action || '-'
+        ]);
+
+        content.push(createSection('المشاكل والملاحظات', 
+          createRTLTable(
+            [
+              { text: 'الوصف', width: '*' },
+              { text: 'الإجراء المتخذ', width: '*' }
+            ],
+            problemsRows,
+            { showRowNumbers: true }
+          )
+        ));
+      }
+
+      // Suggestions Section
+      if (myReports.length > 0 && myReports[0].suggestions && myReports[0].suggestions.length > 0) {
+        const suggestionsRows = myReports[0].suggestions.map(s => [s]);
+
+        content.push(createSection('المقترحات', 
+          createRTLTable(
+            [{ text: 'الاقتراح', width: '*' }],
+            suggestionsRows,
+            { showRowNumbers: true }
+          )
+        ));
+      }
+
+      // Detailed Reports Section
+      const reportsRows = supervisorReports.map(report => {
         const reportDate = new Date(report.date);
         const supervisorName = getUserName(report.user_id);
         return [
-          String(index + 1),
-          String(supervisorName),
+          supervisorName,
           reportDate.toLocaleDateString('ar-SA'),
           String(report.late_teachers?.length || 0),
-          String(report.absent_teachers?.length || 0),
           String(report.covering_teachers?.length || 0),
           String(report.absent_students_count || 0),
-          String(report.student_discipline || 0) + '/10',
-          String(report.classroom_cleanliness || 0) + '/10'
+          `${report.student_discipline || 0}/10`,
+          `${report.classroom_cleanliness || 0}/10`
         ];
       });
 
-      const docDefinition = {
-        pageSize: 'A4',
-        pageOrientation: 'landscape',
-        defaultStyle: {
-          font: 'Cairo',
-          alignment: 'right'
-        },
-        content: [
-          // Header
-          {
-            text: 'مدارس الفجر الجديد الأهلية',
-            style: 'header',
-            alignment: 'center',
-            margin: [0, 0, 0, 10]
-          },
-          {
-            text: 'تقرير الوكيل - تقارير المشرفين المجمعة',
-            style: 'subheader',
-            alignment: 'center',
-            margin: [0, 0, 0, 5]
-          },
-          {
-            text: `الفرع: ${user.branch === 'boys' ? 'البنين' : 'البنات'}`,
-            alignment: 'center',
-            fontSize: 12,
-            margin: [0, 0, 0, 5]
-          },
-          {
-            text: `تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`,
-            alignment: 'center',
-            fontSize: 10,
-            margin: [0, 0, 0, 15]
-          },
-          
-          // Statistics Summary
-          {
-            text: 'الإحصائيات الإجمالية',
-            style: 'sectionHeader',
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              widths: ['*', '*', '*', '*'],
-              body: [
-                [
-                  { text: 'إجمالي التقارير', style: 'tableHeader', alignment: 'center' },
-                  { text: 'المعلمون المتأخرون', style: 'tableHeader', alignment: 'center' },
-                  { text: 'المعلمون الغائبون', style: 'tableHeader', alignment: 'center' },
-                  { text: 'المعلمون المغطون', style: 'tableHeader', alignment: 'center' }
-                ],
-                [
-                  { text: String(stats.totalReports), alignment: 'center' },
-                  { text: String(stats.totalLateTeachers), alignment: 'center' },
-                  { text: String(stats.totalAbsentTeachers), alignment: 'center' },
-                  { text: String(stats.totalCoveringTeachers), alignment: 'center' }
-                ]
-              ]
-            },
-            layout: {
-              fillColor: function (rowIndex) {
-                return rowIndex === 0 ? '#2196F3' : '#E3F2FD';
-              }
-            },
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              widths: ['*', '*', '*', '*'],
-              body: [
-                [
-                  { text: 'الطلاب الغائبون', style: 'tableHeader', alignment: 'center' },
-                  { text: 'متوسط الانضباط', style: 'tableHeader', alignment: 'center' },
-                  { text: 'متوسط النظافة', style: 'tableHeader', alignment: 'center' },
-                  { text: 'متوسط الحضور', style: 'tableHeader', alignment: 'center' }
-                ],
-                [
-                  { text: String(stats.totalAbsentStudents), alignment: 'center' },
-                  { text: String(stats.avgDiscipline) + '/10', alignment: 'center' },
-                  { text: String(stats.avgCleanliness) + '/10', alignment: 'center' },
-                  { text: String(stats.avgAttendance) + '%', alignment: 'center' }
-                ]
-              ]
-            },
-            layout: {
-              fillColor: function (rowIndex) {
-                return rowIndex === 0 ? '#4CAF50' : '#E8F5E9';
-              }
-            },
-            margin: [0, 0, 0, 15]
-          },
+      content.push(createSection(`تفاصيل تقارير المشرفين (${supervisorReports.length})`, 
+        createRTLTable(
+          [
+            { text: 'المشرف', width: 80 },
+            { text: 'التاريخ', width: 60 },
+            { text: 'متأخرون', width: 45 },
+            { text: 'مغطون', width: 45 },
+            { text: 'طلاب غائبون', width: 60 },
+            { text: 'الانضباط', width: 50 },
+            { text: 'النظافة', width: 50 }
+          ],
+          reportsRows,
+          { showRowNumbers: true }
+        )
+      ));
 
-          // Detailed Reports
-          {
-            text: `تفاصيل التقارير (${supervisorReports.length})`,
-            style: 'sectionHeader',
-            margin: [0, 0, 0, 10]
-          },
-          {
-            table: {
-              headerRows: 1,
-              widths: [20, 70, 50, 40, 40, 40, 50, 40, 40],
-              body: [
-                [
-                  { text: '#', style: 'tableHeader' },
-                  { text: 'المشرف', style: 'tableHeader' },
-                  { text: 'التاريخ', style: 'tableHeader' },
-                  { text: 'متأخرون', style: 'tableHeader' },
-                  { text: 'غائبون', style: 'tableHeader' },
-                  { text: 'مغطون', style: 'tableHeader' },
-                  { text: 'طلاب غائبون', style: 'tableHeader' },
-                  { text: 'الانضباط', style: 'tableHeader' },
-                  { text: 'النظافة', style: 'tableHeader' }
-                ],
-                ...reportsData
-              ]
-            },
-            layout: {
-              fillColor: function (rowIndex) {
-                return rowIndex === 0 ? '#9C27B0' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
-              }
-            }
-          }
-        ],
-        styles: {
-          header: {
-            fontSize: 18,
-            bold: true,
-            color: '#1565C0'
-          },
-          subheader: {
-            fontSize: 16,
-            bold: true,
-            color: '#1565C0'
-          },
-          sectionHeader: {
-            fontSize: 14,
-            bold: true,
-            color: '#1565C0'
-          },
-          tableHeader: {
-            bold: true,
-            fontSize: 9,
-            color: 'white'
-          }
-        },
-        footer: function(currentPage, pageCount) {
-          return {
-            text: `صفحة ${currentPage} من ${pageCount}`,
-            alignment: 'center',
-            fontSize: 9,
-            margin: [0, 10, 0, 0]
-          };
+      const filename = `تقرير_الوكيل_${user.branch === 'boys' ? 'بنين' : 'بنات'}_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`;
+      
+      generatePDF(content, filename, {
+        title: 'تقرير الوكيل - تقارير المشرفين المجمعة',
+        orientation: 'landscape',
+        additionalInfo: {
+          leftInfo: `الفرع: ${user.branch === 'boys' ? 'البنين' : 'البنات'}`
         }
-      };
+      });
 
-      const filename = `تقرير_الوكيل_${user.branch === 'boys' ? 'بنين' : 'بنات'}.pdf`;
-      pdfMake.createPdf(docDefinition).download(filename);
       toast.success('تم تصدير PDF بنجاح');
     } catch (error) {
       console.error('PDF Export Error:', error);
