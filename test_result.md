@@ -363,6 +363,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "✅ PDF EXPORT CUSTOMIZATION: Implemented user-requested filtering for ChairmanDashboard and DirectorDashboard PDF exports: 1) REMOVED: 'ملخص التقارير التفصيلية' section completely deleted from both dashboards, 2) CONDITIONAL DISPLAY - Absent/Late/Covering Teachers: Now only appear in PDF when reportTypeFilter is 'all', 'vice_principal', or 'supervisor' (hidden for activities, social, quality reports), 3) CONDITIONAL DISPLAY - Activity Supervisor Teachers: Now only appear in PDF when reportTypeFilter is 'all' or 'activities' (hidden for other report types). This ensures PDF content is contextually relevant to the selected report type filter."
+      - working: "NA"
+        agent: "main"
+        comment: "✅ UI ENHANCEMENTS - CONDITIONAL VIEWS ADDED: Created new ActivitySupervisorsView component and integrated it into ChairmanDashboard and DirectorDashboard. Now: 1) When reportTypeFilter is 'educational_supervision' or 'all' → TeacherProgressView (تقييم تحسين المعلمين) is displayed showing teacher evaluation progress with first/last scores, 2) When reportTypeFilter is 'activities' or 'all' → ActivitySupervisorsView (المعلمون المشرفون على الأنشطة) is displayed showing teachers supervising activities with activity counts. ActivitySupervisorsView fetches data from activities reports, aggregates supervisors from all activities, and displays them in a table with activity counts. Both views have compact mode for dashboard and full mode when clicked."
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
