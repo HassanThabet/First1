@@ -970,23 +970,25 @@ const ChairmanDashboard = () => {
         }
       }
       
-      // جدول المعلمين المشاركين في الأنشطة
-      // TODO: Implement getActivitySupervisorTeachers function
-      // const activitySupervisorTeachers = getActivitySupervisorTeachers();
-      // if (activitySupervisorTeachers.length > 0) {
-      //   const activityTeachersTable = createRTLTable(
-      //     [
-      //       { text: 'اسم المعلم', width: '*' },
-      //       { text: 'عدد الأنشطة', width: 100 }
-      //     ],
-      //     activitySupervisorTeachers.slice(0, 20).map(teacher => [
-      //       teacher.name,
-      //       teacher.count.toString()
-      //     ]),
-      //     { showRowNumbers: true, headerColor: '#e9d5ff' }
-      //   );
-      //   content.push(createSection(`🎯 المعلمون المشاركون في الأنشطة (${activitySupervisorTeachers.length} معلم)`, activityTeachersTable));
-      // }
+      // جدول المعلمين المشاركين في الأنشطة - يظهر فقط في: جميع التقارير، الأنشطة
+      if (reportTypeFilter === 'all' || reportTypeFilter === 'activities') {
+        // TODO: Implement getActivitySupervisorTeachers function
+        // const activitySupervisorTeachers = getActivitySupervisorTeachers();
+        // if (activitySupervisorTeachers.length > 0) {
+        //   const activityTeachersTable = createRTLTable(
+        //     [
+        //       { text: 'اسم المعلم', width: '*' },
+        //       { text: 'عدد الأنشطة', width: 100 }
+        //     ],
+        //     activitySupervisorTeachers.slice(0, 20).map(teacher => [
+        //       teacher.name,
+        //       teacher.count.toString()
+        //     ]),
+        //     { showRowNumbers: true, headerColor: '#e9d5ff' }
+        //   );
+        //   content.push(createSection(`🎯 المعلمون المشاركون في الأنشطة (${activitySupervisorTeachers.length} معلم)`, activityTeachersTable));
+        // }
+      }
       
       // جدول تقييم تحسن المعلمين (من الإشراف التربوي)
       if ((reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && educationalSupervisionReports.length > 0) {
