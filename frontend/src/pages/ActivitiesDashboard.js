@@ -449,19 +449,19 @@ const ActivitiesDashboard = () => {
           {
             table: {
               headerRows: 1,
-              widths: [20, 'auto', 50, 'auto', 'auto', 'auto', 'auto', 40, 40, 'auto'],
+              widths: [20, 60, 50, 50, 60, 60, 50, 40, 40, 50], // Fixed widths instead of 'auto'
               body: [
                 [
-                  { text: '#', style: 'tableHeader' },
-                  { text: 'النشاط', style: 'tableHeader' },
-                  { text: 'التاريخ', style: 'tableHeader' },
-                  { text: 'النوع', style: 'tableHeader' },
-                  { text: 'المشرفون', style: 'tableHeader' },
-                  { text: 'المعلمون المتعاونون', style: 'tableHeader' },
-                  { text: 'الفئة المستهدفة', style: 'tableHeader' },
-                  { text: 'المشاركون', style: 'tableHeader' },
-                  { text: 'التفاعل', style: 'tableHeader' },
-                  { text: 'الأثر التعليمي', style: 'tableHeader' }
+                  { text: '#', style: 'tableHeader', alignment: 'center' },
+                  { text: 'النشاط', style: 'tableHeader', alignment: 'center' },
+                  { text: 'التاريخ', style: 'tableHeader', alignment: 'center' },
+                  { text: 'النوع', style: 'tableHeader', alignment: 'center' },
+                  { text: 'المشرفون', style: 'tableHeader', alignment: 'center' },
+                  { text: 'المعلمون المتعاونون', style: 'tableHeader', alignment: 'center' },
+                  { text: 'الفئة المستهدفة', style: 'tableHeader', alignment: 'center' },
+                  { text: 'المشاركون', style: 'tableHeader', alignment: 'center' },
+                  { text: 'التفاعل', style: 'tableHeader', alignment: 'center' },
+                  { text: 'الأثر التعليمي', style: 'tableHeader', alignment: 'center' }
                 ],
                 ...activitiesData
               ]
