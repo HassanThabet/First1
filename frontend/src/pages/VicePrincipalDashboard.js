@@ -20,6 +20,7 @@ const VicePrincipalDashboard = () => {
   const [supervisorReports, setSupervisorReports] = useState([]);
   const [myReports, setMyReports] = useState([]);
   const [users, setUsers] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingReport, setEditingReport] = useState(null);
   const [selectedSupervisorReport, setSelectedSupervisorReport] = useState(null);
