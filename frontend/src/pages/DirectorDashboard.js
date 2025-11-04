@@ -1698,7 +1698,7 @@ const DirectorDashboard = () => {
                     
                     {/* Activities Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
-                      <div>
+                      <div id="director-activities-chart">
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة (انقر على "المشاركين" للتفاصيل)</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={getActivitiesChartData()} onClick={(e) => {
