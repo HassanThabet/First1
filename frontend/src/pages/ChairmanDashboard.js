@@ -1109,33 +1109,6 @@ const ChairmanDashboard = () => {
         }
       }
       
-      // === القسم 7: ملخص التقارير التفصيلية ===
-      if (reports.length > 0) {
-        const reportsTable = createRTLTable(
-          [
-            { text: 'النوع', width: 80 },
-            { text: 'الموظف', width: '*' },
-            { text: 'التاريخ', width: 100 }
-          ],
-          reports.slice(0, 50).map(report => {
-            const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
-                                    report.type === "supervisor" ? "مشرف" :
-                                    report.type === "activities" ? "أنشطة" :
-                                    report.type === "social" ? "أخصائي" :
-                                    report.type === "quality" ? "جودة" :
-                                    report.type === "educational_supervision" ? "إشراف تربوي" : "";
-            
-            return [
-              reportTypeArabic,
-              report.userName || 'غير محدد',
-              report.date || report.week_start || 'غير محدد'
-            ];
-          }),
-          { showRowNumbers: true }
-        );
-        content.push(createSection(`📋 ملخص التقارير التفصيلية (إجمالي: ${reports.length})`, reportsTable));
-      }
-      
       // Generate PDF
       const filename = `تقرير_رئيس_مجلس_الإدارة_${new Date().toLocaleDateString('ar-SA').replace(/\//g, '-')}.pdf`;
       
