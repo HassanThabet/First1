@@ -1029,7 +1029,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["http://localhost:3000", "https://madaris-alfajr.preview.emergentagent.com"],
+    allow_origins=["http://localhost:3000", "https://rtl-report-system.preview.emergentagent.com"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
