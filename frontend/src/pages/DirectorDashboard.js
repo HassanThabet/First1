@@ -807,17 +807,90 @@ const DirectorDashboard = () => {
     ];
   };
 
-  // Generate PDF Export
-  const exportToPDF = () => {
-    // Initialize pdfMake fonts for this export
-    if (pdfMakeFonts) {
-      pdfMake.vfs = pdfMakeFonts;
-    }
-    
-    pdfMake.fonts = {
-      Cairo: {
-        normal: 'Cairo-Regular.ttf',
-        bold: 'Cairo-Regular.ttf',
+  // Generate PDF Export with charts and comprehensive data
+  const exportToPDF = async () => {
+    try {
+      toast.info("جاري إنشاء التقرير...");
+      
+      const stats = getOverallStatistics();
+      const reports = getDetailedReports();
+      
+      const timeFilterText = timeFilter === "daily" ? "اليوم" : 
+                            timeFilter === "weekly" ? "هذا الأسبوع" : 
+                            timeFilter === "monthly" ? "هذا الشهر" :
+                            timeFilter === "custom" && customStartDate && customEndDate ? 
+                              `من ${customStartDate} إلى ${customEndDate}` : "جميع الفترات";
+      
+      const reportTypeText = reportTypeFilter === "all" ? "جميع التقارير" :
+                            reportTypeFilter === "vice_principal" ? "تقارير الوكلاء" :
+                            reportTypeFilter === "supervisor" ? "تقارير المشرفين" :
+                            reportTypeFilter === "activities" ? "تقارير الأنشطة" :
+                            reportTypeFilter === "social" ? "تقارير الأخصائي الاجتماعي" :
+                            reportTypeFilter === "quality" ? "تقارير الجودة" :
+                            reportTypeFilter === "educational_supervision" ? "تقارير الإشراف التربوي" : "";
+      
+      const branchText = user.branch === 'boys' ? 'فرع البنين' : 'فرع البنات';
+      const content = [];
+      
+      // === القسم 1: الإحصائيات الإجمالية ===
+      const overallStats = [
+        { label: 'إجمالي التقارير', value: stats.totalAllReports.toString(), color: '#dbeafe' },
+        { label: 'المعلمون الغائبون', value: stats.totalAbsentTeachers.toString(), color: '#fee2e2' },
+        { label: 'المعلمون المتأخرون', value: stats.totalLateTeachers.toString(), color: '#fed7aa' },
+        { label: 'المعلمون المغطون', value: stats.totalCoveringTeachers.toString(), color: '#d1fae5' },
+        { label: 'الطلاب الغائبون', value: stats.totalAbsentStudents.toString(), color: '#fce7f3' },
+        { label: 'الحوادث المسجلة', value: stats.totalIncidents.toString(), color: '#fee2e2' }
+      ];
+      
+      content.push(createSection('📊 الإحصائيات العامة', createStatsGrid(overallStats)));
+      
+      // === القسم 2: مؤشرات الأداء ===
+      const performanceTable = createRTLTable(
+        [
+          { text: 'المؤشر', width: '*' },
+          { text: 'القيمة', width: 80 }
+        ],
+        [
+          ['انضباط الطلاب', `${stats.avgDiscipline}/10`],
+          ['نظافة الفصول', `${stats.avgCleanliness}/10`],
+          ['التزام المعلمين', `${stats.avgAttendance}/10`],
+          ['السلوك العام', `${stats.avgBehavior}/10`]
+        ],
+        { showRowNumbers: false }
+      );
+      content.push(createSection('📈 مؤشرات الأداء', performanceTable));
+      
+      // === القسم 3: المخططات البيانية ===
+      toast.info("جاري التقاط المخططات...");
+      
+      const teachersChartImage = await captureChartAsImage('#director-teachers-chart');
+      if (teachersChartImage) {
+        content.push(createSection('📊 توزيع حالات المعلمين', createChartImage(teachersChartImage, { width: 450, height: 250 })));
+      }
+      
+      const performanceChartImage = await captureChartAsImage('#director-performance-chart');
+      if (performanceChartImage) {
+        content.push(createSection('📈 متوسط الأداء العام', createChartImage(performanceChartImage, { width: 450, height: 250 })));
+      }
+      
+      const absentChartImage = await captureChartAsImage('#director-absent-teachers-chart');
+      if (absentChartImage) {
+        content.push(createSection('📉 تفاصيل غياب المعلمين', createChartImage(absentChartImage, { width: 450, height: 250 })));
+      }
+      
+      const activitiesChartImage = await captureChartAsImage('#director-activities-chart');
+      if (activitiesChartImage) {
+        content.push(createSection('🎯 إحصائيات الأنشطة', createChartImage(activitiesChartImage, { width: 450, height: 250 })));
+      }
+      
+      const socialChartImage = await captureChartAsImage('#director-social-chart');
+      if (socialChartImage) {
+        content.push(createSection('👥 توزيع حالات الأخصائي الاجتماعي', createChartImage(socialChartImage, { width: 450, height: 250 })));
+      }
+      
+      // Continue with the rest (similar to ChairmanDashboard)
+      
+      const Cairo = {
         italics: 'Cairo-Regular.ttf',
         bolditalics: 'Cairo-Regular.ttf'
       },
