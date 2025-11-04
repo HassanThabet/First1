@@ -360,6 +360,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🔧 FIXED TypeError IN CHAIRMAN DASHBOARD PDF: Fixed 'TypeError: teacher.subjects.slice(...).join is not a function' error. Root cause: teacher.subjects can be either a string or an array. When it's a string, .slice() returns a string, and strings don't have .join() method. Added Array.isArray() checks in two locations (lines 360 and 957) to handle both cases: if array, use .slice().join(); if string, use as-is; otherwise default to '-'. Ready for testing."
+      - working: "NA"
+        agent: "main"
+        comment: "✅ PDF EXPORT CUSTOMIZATION: Implemented user-requested filtering for ChairmanDashboard and DirectorDashboard PDF exports: 1) REMOVED: 'ملخص التقارير التفصيلية' section completely deleted from both dashboards, 2) CONDITIONAL DISPLAY - Absent/Late/Covering Teachers: Now only appear in PDF when reportTypeFilter is 'all', 'vice_principal', or 'supervisor' (hidden for activities, social, quality reports), 3) CONDITIONAL DISPLAY - Activity Supervisor Teachers: Now only appear in PDF when reportTypeFilter is 'all' or 'activities' (hidden for other report types). This ensures PDF content is contextually relevant to the selected report type filter."
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
