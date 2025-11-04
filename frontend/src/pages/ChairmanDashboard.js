@@ -2185,6 +2185,8 @@ const ChairmanDashboard = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+          </>
+        )}
       </div>
     </DashboardLayout>
   );
