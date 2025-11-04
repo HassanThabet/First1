@@ -1,7 +1,7 @@
-import pdfMake from "pdfmake/build/pdfmake";
+import pdfMake from "@digicole/pdfmake-rtl";
 import pdfMakeFonts from "../fonts/vfs_fonts";
 
-// Initialize fonts
+// Initialize fonts with RTL support
 if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
   pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
   pdfMake.fonts = {
