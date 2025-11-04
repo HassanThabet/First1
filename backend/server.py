@@ -1078,7 +1078,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["http://localhost:3000", "https://arabic-edu-sys.preview.emergentagent.com"],
+    allow_origins=["http://localhost:3000", "https://newdawn-edu-portal.preview.emergentagent.com"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
