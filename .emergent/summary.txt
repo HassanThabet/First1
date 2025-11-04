@@ -1,21 +1,20 @@
 <analysis>
-The previous AI engineer focused on enhancing the مدارس الفجر الجديد الأهلية application, specifically addressing PDF export issues for Arabic (RTL) text. The initial problem was 's lack of native RTL support, leading to the integration of . However, this led to a persistent font loading error: first, , and then . Attempts were made to define  across several dashboard and utility files (, , , , ), referencing  from .
+The previous AI engineer initiated work on the مدارس الفجر الجديد الأهلية application, focusing on critical PDF export fixes for Arabic (RTL) text. The primary challenge was integrating  and defining fonts to resolve  errors.
 
-The current interaction started with confirming priorities with the user. After clarifying that purchases should be discarded and prioritizing the PDF fix, then archiving, the current AI engineer began debugging. The critical breakthrough was identifying a mismatch in how  exports its font data (as a direct object ) and how  or  expects to access it (via ). This explains why the font, though present, cannot be found.
+The current trajectory began with user confirmation to prioritize the PDF fix. The AI engineer systematically debugged by examining , , and relevant dashboard files. A key breakthrough was identifying that  directly exports the font data object (), but the calling code in , , and  incorrectly attempts to access it via . This structural mismatch was the root cause of the font loading failure, preventing  from finding the necessary font files. The immediate next step is to correct this direct assignment in the identified files.
 </analysis>
 
 <product_requirements>
-The مدارس الفجر الجديد الأهلية application is a role-based dashboard system (Admin, Chairman, Director, Vice-Principal, Supervisor, Activities, Social Specialist) with an Arabic (RTL) UI. Core functionalities include CRUD operations for reports, graphical statistics, and Excel/PDF exports. Supervisors manage daily activities, while Vice-Principals handle absent teachers and merged supervisor reports. Directors and Chairmen require aggregated statistics, staff-specific filtering, custom date ranges, detailed views, and interactive charts. Recent enhancements included updating Director and Chairman dashboards with departmental statistics and combined filters. A new requirement for branch filtering (boys/girls) was introduced. The absent teachers responsibility shifted from Supervisor to Vice-Principal. A comprehensive overhaul of PDF export formatting was undertaken for full RTL support and a unified Aklisha template. The immediate and current user request is to resolve the persistent RTL text formatting issues in PDF exports, specifically the  error, followed by implementing automatic archiving of old reports. The purchases functionality was explicitly cancelled by the user.
+The مدارس الفجر الجديد الأهلية application is a role-based dashboard system supporting Arabic (RTL) UI, offering CRUD operations for reports, graphical statistics, and Excel/PDF exports. Key users include Supervisors (daily activities), Vice-Principals (absent teachers, merged reports), Directors, and Chairmen (aggregated statistics, staff filtering, custom date ranges, charts). Recent updates involved enhancing Director and Chairman dashboards with departmental statistics and combined filters, along with a new branch filtering (boys/girls) requirement. The absent teachers responsibility shifted to Vice-Principal. A significant overhaul for PDF export formatting was initiated to achieve full RTL support and a unified Aklisha template. The immediate and current user request is to resolve the  error in PDF exports, followed by implementing automatic archiving of old reports. The purchases functionality was explicitly cancelled.
 </product_requirements>
 
 <key_technical_concepts>
-- **FastAPI:** Python framework for backend APIs.
-- **React:** Frontend library for UI.
-- **MongoDB:** NoSQL database.
-- **Shadcn UI & Tailwind CSS:** Frontend styling.
-- **RTL Support:** Essential for Arabic UI using .
-- **pdfmake & @digicole/pdfmake-rtl:** JavaScript libraries for client-side PDF generation.
-- **Recharts:** React library for data visualization.
+-   **FastAPI:** Python framework for backend APIs.
+-   **React:** Frontend library for UI.
+-   **MongoDB:** NoSQL database.
+-   **Shadcn UI & Tailwind CSS:** Frontend styling.
+-   **RTL Support:** Essential for Arabic UI using .
+-   **pdfmake & @digicole/pdfmake-rtl:** JavaScript libraries for client-side PDF generation.
 </key_technical_concepts>
 
 <code_architecture>
@@ -28,47 +27,44 @@ The application uses a MERN-like stack: React for the frontend, FastAPI for the 
 **Key Files and Their Importance/Changes:**
 
 -   :
-    -   **Importance:** Core API routes and database models. No relevant changes in this trajectory.
--   :
     -   **Importance:** Director's dashboard with report display and PDF export.
-    -   **Changes:** Updated to import  and . Its  function was refactored to use .  was defined to include  and  for Arabic font support.
+    -   **Changes:** Updated to import  and . Its  function was refactored.  was defined.
 -   :
-    -   **Importance:** Chairman's dashboard with similar functionalities to Director's.
-    -   **Changes:** Similar to , updated to use  and . Its  function was refactored, and  was defined with  and .
+    -   **Importance:** Chairman's dashboard.
+    -   **Changes:** Similar to , updated to use  and . Its  function was refactored.  was defined. This file, along with  and , currently contains the incorrect  logic.
 -   :
-    -   **Importance:** Quality department's dashboard, also for PDF export.
-    -   **Changes:** Updated to import  and had  defined for  and .
+    -   **Importance:** Quality department's dashboard.
+    -   **Changes:** Updated to import  and  was defined. This file also contains the incorrect  assignment.
 -   :
-    -   **Importance:** Centralized  configuration, especially for fonts.
-    -   **Changes:** Updated to import . Contains a  definition for  and .
+    -   **Importance:** Centralized  configuration, especially for fonts and  setup.
+    -   **Changes:** Imports  and defines . It correctly imports  from  and sets . However, this configuration is currently *not being used* by the affected dashboard files.
 -    (New file):
-    -   **Importance:** Centralizes PDF generation logic, styles, and RTL handling for consistent exports.
-    -   **Changes:** Created to encapsulate PDF generation. Imports . Includes helper functions like , , and . Contains its own  definition for  and .
+    -   **Importance:** Centralizes PDF generation logic, styles, and RTL handling.
+    -   **Changes:** Created to encapsulate PDF generation, imports , and includes helper functions. Contains its own  definition.
 -   :
-    -   **Importance:** Contains base64 encoded font data, specifically , required by  for Arabic rendering.
-    -   **Changes:** No direct changes to its content in this trajectory. However, the *problem* identified is that this file  (an object directly), while the  setup attempts to access fonts via  or similar nested paths, causing .
+    -   **Importance:** Contains base64 encoded font data, specifically , for .
+    -   **Changes:** No direct changes to its content. It  where  is the direct object containing font data.
 </code_architecture>
 
 <pending_tasks>
--   Address remaining PDF export formatting issues: Specifically, diagnose and fix the  error.
+-   Address remaining PDF export formatting issues: Specifically, fix the  error.
 -   Implement automatic archiving of old reports.
 -   Implement remember me functionality for authentication.
 -   Implement Chairman's detailed teacher evaluations and their PDF/Excel export.
--   Implement full Admin functionalities for managing teachers, classes, and subjects.
--   Verify QualityDashboard has fully integrated all chart functionalities and is bug-free.
 </pending_tasks>
 
 <current_work>
-The immediate focus is on resolving the  error during PDF export. The previous AI engineer had already integrated  and attempted to define  in , , , , and  to include  and .
+The immediate focus is on resolving the  error during PDF export. The previous AI engineer had integrated  and set  in various files.
 
-The current AI engineer has confirmed the user's priority to fix this PDF issue first, followed by archiving. Diagnostic steps involved:
-1.  Reading , which re-emphasized the font error.
-2.  Inspecting  and confirming 's presence within it.
-3.  Examining  and  to see how  is configured.
-4.  Critically, running  on  to understand its export structure. This revealed the core problem:  directly , where  is the object containing the font data. However, the  library (or its RTL wrapper) expects to find these fonts under  or a similar nested structure, leading to the file not found error because the direct export is not being correctly mapped to 's virtual file system. The current work is at the stage of having precisely identified this structural mismatch.
+The current AI engineer has confirmed with the user that fixing this PDF issue is the top priority. Diagnostic steps led to identifying the root cause:
+1.  Confirmed 's presence in .
+2.  Verified that  directly exports an object  containing the font data.
+3.  Discovered that  correctly sets  (assuming  is the import from ).
+4.  Crucially, found that , , and  were *not* using . Instead, they were directly configuring  and attempting to assign  by using an incorrect nested path: .
+
+The work is at the stage where the precise structural mismatch has been identified: the code expects a nested  property, but the  export *is* the  object directly.
 </current_work>
 
 <optional_next_step>
-The next step is to modify the relevant files (e.g., , , dashboard files) to correctly import and integrate the  object from  into .
+Modify , , and  to correctly assign .
 </optional_next_step>
-
