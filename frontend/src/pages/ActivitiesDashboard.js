@@ -571,12 +571,15 @@ const ActivitiesDashboard = () => {
           {
             text: 'المعلمون المتعاونون في الأنشطة',
             style: 'sectionHeader',
-            margin: [0, 0, 0, 10]
+            margin: [0, 20, 0, 15],
+            fontSize: 14,
+            bold: true,
+            color: '#FF9800'
           },
           {
             table: {
               headerRows: 1,
-              widths: [30, 200, 80],
+              widths: [50, '*', 100], // استخدام * لملء العرض المتبقي
               body: (() => {
                 // Aggregate cooperating teachers
                 const cooperatingMap = {};
