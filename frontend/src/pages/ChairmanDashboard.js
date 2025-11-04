@@ -805,8 +805,8 @@ const ChairmanDashboard = () => {
     ];
   };
 
-  // Generate PDF Export with improved RTL formatting
-  const exportToPDF = () => {
+  // Generate PDF Export with charts and comprehensive data
+  const exportToPDF = async () => {
     // Initialize pdfMake fonts for this export
     if (pdfMakeFonts) {
       pdfMake.vfs = pdfMakeFonts;
