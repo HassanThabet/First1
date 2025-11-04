@@ -2510,6 +2510,7 @@ const QualityDashboard = () => {
         </Dialog>
           </>
         )}
+        </TabsContent>
 
         <TabsContent value="teacher-progress">
           <TeacherProgressView />
