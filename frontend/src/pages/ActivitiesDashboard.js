@@ -327,19 +327,29 @@ const ActivitiesDashboard = () => {
           console.error('Error processing date:', e);
         }
 
-        // Return row with all values as strings
-        return [
+        // Return row with all values as strings - MUST have exactly 10 columns
+        const row = [
           String(index + 1),
           String(activity.name || activity.activity_name || '-'),
-          dateStr,
+          String(dateStr),
           String(activity.type || '-'),
-          supervisors,
-          cooperatingTeachers,
+          String(supervisors),
+          String(cooperatingTeachers),
           String(activity.target_group || '-'),
           String(activity.participants_count || 0),
           String(activity.interaction_rate || 0) + '/10',
           String(activity.educational_impact || '-')
-        ].map(val => String(val)); // Ensure all values are strings
+        ];
+        
+        // Verify row has exactly 10 columns
+        if (row.length !== 10) {
+          console.error('Row has incorrect number of columns:', row.length, 'Expected: 10');
+          // Pad or trim to 10 columns
+          while (row.length < 10) row.push('-');
+          if (row.length > 10) row.length = 10;
+        }
+        
+        return row.map(val => String(val || '-')); // Ensure all values are strings
       });
 
       // Define PDF document
