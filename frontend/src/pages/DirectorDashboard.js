@@ -14,6 +14,7 @@ import pdfMakeFonts from "../fonts/vfs_fonts";
 import { createRTLTable, createStatsGrid, pdfStyles } from "../utils/pdfTemplate";
 import DirectorReportForm from "./DirectorReportForm";
 import DirectorReportsList from "./DirectorReportsList";
+import TeacherProgressView from "../components/TeacherProgressView";
 
 const DirectorDashboard = () => {
   const { user } = useContext(AuthContext);
