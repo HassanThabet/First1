@@ -212,10 +212,22 @@ const DirectorDashboard = () => {
     filtered.forEach(report => {
       if (report.activities && Array.isArray(report.activities)) {
         report.activities.forEach(activity => {
-          if (activity.supervising_teachers && Array.isArray(activity.supervising_teachers)) {
-            activity.supervising_teachers.forEach(teacher => {
-              const name = typeof teacher === 'string' ? teacher : teacher.name || teacher.teacher;
-              if (name) {
+          // Check both old field (supervising_teachers) and new field (supervisors)
+          const supervisorsList = activity.supervisors || activity.supervising_teachers || [];
+          
+          if (Array.isArray(supervisorsList)) {
+            supervisorsList.forEach(item => {
+              // Handle both string names and IDs
+              if (typeof item === 'string') {
+                // If it's an ID (UUID format), find teacher name
+                const teacher = teachers.find(t => t.id === item);
+                const name = teacher ? teacher.name : item;
+                if (name) {
+                  teachersMap[name] = (teachersMap[name] || 0) + 1;
+                }
+              } else if (item && (item.name || item.teacher)) {
+                // If it's an object with name
+                const name = item.name || item.teacher;
                 teachersMap[name] = (teachersMap[name] || 0) + 1;
               }
             });
