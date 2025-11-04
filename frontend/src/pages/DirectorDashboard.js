@@ -933,7 +933,8 @@ const DirectorDashboard = () => {
     }
   };
   
-  const OLD_exportToPDF_BACKUP = () => {
+  // OLD function removed
+  const REMOVED_OLD_exportToPDF = () => {
     const timeFilterText = timeFilter === "daily" ? "اليوم" :
                           reportTypeFilter === "vice_principal" ? "تقارير الوكلاء" :
                           reportTypeFilter === "supervisor" ? "تقارير المشرفين" :
