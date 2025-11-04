@@ -266,14 +266,6 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
       );
     });
 
-    content.push({
-      styles: {
-        header: { fontSize: 18, bold: true, color: '#1e40af' },
-        sectionHeader: { fontSize: 14, bold: true, color: '#2563eb' },
-        tableHeader: { bold: true, fontSize: 10, color: 'white' }
-      }
-    });
-
     const docDefinition = {
       pageSize: 'A4',
       pageOrientation: 'portrait',
