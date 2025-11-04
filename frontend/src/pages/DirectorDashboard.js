@@ -87,25 +87,30 @@ const DirectorDashboard = () => {
     return [];
   };
 
-  // Get aggregated teachers lists from all reports
+  // Get aggregated absent teachers from Vice-Principal reports
   const getAggregatedAbsentTeachers = () => {
-    const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
+    const filtered = filterReportsByTimeAndBranch([...vicePrincipalReports]);
     const teachersMap = {};
     
     filtered.forEach(report => {
       if (report.absent_teachers && Array.isArray(report.absent_teachers)) {
         report.absent_teachers.forEach(teacher => {
-          const name = typeof teacher === 'string' ? teacher : teacher.name || teacher.teacher;
+          const name = typeof teacher === 'string' ? teacher : teacher.teacher;
+          const days = typeof teacher === 'object' ? (teacher.absent_days || 0) : 0;
           if (name) {
-            teachersMap[name] = (teachersMap[name] || 0) + 1;
+            if (!teachersMap[name]) {
+              teachersMap[name] = { count: 0, totalDays: 0 };
+            }
+            teachersMap[name].count += 1;
+            teachersMap[name].totalDays += days;
           }
         });
       }
     });
     
     return Object.entries(teachersMap)
-      .map(([name, count]) => ({ name, count }))
-      .sort((a, b) => b.count - a.count);
+      .map(([name, data]) => ({ name, count: data.count, totalDays: data.totalDays }))
+      .sort((a, b) => b.totalDays - a.totalDays);
   };
 
   const getAggregatedLateTeachers = () => {
