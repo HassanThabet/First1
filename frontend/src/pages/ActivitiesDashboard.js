@@ -356,6 +356,22 @@ const ActivitiesDashboard = () => {
         return row.map(val => String(val || '-')); // Ensure all values are strings
       });
 
+      // Log activities data structure
+      console.log('📋 Activities data rows:', activitiesData.length);
+      if (activitiesData.length > 0) {
+        console.log('First row columns:', activitiesData[0].length);
+        console.log('First row:', activitiesData[0]);
+      }
+
+      // Verify all rows have exactly 10 columns
+      const invalidRows = activitiesData.filter(row => row.length !== 10);
+      if (invalidRows.length > 0) {
+        console.error('❌ Found rows with invalid column count:', invalidRows.length);
+        invalidRows.forEach((row, idx) => {
+          console.error(`Row ${idx}: ${row.length} columns`, row);
+        });
+      }
+
       // Define PDF document
       const docDefinition = {
         pageSize: 'A4',
