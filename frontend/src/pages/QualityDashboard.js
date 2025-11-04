@@ -1630,6 +1630,94 @@ const QualityDashboard = () => {
                       </Card>
                     )}
                   </>
+
+                  {/* Detailed Reports Section */}
+                  {showDetailedReports && (
+                    <Card className="mt-6">
+                      <CardHeader>
+                        <CardTitle>📋 التقارير التفصيلية</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {(() => {
+                          const detailedReports = getDetailedReports();
+                          
+                          if (detailedReports.length === 0) {
+                            return (
+                              <div className="text-center py-8 text-gray-500">
+                                لا توجد تقارير متاحة بناءً على الفلاتر المحددة
+                              </div>
+                            );
+                          }
+                          
+                          return (
+                            <div className="space-y-4">
+                              <p className="text-sm text-gray-600 mb-4">
+                                إجمالي عدد التقارير: {detailedReports.length}
+                              </p>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {detailedReports.map((report, index) => {
+                                  const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                                          report.type === "supervisor" ? "مشرف" :
+                                                          report.type === "activities" ? "أنشطة" :
+                                                          report.type === "social" ? "أخصائي اجتماعي" :
+                                                          report.type === "quality" ? "جودة" : "";
+                                  
+                                  const bgColor = report.type === "vice_principal" ? "from-blue-50 to-blue-100 border-blue-500" :
+                                                report.type === "supervisor" ? "from-purple-50 to-purple-100 border-purple-500" :
+                                                report.type === "activities" ? "from-indigo-50 to-indigo-100 border-indigo-500" :
+                                                report.type === "social" ? "from-green-50 to-green-100 border-green-500" :
+                                                report.type === "quality" ? "from-orange-50 to-orange-100 border-orange-500" : "";
+                                  
+                                  return (
+                                    <Card 
+                                      key={index} 
+                                      className={`bg-gradient-to-br ${bgColor} border-r-4 cursor-pointer hover:shadow-lg transition-shadow`}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedReport(report);
+                                        setShowReportModal(true);
+                                      }}
+                                    >
+                                      <CardContent className="p-4">
+                                        <div className="flex justify-between items-start mb-2">
+                                          <span className="text-xs font-semibold px-2 py-1 rounded bg-white shadow-sm">
+                                            {reportTypeArabic}
+                                          </span>
+                                          <span className="text-xs text-gray-600">
+                                            {report.date || report.week_start || 'غير محدد'}
+                                          </span>
+                                        </div>
+                                        <h3 className="font-bold text-gray-800 mb-1">{report.userName || 'غير معروف'}</h3>
+                                        <p className="text-xs text-gray-500 mb-2">
+                                          {users.find(u => u.id === report.user_id)?.branch === "boys" ? "قسم البنين" : "قسم البنات"}
+                                        </p>
+                                        {report.notes && (
+                                          <p className="text-xs text-gray-600 line-clamp-2">{report.notes}</p>
+                                        )}
+                                        {!report.notes && (
+                                          <p className="text-xs text-gray-500 italic">
+                                            {report.type === "supervisor" && `${report.late_teachers?.length || 0} متأخر، ${report.covering_teachers?.length || 0} مغطي`}
+                                            {report.type === "vice_principal" && `${report.absent_teachers?.length || 0} غائب`}
+                                            {report.type === "activities" && `${report.activities?.length || 0} نشاط`}
+                                            {report.type === "social" && `${(report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0)} حالة`}
+                                            {report.type === "quality" && `${report.visited_teachers?.length || 0} زيارة`}
+                                          </p>
+                                        )}
+                                        <div className="mt-3 text-xs text-blue-600 font-medium">
+                                          👆 انقر لعرض التفاصيل الكاملة
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </CardContent>
+                    </Card>
+                  )}
                 </>
               );
             })()}
