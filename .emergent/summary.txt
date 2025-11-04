@@ -1,31 +1,30 @@
 <analysis>
-The previous AI engineer successfully brought the مدارس الفجر الجديد الأهلية application from inception, tackling critical bug fixes and implementing significant features. Initial work addressed Arabic (RTL) PDF font issues and introduced core functionalities like Director's reports, Admin user/teacher management, and an Educational Supervision module. The trajectory shows a transition to refining dashboard integrations and, most recently, a comprehensive overhaul of PDF export capabilities. The engineer systematically integrated  into various dashboards, and then embarked on a multi-step plan to enhance all PDF exports. The process involved installing , refactoring PDF generation utilities, and updating individual dashboard export functions, facing and resolving compilation and runtime errors along the way, demonstrating effective debugging and iterative development.
+The AI engineer systematically addressed user requirements, primarily focusing on PDF export enhancements and dashboard display logic. Initially, the work centered on resolving Unrecognized document structure errors and  related to  in  and , mirroring fixes previously applied to . This involved correcting function names ( to ) and adding robust  checks. Subsequently, the engineer refined PDF content filtering based on report types, removing summary sections and conditionally including teacher lists. The focus then shifted to the UI, specifically implementing conditional display of  and creating  components within  and . The final major task was replacing older, detailed evaluation displays within report modals with the  component. While the application loading and some UI elements were verified via screenshots, the full visual confirmation of all conditional displays and modal replacements remains a pending verification step.
 </analysis>
 
 <product_requirements>
-The مدارس الفجر الجديد الأهلية application is a comprehensive, role-based dashboard system designed for school management, featuring a user interface that fully supports Arabic (RTL) text. It enables users to perform CRUD operations on various reports, visualize data through graphical statistics, and export information in Excel and PDF formats. Key functionalities include distinct dashboards for roles such as Supervisor, Vice-Principal, Director, Chairman, Quality, and Administrator, each offering aggregated statistics and filtering capabilities.
+The مدارس الفجر الجديد الأهلية application is a comprehensive, role-based school management system with full Arabic (RTL) support, offering CRUD operations, data visualization, and Excel/PDF exports across various dashboards (Supervisor, Vice-Principal, Director, Chairman, Quality, Admin, Social Specialist, Activities).
 
-Previously implemented requirements include:
-1.  **PDF Export Fix:** Ensured proper rendering of Arabic text in PDF exports by resolving font-related issues.
-2.  **Director's Report:** Enabled Directors to create, view, edit, delete, and export reports, which are automatically sent to the Chairman and are branch-specific.
-3.  **Admin User & Teacher Management:** Administrators can edit user profiles (name, password) and manage teacher data through bulk Excel import/export.
-4.  **Quality Dashboard Reports:** Enhanced to display detailed reports for members.
-5.  **Educational Supervision Module:** Introduced for supervisors to create teacher evaluation reports, track progress with charts, and export data. These reports are visible across Director, Chairman, and Quality dashboards.
-6.  **Dashboard Consolidation:** Integrated  compactly into Director, Chairman, and Quality dashboards.
-7.  **Latest Enhancements (User Request):**
-    *   **Quality Dashboard Details:** Improve detailed report viewing.
-    *   **Teacher Progress View:** Create a dedicated detailed page and conditionally display the compact view based on Educational Supervision or All Reports filters.
-    *   **Enhanced PDF Exports:** Overhaul all PDF exports to include comprehensive details, charts, and graphs.
-    *   **Chairman Report Specifics:** Replace graphical teacher absence/lateness data in Chairman's PDF with detailed lists of names and counts, and include teacher evaluation specifics.
+Previous implementations include Arabic PDF font fixes, Director's reports, Admin user/teacher management, enhanced Quality Dashboard reports, and a full Educational Supervision module with teacher evaluation and progress tracking, including the  component.
+
+The latest requirements focus on:
+1.  **PDF Export Enhancement**: Comprehensive overhaul to include detailed information, charts, and graphs for all dashboards. Specifically, for Chairman's report, replace graphical teacher absence/lateness with detailed lists and include evaluation specifics.
+2.  **PDF Content Filtering (Chairman/Director)**:
+    *   Remove Detailed General Reports Summary from PDF exports.
+    *   Display Absent/Late/Covering Teachers only in All Reports, Vice-Principal, and Supervisors report types in PDF.
+    *   Display Activity Supervisor Teachers only in All Reports and Activities report types in PDF.
+3.  **UI Display Logic (Chairman/Director)**:
+    *   When Educational Supervision or All Reports are selected, display the  component in the main dashboard area.
+    *   When Activities is selected, display a table of Activity Supervisor Teachers, pulling data from activity reports.
+4.  **Teacher Evaluation Display (Chairman/Director)**: Replace the old detailed teacher evaluation display within the individual report view modals with the  component.
 </product_requirements>
 
 <key_technical_concepts>
--   **MERN-like Stack:** React (Frontend), FastAPI (Backend), MongoDB (Database).
--   **RTL Support:**  for Arabic PDF rendering.
--   **PDF Generation:**  with custom fonts (, ).
--   **Chart to Image Conversion:**  to capture and embed charts in PDFs.
--   **Excel Data Handling:**  for teacher import/export.
--   **Component Reusability:** Shared React components (e.g., ).
+-   **MERN-like Stack**: React (Frontend), FastAPI (Backend), MongoDB (Database).
+-   **RTL Support**:  for Arabic PDF rendering.
+-   **PDF Generation**:  with custom fonts;  for chart embedding.
+-   **Data Handling**:  for Excel teacher import/export.
+-   **Component Reusability**:  and .
 </key_technical_concepts>
 
 <code_architecture>
@@ -38,75 +37,53 @@ The application uses a MERN-like stack: React for the frontend, FastAPI for the 
 **Key Files and Their Importance/Changes:**
 
 -   :
-    -   **Importance:** Defines API endpoints and database interactions.
-    -   **Changes:** Added  model, updated user password logic, added  for Excel import.
+    -   **Importance:** Manages frontend dependencies.
+    -   **Changes:**  for HTML-to-image conversion was previously installed.
 -   :
-    -   **Importance:** Stores base64 font data for  (e.g., , ) for RTL support.
-    -   **Changes:** Contains Arabic font definitions.
+    -   **Importance:** Centralized utility for PDF generation logic.
+    -   **Changes:** No direct changes in this trajectory, but its  function was frequently referenced and corrected.
 -   :
-    -   **Importance:** Director's interface, displaying reports and statistics.
-    -   **Changes:** Fixed initial PDF font. Integrated Create Report and My Reports tabs. Updated report fetching to include educational supervision. Embedded  compactly, and added conditional rendering based on filters. Chart IDs were added for PDF export, and the  function was refactored and cleaned up to remove old code.
+    -   **Importance:** Frontend component for the Director's dashboard.
+    -   **Changes:**
+        -   Fixed  by adding  checks for  before array operations during PDF generation.
+        -   Corrected function name mismatch from  to  in .
+        -   Modified  logic to filter teacher tables based on  and remove ملخص التقارير التفصيلية الإجمالية (Detailed General Reports Summary).
+        -   Integrated  for Activities report type and  for Educational Supervision and All Reports in the main dashboard view.
+        -   Replaced the old detailed teacher evaluation display within the report modal with .
 -   :
-    -   **Importance:** Chairman's overview, including Director's reports and overall statistics.
-    -   **Changes:** Fixed initial PDF font. Integrated  and  (first as a tab, then compactly embedded with conditional rendering). Chart IDs were added for PDF export. The  function was completely rewritten to incorporate  for charts, detailed tables for teacher attendance/lateness, and  utilities. Fixed import paths for PDF utilities and an undefined function ().
+    -   **Importance:** Frontend component for the Chairman's dashboard.
+    -   **Changes:**
+        -   Corrected function name mismatch from  to  in .
+        -   Fixed  by adding  checks for  before array operations during PDF generation.
+        -   Modified  logic to filter teacher tables based on  and remove ملخص التقارير التفصيلية الإجمالية (Detailed General Reports Summary).
+        -   Integrated  for Activities report type and  for Educational Supervision and All Reports in the main dashboard view.
+        -   Replaced the old detailed teacher evaluation display within the report modal with .
 -   :
-    -   **Importance:** Quality department's dashboard, showing detailed reports.
-    -   **Changes:** Fixed initial PDF font. Enhanced detailed member reports. Integrated  compactly with conditional rendering. Added a generic modal for displaying detailed reports of various types. Imported  component.
+    -   **Importance:** Reusable component for displaying teacher progress evaluations.
+    -   **Changes:** Fixed an issue where PDF content was incorrectly pushed inside the content array, causing Unrecognized document structure errors.
 -   :
-    -   **Importance:** Administrator's control panel.
-    -   **Changes:** Enhanced user management (name, password reset) and implemented Excel import/export for teachers.
--    (New):
-    -   **Importance:** Form for Directors to create new reports.
-    -   **Changes:** Newly created file.
--    (New):
-    -   **Importance:** Displays Director's reports.
-    -   **Changes:** Newly created file; PDF export fixed with .
--    (New):
-    -   **Importance:** Component to display Director's reports within the Chairman's dashboard.
-    -   **Changes:** Newly created file.  was rewritten to use  for enhanced PDF generation.
--    (Modified):
-    -   **Importance:** Supervisor's main interface.
-    -   **Changes:** Refactored to use tabs for Create Report, Reports List, and Teacher Progress.
--    (New):
-    -   **Importance:** Form for supervisors to create teacher evaluation reports.
-    -   **Changes:** Newly created file.
--    (New):
-    -   **Importance:** Displays supervisor's created reports.
-    -   **Changes:** Newly created file.
--    (New):
-    -   **Importance:** Visualizes teacher improvement.
-    -   **Changes:** Newly created file; includes teacher filter, charts, PDF export.
--    (New):
-    -   **Importance:** Reusable component for displaying teacher progress.
-    -   **Changes:** Newly created file; enhanced to accept a  prop for condensed display.
--   :
-    -   **Importance:** Centralized PDF generation utilities.
-    -   **Changes:** Added  helper function, leveraging , for embedding charts into PDFs. Extended exports to include new helper functions.
+    -   **Importance:** *Newly created component* to display a table of teachers supervising activities.
+    -   **Changes:** Created this new file with basic structure for fetching and displaying activity supervisors.
 </code_architecture>
 
 <pending_tasks>
 -   Implement automatic archiving of old reports.
 -   Implement remember me functionality for authentication.
--   Implement Chairman's detailed teacher evaluations and their PDF/Excel export.
+-   Complete PDF export enhancement for ,  (as a standalone, not just embedded), , , , and .
 -   Create a dedicated detailed page for .
--   Complete PDF export enhancement for , , , , , , and .
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was diligently working on a multi-step plan to significantly enhance the PDF export functionality across the entire application, aiming to include all details, charts, and graphs in a professional, Arabic-compatible format.
+Immediately before this summary request, the AI engineer was focused on implementing user-requested UI and PDF content adjustments in  and . The work started by addressing a persistent Unrecognized document structure error in  and  PDF exports, which was traced to an incorrect function call ( instead of ) and an improperly structured content array within . Another  was resolved by adding  checks before array operations on  in both  and  PDF generation logic.
 
-The work completed in this phase includes:
-1.  **Preparation and Setup (Step 1):** The  library was installed in the frontend (), and new helper functions, specifically , were added to . These helpers are crucial for converting HTML chart elements into images for embedding within PDF documents.
-2.  **Chairman Dashboard PDF Enhancement (Step 2):**
-    *   **Chart IDs:** Specific IDs (, , etc.) were added to the chart components within  to allow  to target and capture them.
-    *   ** Rewrite:** The  function in  was completely refactored. It now leverages the new utilities from  and  to include the captured chart images.
-    *   **Detailed Teacher Lists:** As per user request, the PDF for the Chairman's overall report now includes detailed tables listing absent, late, covered, and activity-participating teachers by name and count, instead of just summary charts.
-    *   **Bug Fixes:** The engineer addressed compilation errors related to incorrect import paths ( vs ) and a runtime error where  was undefined by commenting out the problematic code.
-    *   **Validation:** The last interaction confirms that the Chairman Dashboard PDF export is now functioning correctly, showing a success message for exporting reports with all charts and details.
+Following these fixes, the user requested specific modifications to PDF content and UI display logic:
+1.  **PDF Content Refinement**: The ملخص التقارير التفصيلية الإجمالية (Detailed General Reports Summary) section was removed from PDF exports in both  and . Conditional logic was added to the PDF generation to display Absent/Late/Covering Teachers only for All Reports, Vice-Principal, and Supervisors report types, and Activity Supervisor Teachers only for All Reports and Activities types.
+2.  **UI Component Integration**: A new React component, , was created to display teachers supervising activities. This component, along with , was integrated into  and  to appear conditionally based on the selected report type (Activities for supervisors, Educational Supervision or All Reports for teacher progress).
+3.  **Modal Display Update**: The existing detailed teacher evaluation display within the individual report view modals in both  and  was replaced with the  component.
 
-The work for enhancing ChairmanDashboard's PDF export is now complete and validated by the user.
+The application loads successfully, and  is visible in the main dashboard tabs as intended. However, the visual verification of the  component and the precise replacement of the old evaluation content within the modals still needs to be explicitly confirmed.
 </current_work>
 
 <optional_next_step>
-Proceed with **Step 3** of the PDF enhancement plan: improve PDF export for .
+Verify the correct display of the  component and the  within report modals in  and .
 </optional_next_step>
