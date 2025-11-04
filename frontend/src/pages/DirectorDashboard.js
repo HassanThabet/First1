@@ -1755,25 +1755,27 @@ const DirectorDashboard = () => {
                 </CardContent>
               </Card>
 
-              {/* Teacher Progress Section */}
-              <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-t-4 border-cyan-500">
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-xl">📈 تقييم تحسن المعلمين</CardTitle>
-                    <Button
-                      onClick={() => setActiveTab("teacher-progress")}
-                      variant="outline"
-                      size="sm"
-                      className="text-cyan-600 hover:text-cyan-700"
-                    >
-                      عرض التفاصيل الكاملة ←
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <TeacherProgressView branch={user.branch} compact={true} />
-                </CardContent>
-              </Card>
+              {/* Teacher Progress Section - Only show for educational_supervision or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && (
+                <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-t-4 border-cyan-500">
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-xl">📈 تقييم تحسن المعلمين</CardTitle>
+                      <Button
+                        onClick={() => setActiveTab("teacher-progress")}
+                        variant="outline"
+                        size="sm"
+                        className="text-cyan-600 hover:text-cyan-700"
+                      >
+                        عرض التفاصيل الكاملة ←
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <TeacherProgressView branch={user.branch} compact={true} />
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Detailed Reports Section */}
               {showDetailedReports && (
