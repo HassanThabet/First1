@@ -775,21 +775,22 @@ const DirectorDashboard = () => {
     // Initialize pdfMake fonts for this export
     if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
       pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
-      pdfMake.fonts = {
-        Cairo: {
-          normal: 'Cairo-Regular.ttf',
-          bold: 'Cairo-Regular.ttf',
-          italics: 'Cairo-Regular.ttf',
-          bolditalics: 'Cairo-Regular.ttf'
-        },
-        Roboto: {
-          normal: 'Roboto-Regular.ttf',
-          bold: 'Roboto-Medium.ttf',
-          italics: 'Roboto-Italic.ttf',
-          bolditalics: 'Roboto-MediumItalic.ttf'
-        }
-      };
     }
+    
+    pdfMake.fonts = {
+      Cairo: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      },
+      Roboto: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      }
+    };
     
     const stats = getOverallStatistics();
     const reports = getDetailedReports();
