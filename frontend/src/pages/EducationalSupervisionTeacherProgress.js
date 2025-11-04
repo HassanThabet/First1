@@ -87,12 +87,227 @@ const EducationalSupervisionTeacherProgress = () => {
       progressData.sort((a, b) => b.improvement - a.improvement);
       
       setReports(allReports);
+      setAllTeacherProgress(progressData);
       setTeacherProgress(progressData);
     } catch (error) {
       console.error("Error fetching reports:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Filter teachers based on selection
+  useEffect(() => {
+    if (selectedTeacher === "all") {
+      setTeacherProgress(allTeacherProgress);
+    } else {
+      const filtered = allTeacherProgress.filter(t => t.teacher_id === selectedTeacher);
+      setTeacherProgress(filtered);
+    }
+  }, [selectedTeacher, allTeacherProgress]);
+
+  // Export teacher progress to PDF
+  const exportToPDF = (teacher) => {
+    if (pdfMakeFonts) {
+      pdfMake.vfs = pdfMakeFonts;
+    }
+    
+    pdfMake.fonts = {
+      Cairo: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      },
+      Roboto: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      },
+      Nillima: {
+        normal: 'Cairo-Regular.ttf',
+        bold: 'Cairo-Regular.ttf',
+        italics: 'Cairo-Regular.ttf',
+        bolditalics: 'Cairo-Regular.ttf'
+      }
+    };
+
+    // Prepare evaluation data for table
+    const evaluationRows = teacher.evaluations.map((eval_item, idx) => [
+      { text: (idx + 1).toString(), alignment: 'center' },
+      { text: formatDate(eval_item.date), alignment: 'center' },
+      { text: eval_item.planning.toString(), alignment: 'center' },
+      { text: eval_item.performance.toString(), alignment: 'center' },
+      { text: eval_item.time_management.toString(), alignment: 'center' },
+      { text: eval_item.goal_achievement.toString(), alignment: 'center' },
+      { text: eval_item.average.toFixed(1), alignment: 'center', bold: true }
+    ]);
+
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 60, 40, 60],
+      defaultStyle: {
+        font: 'Cairo',
+        fontSize: 11,
+        direction: 'rtl',
+        alignment: 'right'
+      },
+      content: [
+        {
+          text: 'تقرير تقييم تحسن المعلم',
+          style: 'header',
+          alignment: 'center',
+          margin: [0, 0, 0, 20]
+        },
+        {
+          columns: [
+            {
+              width: '50%',
+              text: [
+                { text: 'المعلم: ', bold: true },
+                { text: teacher.teacher_name }
+              ]
+            },
+            {
+              width: '50%',
+              text: [
+                { text: 'عدد التقييمات: ', bold: true },
+                { text: teacher.evaluationCount.toString() }
+              ],
+              alignment: 'left'
+            }
+          ],
+          margin: [0, 0, 0, 15]
+        },
+        {
+          text: 'ملخص الأداء',
+          style: 'sectionHeader',
+          margin: [0, 10, 0, 10]
+        },
+        {
+          columns: [
+            {
+              width: '33%',
+              stack: [
+                { text: 'التقييم الأول', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
+                { text: `${teacher.firstAverage}/10`, fontSize: 24, bold: true, color: '#2563eb' }
+              ],
+              alignment: 'center'
+            },
+            {
+              width: '34%',
+              stack: [
+                { text: 'التقييم الحالي', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
+                { text: `${teacher.currentAverage}/10`, fontSize: 24, bold: true, color: '#16a34a' }
+              ],
+              alignment: 'center'
+            },
+            {
+              width: '33%',
+              stack: [
+                { text: 'نسبة التحسن', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
+                { 
+                  text: `${teacher.improvement > 0 ? '+' : ''}${teacher.improvement}%`, 
+                  fontSize: 24, 
+                  bold: true, 
+                  color: teacher.trend === 'up' ? '#16a34a' : teacher.trend === 'down' ? '#dc2626' : '#ca8a04'
+                }
+              ],
+              alignment: 'center'
+            }
+          ],
+          margin: [0, 0, 0, 20]
+        },
+        {
+          text: 'جدول التقييمات التفصيلي',
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10]
+        },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto'],
+            body: [
+              [
+                { text: '#', style: 'tableHeader', alignment: 'center' },
+                { text: 'التاريخ', style: 'tableHeader', alignment: 'center' },
+                { text: 'التخطيط', style: 'tableHeader', alignment: 'center' },
+                { text: 'الأداء', style: 'tableHeader', alignment: 'center' },
+                { text: 'إدارة الوقت', style: 'tableHeader', alignment: 'center' },
+                { text: 'الأهداف', style: 'tableHeader', alignment: 'center' },
+                { text: 'المتوسط', style: 'tableHeader', alignment: 'center' }
+              ],
+              ...evaluationRows
+            ]
+          },
+          layout: {
+            fillColor: function (rowIndex) {
+              return (rowIndex === 0) ? '#2563eb' : (rowIndex % 2 === 0) ? '#f3f4f6' : null;
+            },
+            hLineWidth: function () { return 1; },
+            vLineWidth: function () { return 1; },
+            hLineColor: function () { return '#e5e7eb'; },
+            vLineColor: function () { return '#e5e7eb'; }
+          },
+          margin: [0, 0, 0, 20]
+        },
+        {
+          text: 'التقييم النوعي (آخر تقرير)',
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10]
+        },
+        {
+          columns: [
+            {
+              width: '50%',
+              stack: [
+                { text: 'نقاط القوة', fontSize: 12, bold: true, color: '#16a34a', margin: [0, 0, 0, 5] },
+                { 
+                  text: teacher.evaluations[teacher.evaluations.length - 1]?.strengths || 'لا يوجد', 
+                  fontSize: 10,
+                  background: '#f0fdf4',
+                  margin: [5, 5, 5, 5]
+                }
+              ]
+            },
+            {
+              width: '50%',
+              stack: [
+                { text: 'نقاط التطوير', fontSize: 12, bold: true, color: '#ea580c', margin: [0, 0, 0, 5] },
+                { 
+                  text: teacher.evaluations[teacher.evaluations.length - 1]?.needs_support || 'لا يوجد', 
+                  fontSize: 10,
+                  background: '#fff7ed',
+                  margin: [5, 5, 5, 5]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      styles: {
+        header: {
+          fontSize: 18,
+          bold: true,
+          color: '#1e40af'
+        },
+        sectionHeader: {
+          fontSize: 14,
+          bold: true,
+          color: '#2563eb'
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 10,
+          color: 'white'
+        }
+      }
+    };
+
+    pdfMake.createPdf(docDefinition).download(`تقرير_تحسن_${teacher.teacher_name}.pdf`);
+    toast.success("تم تصدير التقرير بنجاح");
   };
 
   const formatDate = (dateString) => {
