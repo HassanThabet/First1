@@ -1435,6 +1435,16 @@ const QualityDashboard = () => {
                     </CardContent>
                   </Card>
 
+                  {/* Teacher Progress Evaluation - Compact View */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg text-gray-800">📈 تقييم تحسن المعلمين</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <TeacherProgressView compact={true} />
+                    </CardContent>
+                  </Card>
+
                   {/* Overall Summary */}
                   <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
                     <CardContent className="p-6">
