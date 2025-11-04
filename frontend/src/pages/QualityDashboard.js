@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { toast } from "sonner";
 import { Eye, FileText, BarChart3 } from "lucide-react";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import pdfMake from "pdfmake/build/pdfmake";
+import pdfMake from "@digicole/pdfmake-rtl";
 import pdfMakeFonts from "../fonts/vfs_fonts";
 
 const QualityDashboard = () => {
