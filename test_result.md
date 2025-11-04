@@ -328,6 +328,18 @@ frontend:
         agent: "main"
         comment: "Next to be implemented"
 
+  - task: "Full RTL PDF Export with @digicole/pdfmake-rtl"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/utils/pdfTemplate.js, frontend/src/pages/ChairmanDashboard.js, frontend/src/pages/DirectorDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Installed and integrated @digicole/pdfmake-rtl package which provides automatic RTL text support for Arabic. Updated pdfTemplate.js, pdfConfig.js, ChairmanDashboard.js, DirectorDashboard.js, and QualityDashboard.js to use the new RTL-enabled pdfMake. Created improved PDF export functions with createStatsGrid helper for better statistics display. Added comprehensive PDF generation with proper Arabic text rendering, aligned tables, and professional formatting. Created CHAIRMAN_DASHBOARD_IMPROVEMENTS.md with detailed UI/UX enhancement suggestions."
+
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
     working: false
