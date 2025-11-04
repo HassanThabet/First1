@@ -356,27 +356,58 @@ const SocialSpecialistDashboard = () => {
             margin: [0, 0, 0, 15]
           },
 
-          // Cases Distribution - Rebuilt without colSpan
+          // Cases Distribution - Full width
           {
             text: 'توزيع الحالات',
             style: 'sectionHeader',
             alignment: 'center',
-            margin: [0, 0, 0, 10]
+            margin: [0, 10, 0, 10],
+            fontSize: 14,
+            bold: true,
+            color: '#9C27B0'
           },
           {
             table: {
-              widths: [125, 125, 125, 125],
+              widths: ['*', '*', '*', '*'], // توزيع متساوي على العرض
               body: [
                 [
-                  { text: `نفسية: ${String(stats.totalPsychological || 0)}`, alignment: 'center', fillColor: '#E1F5FE' },
-                  { text: `أكاديمية: ${String(stats.totalAcademic || 0)}`, alignment: 'center', fillColor: '#E1F5FE' },
-                  { text: `سلوكية: ${String(stats.totalBehavioral || 0)}`, alignment: 'center', fillColor: '#E1F5FE' },
-                  { text: `جلسات: ${String(stats.totalSessions || 0)}`, alignment: 'center', fillColor: '#E1F5FE' }
+                  { 
+                    text: `نفسية\n${String(stats.totalPsychological || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E1F5FE',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `أكاديمية\n${String(stats.totalAcademic || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E1F5FE',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `سلوكية\n${String(stats.totalBehavioral || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E1F5FE',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `جلسات\n${String(stats.totalSessions || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E1F5FE',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  }
                 ]
               ]
             },
-            layout: 'lightHorizontalLines',
-            margin: [0, 0, 0, 10]
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15]
           },
 
           // Actions Summary - Rebuilt without colSpan
