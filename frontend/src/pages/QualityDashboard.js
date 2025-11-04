@@ -1759,6 +1759,179 @@ const QualityDashboard = () => {
         </TabsContent>
       </Tabs>
 
+      {/* Detailed Report Modal for Statistics Tab */}
+      <Dialog open={showReportModal} onOpenChange={(open) => {
+        setShowReportModal(open);
+        if (!open) setSelectedReport(null);
+      }}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              {selectedReport && (
+                selectedReport.type === "quality" 
+                  ? `تقرير الجودة - ${new Date(selectedReport.date).toLocaleDateString("ar-SA")}`
+                  : selectedReport.type === "supervisor" 
+                  ? `تقرير المشرف - ${selectedReport.userName}`
+                  : selectedReport.type === "vice_principal"
+                  ? `تقرير الوكيل - ${selectedReport.userName}`
+                  : selectedReport.type === "activities"
+                  ? `تقرير الأنشطة - ${selectedReport.userName}`
+                  : selectedReport.type === "social"
+                  ? `تقرير الأخصائي الاجتماعي - ${selectedReport.userName}`
+                  : selectedReport.type === "educational_supervision"
+                  ? `تقرير الإشراف التربوي - ${selectedReport.userName}`
+                  : "تفاصيل التقرير"
+              )}
+            </DialogTitle>
+          </DialogHeader>
+
+          {selectedReport && (
+            <div className="space-y-4 p-4">
+              {/* Quality Report */}
+              {selectedReport.type === "quality" && sections.map((section) => (
+                <Card key={section.key} className={`border-2 border-${section.color}-200`}>
+                  <CardHeader className={`bg-gradient-to-r from-${section.color}-50 to-${section.color}-100`}>
+                    <CardTitle className="text-lg">{section.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 pt-4">
+                    {selectedReport[section.key]?.positives && (
+                      <div className={`p-3 bg-green-50 rounded-lg border border-green-200`}>
+                        <div className="text-sm font-bold text-green-800 mb-2">الإيجابيات</div>
+                        <p className="text-sm text-gray-700">{selectedReport[section.key].positives}</p>
+                      </div>
+                    )}
+                    {selectedReport[section.key]?.observations && (
+                      <div className={`p-3 bg-orange-50 rounded-lg border border-orange-200`}>
+                        <div className="text-sm font-bold text-orange-800 mb-2">الملاحظات</div>
+                        <p className="text-sm text-gray-700">{selectedReport[section.key].observations}</p>
+                      </div>
+                    )}
+                    {selectedReport[section.key]?.actions && (
+                      <div className={`p-3 bg-blue-50 rounded-lg border border-blue-200`}>
+                        <div className="text-sm font-bold text-blue-800 mb-2">الإجراءات المقترحة</div>
+                        <p className="text-sm text-gray-700">{selectedReport[section.key].actions}</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+
+              {/* Supervisor Report */}
+              {selectedReport.type === "supervisor" && (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                    <div className="bg-orange-50 p-3 rounded border border-orange-200">
+                      <div className="text-xs text-gray-600">معلمون متأخرون</div>
+                      <div className="text-2xl font-bold text-orange-700">{selectedReport.late_teachers?.length || 0}</div>
+                    </div>
+                    <div className="bg-green-50 p-3 rounded border border-green-200">
+                      <div className="text-xs text-gray-600">معلمون مغطون</div>
+                      <div className="text-2xl font-bold text-green-700">{selectedReport.covering_teachers?.length || 0}</div>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                      <div className="text-xs text-gray-600">طلاب غائبون</div>
+                      <div className="text-2xl font-bold text-blue-700">{selectedReport.absent_students_count || 0}</div>
+                    </div>
+                    <div className="bg-red-50 p-3 rounded border border-red-200">
+                      <div className="text-xs text-gray-600">حوادث</div>
+                      <div className="text-2xl font-bold text-red-700">{selectedReport.incidents?.length || 0}</div>
+                    </div>
+                  </div>
+                  {selectedReport.notes && (
+                    <Card>
+                      <CardHeader><CardTitle>ملاحظات</CardTitle></CardHeader>
+                      <CardContent><p>{selectedReport.notes}</p></CardContent>
+                    </Card>
+                  )}
+                </>
+              )}
+
+              {/* Vice Principal Report */}
+              {selectedReport.type === "vice_principal" && (
+                <>
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="bg-red-50 p-3 rounded border border-red-200">
+                      <div className="text-xs text-gray-600">معلمون غائبون</div>
+                      <div className="text-2xl font-bold text-red-700">{selectedReport.absent_teachers?.length || 0}</div>
+                    </div>
+                    <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                      <div className="text-xs text-gray-600">أسبوع</div>
+                      <div className="text-sm font-bold text-blue-700">
+                        {selectedReport.week_start} - {selectedReport.week_end}
+                      </div>
+                    </div>
+                  </div>
+                  {selectedReport.notes && (
+                    <Card>
+                      <CardHeader><CardTitle>ملاحظات</CardTitle></CardHeader>
+                      <CardContent><p>{selectedReport.notes}</p></CardContent>
+                    </Card>
+                  )}
+                </>
+              )}
+
+              {/* Activities Report */}
+              {selectedReport.type === "activities" && (
+                <>
+                  <div className="bg-purple-50 p-3 rounded border border-purple-200 mb-4">
+                    <div className="text-xs text-gray-600">عدد الأنشطة</div>
+                    <div className="text-2xl font-bold text-purple-700">{selectedReport.activities?.length || 0}</div>
+                  </div>
+                  {selectedReport.notes && (
+                    <Card>
+                      <CardHeader><CardTitle>ملاحظات</CardTitle></CardHeader>
+                      <CardContent><p>{selectedReport.notes}</p></CardContent>
+                    </Card>
+                  )}
+                </>
+              )}
+
+              {/* Social Specialist Report */}
+              {selectedReport.type === "social" && (
+                <>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="bg-pink-50 p-3 rounded border border-pink-200">
+                      <div className="text-xs text-gray-600">حالات نفسية</div>
+                      <div className="text-2xl font-bold text-pink-700">{selectedReport.psychological_cases || 0}</div>
+                    </div>
+                    <div className="bg-amber-50 p-3 rounded border border-amber-200">
+                      <div className="text-xs text-gray-600">حالات أكاديمية</div>
+                      <div className="text-2xl font-bold text-amber-700">{selectedReport.academic_cases || 0}</div>
+                    </div>
+                    <div className="bg-red-50 p-3 rounded border border-red-200">
+                      <div className="text-xs text-gray-600">حالات سلوكية</div>
+                      <div className="text-2xl font-bold text-red-700">{selectedReport.behavioral_cases || 0}</div>
+                    </div>
+                  </div>
+                  {selectedReport.notes && (
+                    <Card>
+                      <CardHeader><CardTitle>ملاحظات</CardTitle></CardHeader>
+                      <CardContent><p>{selectedReport.notes}</p></CardContent>
+                    </Card>
+                  )}
+                </>
+              )}
+
+              {/* Educational Supervision Report */}
+              {selectedReport.type === "educational_supervision" && (
+                <>
+                  <div className="bg-cyan-50 p-3 rounded border border-cyan-200 mb-4">
+                    <div className="text-xs text-gray-600">عدد المعلمين المقيّمين</div>
+                    <div className="text-2xl font-bold text-cyan-700">{selectedReport.teacher_evaluations?.length || 0}</div>
+                  </div>
+                  {selectedReport.notes && (
+                    <Card>
+                      <CardHeader><CardTitle>ملاحظات</CardTitle></CardHeader>
+                      <CardContent><p>{selectedReport.notes}</p></CardContent>
+                    </Card>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Teachers List Modal */}
       <Dialog open={showTeachersListModal} onOpenChange={setShowTeachersListModal}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
