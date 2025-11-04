@@ -342,6 +342,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Fixed font initialization error ('Nillima' font not defined). Updated all PDF export functions to properly define both Cairo and Roboto fonts in pdfMake.fonts object. Fixed in: ChairmanDashboard.js (exportToPDF and exportTeachersListToPDF), DirectorDashboard.js (exportToPDF and exportTeachersListToPDF), QualityDashboard.js (exportTeachersListToPDF), pdfTemplate.js, and pdfConfig.js. All files now initialize fonts outside of conditional block to ensure fonts are always defined before PDF generation."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 FIXED CRITICAL PDF EXPORT BUG: Corrected font loading error 'File Cairo-Regular.ttf not found in virtual file system'. Root cause identified: ChairmanDashboard.js, DirectorDashboard.js, and QualityDashboard.js were incorrectly trying to access fonts via nested path 'pdfMakeFonts.pdfMake.vfs' when vfs_fonts.js exports the font object directly. Fixed by changing to direct assignment 'pdfMake.vfs = pdfMakeFonts' in all three files. PDF export should now work correctly with Arabic RTL support."
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
