@@ -1,0 +1,1 @@
+Replace import pdfMake from "pdfmake/build/pdfmake"; with import pdfMake from "@digicole/pdfmake-rtl";
