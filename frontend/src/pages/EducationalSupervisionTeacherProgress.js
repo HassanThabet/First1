@@ -407,26 +407,37 @@ const EducationalSupervisionTeacherProgress = () => {
               <Card key={teacher.teacher_id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex justify-between items-start">
-                    <div>
+                    <div className="flex-1">
                       <CardTitle className="text-lg">{teacher.teacher_name}</CardTitle>
                       <p className="text-sm text-gray-600 mt-1">
                         عدد التقييمات: {teacher.evaluationCount}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center gap-2">
-                        {teacher.trend === "up" && <TrendingUp className="w-5 h-5 text-green-600" />}
-                        {teacher.trend === "down" && <TrendingDown className="w-5 h-5 text-red-600" />}
-                        {teacher.trend === "stable" && <Minus className="w-5 h-5 text-yellow-600" />}
-                        <span className={`text-lg font-bold ${
-                          teacher.trend === "up" ? "text-green-600" : 
-                          teacher.trend === "down" ? "text-red-600" : 
-                          "text-yellow-600"
-                        }`}>
-                          {teacher.improvement > 0 ? "+" : ""}{teacher.improvement}%
-                        </span>
+                    <div className="flex flex-col items-end gap-3">
+                      <div className="text-right">
+                        <div className="flex items-center gap-2">
+                          {teacher.trend === "up" && <TrendingUp className="w-5 h-5 text-green-600" />}
+                          {teacher.trend === "down" && <TrendingDown className="w-5 h-5 text-red-600" />}
+                          {teacher.trend === "stable" && <Minus className="w-5 h-5 text-yellow-600" />}
+                          <span className={`text-lg font-bold ${
+                            teacher.trend === "up" ? "text-green-600" : 
+                            teacher.trend === "down" ? "text-red-600" : 
+                            "text-yellow-600"
+                          }`}>
+                            {teacher.improvement > 0 ? "+" : ""}{teacher.improvement}%
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">نسبة التحسن</p>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1">نسبة التحسن</p>
+                      <Button
+                        onClick={() => exportToPDF(teacher)}
+                        size="sm"
+                        variant="outline"
+                        className="text-blue-600 hover:text-blue-700"
+                      >
+                        <FileText className="w-4 h-4 ml-1" />
+                        تصدير PDF
+                      </Button>
                     </div>
                   </div>
                 </CardHeader>
