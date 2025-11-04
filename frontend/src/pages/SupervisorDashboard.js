@@ -931,7 +931,7 @@ const SupervisorDashboard = () => {
                     {/* Detailed Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Teachers Info */}
-                      {(selectedReport.late_teachers?.length > 0 || selectedReport.absent_teachers?.length > 0 || selectedReport.covering_teachers?.length > 0) && (
+                      {(selectedReport.late_teachers?.length > 0 || selectedReport.covering_teachers?.length > 0) && (
                         <div className="space-y-3">
                           <h4 className="text-md font-bold text-gray-800 mb-3 border-b-2 border-gray-200 pb-2">
                             بيانات المعلمين
@@ -948,23 +948,6 @@ const SupervisorDashboard = () => {
                                   <li key={i} className="flex items-start">
                                     <span className="text-orange-600 ml-2">•</span>
                                     <span><strong>{lt.teacher}</strong> - {lt.subject} - حصة {lt.period}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                          
-                          {selectedReport.absent_teachers && selectedReport.absent_teachers.length > 0 && (
-                            <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                              <div className="text-sm font-bold text-red-800 mb-2 flex items-center">
-                                <span className="w-2 h-2 bg-red-500 rounded-full ml-2"></span>
-                                المعلمون الغائبون ({selectedReport.absent_teachers.length})
-                              </div>
-                              <ul className="text-sm text-gray-700 space-y-1">
-                                {selectedReport.absent_teachers.map((at, i) => (
-                                  <li key={i} className="flex items-start">
-                                    <span className="text-red-600 ml-2">•</span>
-                                    <span><strong>{at.teacher}</strong> - {at.subject} - حصة {at.period}</span>
                                   </li>
                                 ))}
                               </ul>
