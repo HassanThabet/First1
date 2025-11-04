@@ -254,6 +254,33 @@ const ActivitiesDashboard = () => {
   // Export to PDF using pdfmake with Arabic support
   const exportToPDF = () => {
     try {
+      // Configure pdfMake fonts
+      const pdfMakeFonts = require('../fonts/vfs_fonts').default;
+      if (pdfMakeFonts) {
+        pdfMake.vfs = pdfMakeFonts;
+      }
+
+      pdfMake.fonts = {
+        Cairo: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Regular.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Regular.ttf'
+        },
+        Roboto: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Regular.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Regular.ttf'
+        },
+        Nillima: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Regular.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Regular.ttf'
+        }
+      };
+
       const mergedReports = getMergedReports();
       const stats = getMergedStatistics();
       let allActivities = mergedReports.flatMap(r => r.activities || []);
