@@ -1712,7 +1712,7 @@ const ChairmanDashboard = () => {
                     
                     {/* Social Cases Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
-                      <div>
+                      <div id="chairman-social-chart">
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات الأخصائي الاجتماعي</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <PieChart>
