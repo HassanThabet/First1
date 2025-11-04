@@ -406,6 +406,51 @@ async def update_teacher(teacher_id: str, teacher_data: dict, current_user: dict
     await db.teachers.update_one({"id": teacher_id}, {"$set": teacher_data})
     return {"message": "تم تحديث المعلم بنجاح"}
 
+@api_router.post("/teachers/bulk-import")
+async def bulk_import_teachers(teachers_data: List[dict], current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="غير مصرح")
+    
+    imported_count = 0
+    errors = []
+    
+    for idx, teacher_data in enumerate(teachers_data):
+        try:
+            # Add ID if not present
+            if "id" not in teacher_data or not teacher_data["id"]:
+                teacher_data["id"] = str(uuid.uuid4())
+            
+            # Validate required fields
+            if not teacher_data.get("name") or not teacher_data.get("subject") or not teacher_data.get("branch"):
+                errors.append(f"الصف {idx + 1}: حقول مطلوبة ناقصة (الاسم، المادة، الفرع)")
+                continue
+            
+            # Check if teacher already exists by name and branch
+            existing = await db.teachers.find_one({
+                "name": teacher_data["name"],
+                "branch": teacher_data["branch"]
+            })
+            
+            if existing:
+                # Update existing teacher
+                await db.teachers.update_one(
+                    {"id": existing["id"]},
+                    {"$set": teacher_data}
+                )
+            else:
+                # Insert new teacher
+                await db.teachers.insert_one(teacher_data)
+            
+            imported_count += 1
+        except Exception as e:
+            errors.append(f"الصف {idx + 1}: {str(e)}")
+    
+    return {
+        "message": f"تم استيراد {imported_count} معلم بنجاح",
+        "imported_count": imported_count,
+        "errors": errors if errors else None
+    }
+
 @api_router.delete("/teachers/{teacher_id}")
 async def delete_teacher(teacher_id: str, current_user: dict = Depends(get_current_user)):
     if current_user["role"] != "admin":
