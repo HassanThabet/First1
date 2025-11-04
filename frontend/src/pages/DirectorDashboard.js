@@ -1637,7 +1637,7 @@ const DirectorDashboard = () => {
                     
                     {/* Performance Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
-                      <div>
+                      <div id="director-performance-chart">
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">متوسط الأداء العام</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <BarChart data={getPerformanceChartData()}>
