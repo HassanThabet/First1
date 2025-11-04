@@ -202,20 +202,69 @@ export const createInfoBox = (label, value, color = '#dbeafe') => {
   return {
     columns: [
       {
-        text: value,
-        style: 'infoBoxValue',
-        alignment: 'left',
-        width: 'auto'
-      },
-      {
         text: label,
         style: 'infoBoxLabel',
         alignment: 'right',
         width: '*'
+      },
+      {
+        text: value,
+        style: 'infoBoxValue',
+        alignment: 'center',
+        width: 'auto'
       }
     ],
     fillColor: color,
-    margin: [0, 5, 0, 5]
+    margin: [0, 3, 0, 3]
+  };
+};
+
+/**
+ * Create a statistics grid/table for overall stats
+ */
+export const createStatsGrid = (stats) => {
+  // Group stats into rows of 2
+  const statsRows = [];
+  for (let i = 0; i < stats.length; i += 2) {
+    const row = [];
+    
+    // First stat (right side in RTL)
+    if (stats[i]) {
+      row.push({
+        stack: [
+          { text: stats[i].label, style: 'statLabel', alignment: 'center' },
+          { text: stats[i].value, style: 'statValue', alignment: 'center', margin: [0, 5, 0, 0] }
+        ],
+        fillColor: stats[i].color || '#dbeafe',
+        margin: [5, 5, 5, 5]
+      });
+    }
+    
+    // Second stat (left side in RTL)
+    if (stats[i + 1]) {
+      row.push({
+        stack: [
+          { text: stats[i + 1].label, style: 'statLabel', alignment: 'center' },
+          { text: stats[i + 1].value, style: 'statValue', alignment: 'center', margin: [0, 5, 0, 0] }
+        ],
+        fillColor: stats[i + 1].color || '#fef3c7',
+        margin: [5, 5, 5, 5]
+      });
+    } else {
+      // Empty cell if odd number
+      row.push({ text: '', width: '*' });
+    }
+    
+    statsRows.push({
+      columns: row,
+      columnGap: 10,
+      margin: [0, 0, 0, 5]
+    });
+  }
+  
+  return {
+    stack: statsRows,
+    margin: [0, 0, 0, 15]
   };
 };
 
