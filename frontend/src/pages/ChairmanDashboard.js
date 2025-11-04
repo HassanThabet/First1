@@ -15,7 +15,7 @@ import {
   createSection, 
   createChartImage, 
   captureChartAsImage, 
-  generatePDF as generatePDFTemplate,
+  generatePDF,
   createRTLTable,
   createStatsGrid
 } from "../utils/pdfTemplate";
