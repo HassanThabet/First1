@@ -1,8 +1,10 @@
-import pdfMake from 'pdfmake/build/pdfmake';
+import pdfMake from '@digicole/pdfmake-rtl';
 import pdfFonts from '../fonts/vfs_fonts';
 
-// Configure pdfMake with Arabic font
-pdfMake.vfs = pdfFonts;
+// Configure pdfMake with Arabic font and RTL support
+if (pdfFonts && pdfFonts.pdfMake && pdfFonts.pdfMake.vfs) {
+  pdfMake.vfs = pdfFonts.pdfMake.vfs;
+}
 
 pdfMake.fonts = {
   Cairo: {
