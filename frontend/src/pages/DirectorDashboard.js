@@ -1598,7 +1598,7 @@ const DirectorDashboard = () => {
                   <div className="space-y-6">
                     {/* Teachers Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
-                      <div>
+                      <div id="director-teachers-chart">
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين (انقر للتفاصيل)</h3>
                         <ResponsiveContainer width="100%" height={300}>
                           <PieChart>
