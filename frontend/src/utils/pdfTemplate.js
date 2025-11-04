@@ -1,5 +1,6 @@
 import pdfMake from "@digicole/pdfmake-rtl";
 import pdfMakeFonts from "../fonts/vfs_fonts";
+import html2canvas from "html2canvas";
 
 // Initialize fonts with RTL support
 if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
