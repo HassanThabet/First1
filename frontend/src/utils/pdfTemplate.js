@@ -4,15 +4,22 @@ import pdfMakeFonts from "../fonts/vfs_fonts";
 // Initialize fonts with RTL support
 if (pdfMakeFonts && pdfMakeFonts.pdfMake && pdfMakeFonts.pdfMake.vfs) {
   pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
-  pdfMake.fonts = {
-    Cairo: {
-      normal: 'Cairo-Regular.ttf',
-      bold: 'Cairo-Regular.ttf',
-      italics: 'Cairo-Regular.ttf',
-      bolditalics: 'Cairo-Regular.ttf'
-    }
-  };
 }
+
+pdfMake.fonts = {
+  Cairo: {
+    normal: 'Cairo-Regular.ttf',
+    bold: 'Cairo-Regular.ttf',
+    italics: 'Cairo-Regular.ttf',
+    bolditalics: 'Cairo-Regular.ttf'
+  },
+  Roboto: {
+    normal: 'Cairo-Regular.ttf',
+    bold: 'Cairo-Regular.ttf',
+    italics: 'Cairo-Regular.ttf',
+    bolditalics: 'Cairo-Regular.ttf'
+  }
+};
 
 /**
  * Create school header for PDF (placeholder for future logo/aklesha)
