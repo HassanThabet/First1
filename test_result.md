@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix '_minWidth' error in PDF export for Activities and Social Specialist dashboards - table column mismatch causing pdfMake to fail."
+user_problem_statement: "Copy entire DirectorDashboard statistics tab to QualityDashboard, add teacher progress tab, and add PDF export to statistics."
 
 backend:
   - task: "Authentication API endpoints"
