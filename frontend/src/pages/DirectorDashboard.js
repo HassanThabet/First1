@@ -1653,33 +1653,33 @@ const DirectorDashboard = () => {
                 {/* Supervisor Report Details */}
                 {selectedReport.type === "supervisor" && (
                   <div className="space-y-4">
-                    {selectedReport.late_teachers && selectedReport.late_teachers.length > 0 && (
+                    {selectedReport.late_teachers && Array.isArray(selectedReport.late_teachers) && selectedReport.late_teachers.length > 0 && (
                       <div className="p-4 bg-orange-50 rounded-lg">
                         <h4 className="font-semibold text-orange-800 mb-2">المعلمون المتأخرون:</h4>
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.late_teachers.map((lt, idx) => (
                             <li key={idx} className="text-sm">
-                              {typeof lt === 'object' ? `${lt.teacher} - ${lt.subject} - ${lt.minutes_late} دقيقة` : lt}
+                              {typeof lt === 'object' ? `${lt.teacher || ''} - ${lt.subject || ''} - ${lt.minutes_late || 0} دقيقة` : lt}
                             </li>
                           ))}
                         </ul>
                       </div>
                     )}
                     
-                    {selectedReport.covering_teachers && selectedReport.covering_teachers.length > 0 && (
+                    {selectedReport.covering_teachers && Array.isArray(selectedReport.covering_teachers) && selectedReport.covering_teachers.length > 0 && (
                       <div className="p-4 bg-green-50 rounded-lg">
                         <h4 className="font-semibold text-green-800 mb-2">المعلمون المغطون:</h4>
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.covering_teachers.map((ct, idx) => (
                             <li key={idx} className="text-sm">
-                              {typeof ct === 'object' ? `${ct.teacher} - ${ct.subject} (الحصة ${ct.period})` : ct}
+                              {typeof ct === 'object' ? `${ct.teacher || ''} - ${ct.subject || ''} (الحصة ${ct.period || ''})` : ct}
                             </li>
                           ))}
                         </ul>
                       </div>
                     )}
                     
-                    {selectedReport.incidents && selectedReport.incidents.length > 0 && (
+                    {selectedReport.incidents && Array.isArray(selectedReport.incidents) && selectedReport.incidents.length > 0 && (
                       <div className="p-4 bg-yellow-50 rounded-lg">
                         <h4 className="font-semibold text-yellow-800 mb-2">الحوادث:</h4>
                         <ul className="list-disc list-inside space-y-1">
@@ -1687,6 +1687,16 @@ const DirectorDashboard = () => {
                             <li key={idx} className="text-sm">{inc}</li>
                           ))}
                         </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.student_movement && (
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold text-blue-800 mb-2">حركة الطلاب:</h4>
+                        <p className="text-sm">{selectedReport.student_movement}</p>
+                        {selectedReport.student_movement_notes && (
+                          <p className="text-xs text-gray-600 mt-2">ملاحظات: {selectedReport.student_movement_notes}</p>
+                        )}
                       </div>
                     )}
                     
@@ -1708,6 +1718,24 @@ const DirectorDashboard = () => {
                         <p className="text-2xl font-bold text-green-700">{selectedReport.general_behavior || 0}/10</p>
                       </div>
                     </div>
+                    
+                    {(selectedReport.general_notes || selectedReport.student_discipline_notes || selectedReport.classroom_cleanliness_notes || selectedReport.teacher_attendance_notes) && (
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800 mb-2">الملاحظات:</h4>
+                        {selectedReport.student_discipline_notes && (
+                          <p className="text-sm mb-2"><strong>انضباط الطلاب:</strong> {selectedReport.student_discipline_notes}</p>
+                        )}
+                        {selectedReport.classroom_cleanliness_notes && (
+                          <p className="text-sm mb-2"><strong>نظافة الفصول:</strong> {selectedReport.classroom_cleanliness_notes}</p>
+                        )}
+                        {selectedReport.teacher_attendance_notes && (
+                          <p className="text-sm mb-2"><strong>التزام المعلمين:</strong> {selectedReport.teacher_attendance_notes}</p>
+                        )}
+                        {selectedReport.general_notes && (
+                          <p className="text-sm"><strong>ملاحظات عامة:</strong> {selectedReport.general_notes}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
                 
