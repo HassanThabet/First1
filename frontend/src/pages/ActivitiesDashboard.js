@@ -256,7 +256,15 @@ const ActivitiesDashboard = () => {
     try {
       const mergedReports = getMergedReports();
       const stats = getMergedStatistics();
-      const allActivities = mergedReports.flatMap(r => r.activities || []);
+      let allActivities = mergedReports.flatMap(r => r.activities || []);
+
+      // Filter by selected activity if not "all"
+      if (selectedActivity !== "all") {
+        allActivities = allActivities.filter(activity => {
+          const activityName = activity.name || activity.activity_name;
+          return activityName === selectedActivity;
+        });
+      }
 
       // Check if there are activities to export
       if (allActivities.length === 0) {
