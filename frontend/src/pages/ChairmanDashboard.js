@@ -1570,7 +1570,7 @@ const ChairmanDashboard = () => {
                                     )}
                                     {!report.notes && (
                                       <p className="text-xs text-gray-500 italic">
-                                        {report.type === "supervisor" && `${report.absent_teachers?.length || 0} غائب، ${report.late_teachers?.length || 0} متأخر`}
+                                        {report.type === "supervisor" && `${report.late_teachers?.length || 0} متأخر، ${report.covering_teachers?.length || 0} مغطي`}
                                         {report.type === "activities" && `${report.activities?.length || 0} نشاط`}
                                         {report.type === "social" && `${(report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0)} حالة`}
                                         {report.type === "quality" && `${report.visited_teachers?.length || 0} زيارة`}
