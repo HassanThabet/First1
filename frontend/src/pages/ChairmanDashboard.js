@@ -1740,6 +1740,16 @@ const ChairmanDashboard = () => {
                 </CardContent>
               </Card>
 
+              {/* Teacher Progress Evaluation - Compact View */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg text-gray-800">📈 تقييم تحسن المعلمين</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <TeacherProgressView compact={true} />
+                </CardContent>
+              </Card>
+
               {/* Detailed Reports Section */}
               {showDetailedReports && (
                 <Card>
