@@ -339,6 +339,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Installed and integrated @digicole/pdfmake-rtl package which provides automatic RTL text support for Arabic. Updated pdfTemplate.js, pdfConfig.js, ChairmanDashboard.js, DirectorDashboard.js, and QualityDashboard.js to use the new RTL-enabled pdfMake. Created improved PDF export functions with createStatsGrid helper for better statistics display. Added comprehensive PDF generation with proper Arabic text rendering, aligned tables, and professional formatting. Created CHAIRMAN_DASHBOARD_IMPROVEMENTS.md with detailed UI/UX enhancement suggestions."
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed font initialization error ('Nillima' font not defined). Updated all PDF export functions to properly define both Cairo and Roboto fonts in pdfMake.fonts object. Fixed in: ChairmanDashboard.js (exportToPDF and exportTeachersListToPDF), DirectorDashboard.js (exportToPDF and exportTeachersListToPDF), QualityDashboard.js (exportTeachersListToPDF), pdfTemplate.js, and pdfConfig.js. All files now initialize fonts outside of conditional block to ensure fonts are always defined before PDF generation."
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
