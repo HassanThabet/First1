@@ -644,7 +644,7 @@ const AdminDashboard = () => {
                         إضافة معلم
                       </Button>
                     </DialogTrigger>
-                  <DialogContent>
+                    <DialogContent>
                     <DialogHeader>
                       <DialogTitle>{editingItem ? "تعديل معلم" : "إضافة معلم جديد"}</DialogTitle>
                     </DialogHeader>
