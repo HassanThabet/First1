@@ -463,28 +463,30 @@ const ActivitiesDashboard = () => {
             margin: [0, 0, 0, 20]
           },
 
-          // Activities Table
+          // Activities Table - Full width optimized for landscape
           {
             text: 'تفاصيل الأنشطة',
             style: 'sectionHeader',
-            margin: [0, 0, 0, 10]
+            margin: [0, 0, 0, 10],
+            fontSize: 14,
+            bold: true
           },
           {
             table: {
               headerRows: 1,
-              widths: [20, 60, 50, 50, 60, 60, 50, 40, 40, 50], // Fixed widths instead of 'auto'
+              widths: [25, 80, 55, 55, 75, 75, 65, 45, 45, 65], // محسّنة لملء الصفحة الأفقية
               body: [
                 [
-                  { text: '#', style: 'tableHeader', alignment: 'center' },
-                  { text: 'النشاط', style: 'tableHeader', alignment: 'center' },
-                  { text: 'التاريخ', style: 'tableHeader', alignment: 'center' },
-                  { text: 'النوع', style: 'tableHeader', alignment: 'center' },
-                  { text: 'المشرفون', style: 'tableHeader', alignment: 'center' },
-                  { text: 'المعلمون المتعاونون', style: 'tableHeader', alignment: 'center' },
-                  { text: 'الفئة المستهدفة', style: 'tableHeader', alignment: 'center' },
-                  { text: 'المشاركون', style: 'tableHeader', alignment: 'center' },
-                  { text: 'التفاعل', style: 'tableHeader', alignment: 'center' },
-                  { text: 'الأثر التعليمي', style: 'tableHeader', alignment: 'center' }
+                  { text: '#', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'النشاط', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'التاريخ', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'النوع', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'المشرفون', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'المتعاونون', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'الفئة المستهدفة', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'المشاركون', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'التفاعل', style: 'tableHeader', alignment: 'center', fontSize: 9 },
+                  { text: 'الأثر التعليمي', style: 'tableHeader', alignment: 'center', fontSize: 9 }
                 ],
                 ...activitiesData
               ]
