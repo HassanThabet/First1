@@ -308,13 +308,19 @@ frontend:
     implemented: true
     working: "NA"
     file: "frontend/src/pages/DirectorDashboard.js, frontend/src/pages/ChairmanDashboard.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: "ADDED: Created getCooperatingTeachers() function in both DirectorDashboard and ChairmanDashboard that aggregates cooperating teachers from activities reports. Added cooperating teachers table to PDF export (displays only for 'all' or 'activities' report types). Table shows teacher names and activity counts with orange header color for visual distinction from supervisors table."
+      - working: false
+        agent: "user"
+        comment: "USER REPORTED: PDF export not working in Director and Chairman dashboards."
+      - working: "NA"
+        agent: "main"
+        comment: "FIXED: Root cause identified - teachers state array was not defined in DirectorDashboard and ChairmanDashboard. Added teachers state and fetch from /api/teachers in fetchAllData(). Both getAggregatedActivityTeachers() and getCooperatingTeachers() functions rely on teachers array to resolve IDs to names. Without this, PDF export would fail when trying to access undefined teachers variable."
 
   - task: "Social Specialist Dashboard with modal view and filtering"
     implemented: true
