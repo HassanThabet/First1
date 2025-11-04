@@ -1436,15 +1436,31 @@ const QualityDashboard = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Teacher Progress Evaluation - Compact View */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg text-gray-800">📈 تقييم تحسن المعلمين</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <TeacherProgressView compact={true} />
-                    </CardContent>
-                  </Card>
+                  {/* Teacher Progress Evaluation - Compact View - Only show for educational_supervision or all */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && (
+                    <Card>
+                      <CardHeader>
+                        <div className="flex justify-between items-center">
+                          <CardTitle className="text-lg text-gray-800">📈 تقييم تحسن المعلمين</CardTitle>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              // Create a new tab or show full view
+                              // For now, we'll add a message
+                              toast.info("انتقل إلى تبويب الإشراف التربوي المنفصل لعرض التفاصيل الكاملة");
+                            }}
+                            className="text-blue-600 hover:text-blue-700"
+                          >
+                            عرض التفاصيل الكاملة →
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <TeacherProgressView compact={true} />
+                      </CardContent>
+                    </Card>
+                  )}
 
                   {/* Overall Summary */}
                   <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
