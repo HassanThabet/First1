@@ -345,9 +345,9 @@ const SocialSpecialistDashboard = () => {
                   {}
                 ],
                 [
-                  { text: `التواصل مع الأسر: ${stats.totalFamilies || 0}`, alignment: 'center' },
-                  { text: `التحويلات: ${stats.totalReferrals || 0}`, alignment: 'center' },
-                  { text: `المتابعات: ${stats.totalFollowUps || 0}`, alignment: 'center' }
+                  { text: `التواصل مع الأسر: ${String(stats.totalFamilies || 0)}`, alignment: 'center' },
+                  { text: `التحويلات: ${String(stats.totalReferrals || 0)}`, alignment: 'center' },
+                  { text: `المتابعات: ${String(stats.totalFollowUps || 0)}`, alignment: 'center' }
                 ]
               ]
             },
