@@ -273,6 +273,24 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Fixed 'Malformed table row' error by ensuring all table cells are strings and handling undefined values properly. Added filters to remove undefined teacher names and converted all numeric values to strings."
+      - working: "NA"
+        agent: "user"
+        comment: "USER REPORTED: PDF export for activities reports showing errors. Also, teachers participating in activities are not displayed."
+
+  - task: "ActivitySupervisorsView data fetching"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/ActivitySupervisorsView.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "USER REPORTED: ActivitySupervisorsView not showing teachers in Director and Chairman dashboards. Teachers participating in activities (supervisors and cooperating teachers) are not being fetched."
+      - working: "NA"
+        agent: "main"
+        comment: "FIXED: Changed ActivitySupervisorsView to fetch teachers from /api/teachers instead of /api/users with role filter. This matches the same data source used by ActivitiesDashboard and should now correctly match teacher IDs in activities.supervisors array."
 
   - task: "Social Specialist Dashboard with modal view and filtering"
     implemented: true
