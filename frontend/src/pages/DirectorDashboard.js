@@ -2200,6 +2200,8 @@ const DirectorDashboard = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+          </>
+        )}
       </div>
     </DashboardLayout>
   );
