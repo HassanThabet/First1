@@ -362,6 +362,72 @@ export const createFooter = (customText = null) => {
 };
 
 /**
+ * Convert chart/element to image for PDF
+ * @param {string} elementId - ID of the element to capture
+ * @param {Object} options - Options for image capture
+ * @returns {Promise<string>} Base64 image data
+ */
+export const captureChartAsImage = async (elementId, options = {}) => {
+  const {
+    width = 500,
+    height = 300,
+    backgroundColor = '#ffffff'
+  } = options;
+
+  try {
+    const element = document.getElementById(elementId) || document.querySelector(elementId);
+    if (!element) {
+      console.warn(`Element ${elementId} not found`);
+      return null;
+    }
+
+    const canvas = await html2canvas(element, {
+      backgroundColor: backgroundColor,
+      scale: 2, // Higher quality
+      logging: false,
+      width: element.offsetWidth,
+      height: element.offsetHeight
+    });
+
+    return canvas.toDataURL('image/png');
+  } catch (error) {
+    console.error('Error capturing chart:', error);
+    return null;
+  }
+};
+
+/**
+ * Create image element for PDF from base64 data
+ * @param {string} imageData - Base64 image data
+ * @param {Object} options - Image options
+ */
+export const createChartImage = (imageData, options = {}) => {
+  const {
+    width = 480,
+    height = 250,
+    alignment = 'center',
+    margin = [0, 10, 0, 15]
+  } = options;
+
+  if (!imageData) {
+    return {
+      text: '[المخطط غير متوفر]',
+      style: 'note',
+      alignment: 'center',
+      margin: margin
+    };
+  }
+
+  return {
+    image: imageData,
+    width: width,
+    height: height,
+    alignment: alignment,
+    margin: margin
+  };
+};
+
+/**
  * Generate complete PDF document
  */
 export const generatePDF = (content, filename, options = {}) => {
