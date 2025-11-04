@@ -1038,41 +1038,70 @@ const ActivitiesDashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label>الفترة</Label>
+                      <Select value={mergedPeriod} onValueChange={setMergedPeriod}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="weekly">هذا الأسبوع (السبت - الأربعاء)</SelectItem>
+                          <SelectItem value="monthly">هذا الشهر</SelectItem>
+                          <SelectItem value="custom">نطاق مخصص</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {mergedPeriod === "custom" && (
+                      <>
+                        <div>
+                          <Label>من تاريخ</Label>
+                          <Input
+                            type="date"
+                            value={mergedStartDate}
+                            onChange={(e) => setMergedStartDate(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label>إلى تاريخ</Label>
+                          <Input
+                            type="date"
+                            value={mergedEndDate}
+                            onChange={(e) => setMergedEndDate(e.target.value)}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Activity Filter */}
                   <div>
-                    <Label>الفترة</Label>
-                    <Select value={mergedPeriod} onValueChange={setMergedPeriod}>
+                    <Label>فلترة حسب النشاط</Label>
+                    <Select value={selectedActivity} onValueChange={setSelectedActivity}>
                       <SelectTrigger>
-                        <SelectValue />
+                        <SelectValue placeholder="اختر نشاط محدد..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="weekly">هذا الأسبوع (السبت - الأربعاء)</SelectItem>
-                        <SelectItem value="monthly">هذا الشهر</SelectItem>
-                        <SelectItem value="custom">نطاق مخصص</SelectItem>
+                        <SelectItem value="all">جميع الأنشطة</SelectItem>
+                        {(() => {
+                          const uniqueActivities = new Set();
+                          allReports.forEach(report => {
+                            report.activities?.forEach(activity => {
+                              const activityName = activity.name || activity.activity_name;
+                              if (activityName) {
+                                uniqueActivities.add(activityName);
+                              }
+                            });
+                          });
+                          return Array.from(uniqueActivities).sort().map(name => (
+                            <SelectItem key={name} value={name}>{name}</SelectItem>
+                          ));
+                        })()}
                       </SelectContent>
                     </Select>
                   </div>
-                  
-                  {mergedPeriod === "custom" && (
-                    <>
-                      <div>
-                        <Label>من تاريخ</Label>
-                        <Input
-                          type="date"
-                          value={mergedStartDate}
-                          onChange={(e) => setMergedStartDate(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label>إلى تاريخ</Label>
-                        <Input
-                          type="date"
-                          value={mergedEndDate}
-                          onChange={(e) => setMergedEndDate(e.target.value)}
-                        />
-                      </div>
-                    </>
-                  )}
                 </div>
               </CardContent>
             </Card>
