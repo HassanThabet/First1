@@ -375,28 +375,25 @@ const SocialSpecialistDashboard = () => {
             margin: [0, 0, 0, 10]
           },
 
-          // Actions Summary
+          // Actions Summary - Rebuilt without colSpan
+          {
+            text: 'ملخص الإجراءات',
+            style: 'sectionHeader',
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
           {
             table: {
-              widths: [165, 165, 165], // Fixed widths instead of '*'
+              widths: [165, 165, 165],
               body: [
                 [
-                  { text: 'ملخص الإجراءات', colSpan: 3, style: 'tableHeader', alignment: 'center' },
-                  {},
-                  {}
-                ],
-                [
-                  { text: `التواصل مع الأسر: ${String(stats.totalFamilies || 0)}`, alignment: 'center' },
-                  { text: `التحويلات: ${String(stats.totalReferrals || 0)}`, alignment: 'center' },
-                  { text: `المتابعات: ${String(stats.totalFollowUps || 0)}`, alignment: 'center' }
+                  { text: `التواصل مع الأسر: ${String(stats.totalFamilies || 0)}`, alignment: 'center', fillColor: '#F1F8E9' },
+                  { text: `التحويلات: ${String(stats.totalReferrals || 0)}`, alignment: 'center', fillColor: '#F1F8E9' },
+                  { text: `المتابعات: ${String(stats.totalFollowUps || 0)}`, alignment: 'center', fillColor: '#F1F8E9' }
                 ]
               ]
             },
-            layout: {
-              fillColor: function (rowIndex) {
-                return rowIndex === 0 ? '#4CAF50' : '#F1F8E9';
-              }
-            },
+            layout: 'lightHorizontalLines',
             margin: [0, 0, 0, 15]
           },
 
