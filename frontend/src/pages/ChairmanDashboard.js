@@ -36,6 +36,7 @@ const ChairmanDashboard = () => {
   const [vicePrincipalReports, setVicePrincipalReports] = useState([]);
   const [educationalSupervisionReports, setEducationalSupervisionReports] = useState([]);
   const [users, setUsers] = useState([]);
+  const [teachers, setTeachers] = useState([]);
   const [timeFilter, setTimeFilter] = useState("all");
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
