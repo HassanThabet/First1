@@ -888,7 +888,202 @@ const DirectorDashboard = () => {
         content.push(createSection('👥 توزيع حالات الأخصائي الاجتماعي', createChartImage(socialChartImage, { width: 450, height: 250 })));
       }
       
-      // === القسم 4: تفاصيل التقارير ===
+      // === القسم 3.1: جداول تفصيلية للمعلمين ===
+      
+      // جدول المعلمين الغائبين
+      const absentTeachers = getAggregatedAbsentTeachers();
+      if (absentTeachers.length > 0) {
+        const absentTeachersTable = createRTLTable(
+          [
+            { text: 'اسم المعلم', width: '*' },
+            { text: 'عدد أيام الغياب', width: 80 },
+            { text: 'عدد التقارير', width: 80 }
+          ],
+          absentTeachers.slice(0, 20).map(teacher => [
+            teacher.name,
+            teacher.totalDays.toString(),
+            teacher.count.toString()
+          ]),
+          { showRowNumbers: true, headerColor: '#fee2e2' }
+        );
+        content.push(createSection(`👤 المعلمون الغائبون (${absentTeachers.length} معلم)`, absentTeachersTable));
+      }
+      
+      // جدول المعلمين المتأخرين
+      const lateTeachers = getAggregatedLateTeachers();
+      if (lateTeachers.length > 0) {
+        const lateTeachersTable = createRTLTable(
+          [
+            { text: 'اسم المعلم', width: '*' },
+            { text: 'عدد مرات التأخير', width: 80 },
+            { text: 'إجمالي الدقائق', width: 80 }
+          ],
+          lateTeachers.slice(0, 20).map(teacher => [
+            teacher.name,
+            teacher.count.toString(),
+            teacher.totalMinutes ? teacher.totalMinutes.toString() + ' دقيقة' : '-'
+          ]),
+          { showRowNumbers: true, headerColor: '#fed7aa' }
+        );
+        content.push(createSection(`⏰ المعلمون المتأخرون (${lateTeachers.length} معلم)`, lateTeachersTable));
+      }
+      
+      // جدول المعلمين المغطين
+      const coveringTeachers = getAggregatedCoveringTeachers();
+      if (coveringTeachers.length > 0) {
+        const coveringTeachersTable = createRTLTable(
+          [
+            { text: 'اسم المعلم', width: '*' },
+            { text: 'عدد الحصص المغطاة', width: 80 },
+            { text: 'المواد', width: 120 }
+          ],
+          coveringTeachers.slice(0, 20).map(teacher => [
+            teacher.name,
+            teacher.count.toString(),
+            teacher.subjects && teacher.subjects.length > 0 ? teacher.subjects.slice(0, 3).join(', ') : '-'
+          ]),
+          { showRowNumbers: true, headerColor: '#d1fae5' }
+        );
+        content.push(createSection(`📚 المعلمون المغطون (${coveringTeachers.length} معلم)`, coveringTeachersTable));
+      }
+      
+      // جدول المعلمين المشاركين في الأنشطة
+      const activityTeachers = getAggregatedActivityTeachers();
+      if (activityTeachers.length > 0) {
+        const activityTeachersTable = createRTLTable(
+          [
+            { text: 'اسم المعلم', width: '*' },
+            { text: 'عدد الأنشطة', width: 100 }
+          ],
+          activityTeachers.slice(0, 20).map(teacher => [
+            teacher.name,
+            teacher.count.toString()
+          ]),
+          { showRowNumbers: true, headerColor: '#e9d5ff' }
+        );
+        content.push(createSection(`🎯 المعلمون المشاركون في الأنشطة (${activityTeachers.length} معلم)`, activityTeachersTable));
+      }
+      
+      // جدول تقييم تحسن المعلمين (من الإشراف التربوي)
+      if ((reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && educationalSupervisionReports.length > 0) {
+        const teacherEvaluations = [];
+        educationalSupervisionReports.forEach(report => {
+          if (report.teacher_evaluations && Array.isArray(report.teacher_evaluations)) {
+            report.teacher_evaluations.forEach(evaluation => {
+              const existing = teacherEvaluations.find(t => t.teacherName === evaluation.teacher_name);
+              if (existing) {
+                existing.evaluations.push({
+                  date: report.report_date,
+                  weeklyPerformance: evaluation.weekly_performance,
+                  strategies: evaluation.strategies_used,
+                  strengths: evaluation.strengths,
+                  supportAreas: evaluation.support_areas
+                });
+              } else {
+                teacherEvaluations.push({
+                  teacherName: evaluation.teacher_name,
+                  evaluations: [{
+                    date: report.report_date,
+                    weeklyPerformance: evaluation.weekly_performance,
+                    strategies: evaluation.strategies_used,
+                    strengths: evaluation.strengths,
+                    supportAreas: evaluation.support_areas
+                  }]
+                });
+              }
+            });
+          }
+        });
+        
+        if (teacherEvaluations.length > 0) {
+          const evaluationRows = teacherEvaluations.slice(0, 30).map(teacher => {
+            const evals = teacher.evaluations;
+            const firstEval = evals[0]?.weeklyPerformance || 0;
+            const lastEval = evals[evals.length - 1]?.weeklyPerformance || 0;
+            const improvement = lastEval - firstEval;
+            const status = improvement > 0 ? '✅ تحسن' : improvement < 0 ? '⚠️ تراجع' : '➖ مستقر';
+            
+            return [
+              teacher.teacherName,
+              evals.length.toString(),
+              firstEval + '/10',
+              lastEval + '/10',
+              improvement > 0 ? '+' + improvement.toFixed(1) : improvement.toFixed(1),
+              status
+            ];
+          });
+          
+          const teacherEvalTable = createRTLTable(
+            [
+              { text: 'اسم المعلم', width: '*' },
+              { text: 'عدد التقييمات', width: 60 },
+              { text: 'أول تقييم', width: 50 },
+              { text: 'آخر تقييم', width: 50 },
+              { text: 'التحسن', width: 50 },
+              { text: 'الحالة', width: 70 }
+            ],
+            evaluationRows,
+            { showRowNumbers: true, headerColor: '#dbeafe' }
+          );
+          content.push(createSection(`📈 تقييم تحسن المعلمين (${teacherEvaluations.length} معلم)`, teacherEvalTable));
+        }
+      }
+      
+      // === القسم 4: تفاصيل الأنشطة ===
+      if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
+        if (stats.activitiesReportsCount > 0) {
+          const activitiesStats = [
+            { label: 'إجمالي الأنشطة', value: stats.totalActivities.toString(), color: '#dbeafe' },
+            { label: 'إجمالي المشاركين', value: stats.totalActivitiesParticipants.toString(), color: '#e9d5ff' },
+            { label: 'متوسط التفاعل', value: `${stats.avgActivitiesInteraction}/10`, color: '#d1fae5' }
+          ];
+          content.push(createSection('🎯 تفاصيل الأنشطة', createStatsGrid(activitiesStats)));
+        }
+      }
+      
+      // === القسم 5: تفاصيل الأخصائي الاجتماعي ===
+      if (reportTypeFilter === "all" || reportTypeFilter === "social") {
+        if (stats.socialReportsCount > 0) {
+          const socialStatsTable = createRTLTable(
+            [
+              { text: 'نوع الحالة', width: '*' },
+              { text: 'العدد', width: 80 }
+            ],
+            [
+              ['حالات نفسية', stats.totalPsychologicalCases.toString()],
+              ['حالات أكاديمية', stats.totalAcademicCases.toString()],
+              ['حالات سلوكية', stats.totalBehavioralCases.toString()],
+              [{ text: 'إجمالي الحالات', bold: true }, { text: stats.totalStudentCases.toString(), bold: true, fillColor: '#dbeafe' }]
+            ],
+            { showRowNumbers: false }
+          );
+          content.push(createSection('👥 إحصائيات الأخصائي الاجتماعي', {
+            stack: [
+              socialStatsTable,
+              {
+                columns: [
+                  { text: `إجمالي الجلسات: ${stats.totalSessions}`, style: 'infoText', width: '*', alignment: 'right' },
+                  { text: `التواصل مع الأسر: ${stats.totalFamilyContacts}`, style: 'infoText', width: '*', alignment: 'left' }
+                ],
+                margin: [0, 10, 0, 0]
+              }
+            ]
+          }));
+        }
+      }
+      
+      // === القسم 6: تفاصيل الجودة ===
+      if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
+        if (stats.qualityReportsCount > 0) {
+          const qualityStats = [
+            { label: 'إجمالي الزيارات', value: stats.totalQualityVisits.toString(), color: '#dbeafe' },
+            { label: 'متوسط الأداء التدريسي', value: `${stats.avgQualityTeachingRate}/10`, color: '#d1fae5' }
+          ];
+          content.push(createSection('✅ إحصائيات الجودة', createStatsGrid(qualityStats)));
+        }
+      }
+      
+      // === القسم 7: تفاصيل التقارير ===
       if (reports.length > 0) {
         const reportsTable = createRTLTable(
           [
