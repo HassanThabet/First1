@@ -847,7 +847,7 @@ const VicePrincipalDashboard = () => {
                 type="button"
                 onClick={() => {
                   setEditingReport(null);
-                  setFormData({ problems: [], suggestions: [], week_start: "", week_end: "" });
+                  setFormData({ problems: [], suggestions: [], week_start: "", week_end: "", absent_teachers: [] });
                 }}
                 variant="outline"
                 className="w-full"
