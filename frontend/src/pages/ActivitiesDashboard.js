@@ -415,28 +415,25 @@ const ActivitiesDashboard = () => {
             margin: [0, 0, 0, 15]
           },
           
-          // Statistics Box
+          // Statistics Box - Rebuilt without colSpan
+          {
+            text: 'إجمالي الإحصائيات',
+            style: 'sectionHeader',
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
           {
             table: {
-              widths: [165, 165, 165], // Fixed widths instead of '*'
+              widths: [165, 165, 165],
               body: [
                 [
-                  { text: 'إجمالي الإحصائيات', colSpan: 3, style: 'tableHeader', alignment: 'center' },
-                  {},
-                  {}
-                ],
-                [
-                  { text: `إجمالي الأنشطة: ${String(stats.totalActivities || 0)}`, alignment: 'center' },
-                  { text: `إجمالي المشاركين: ${String(stats.totalParticipants || 0)}`, alignment: 'center' },
-                  { text: `متوسط التفاعل: ${String(stats.avgInteraction || 0)}/10`, alignment: 'center' }
+                  { text: `إجمالي الأنشطة: ${String(stats.totalActivities || 0)}`, alignment: 'center', fillColor: '#E0F2F1' },
+                  { text: `إجمالي المشاركين: ${String(stats.totalParticipants || 0)}`, alignment: 'center', fillColor: '#E0F2F1' },
+                  { text: `متوسط التفاعل: ${String(stats.avgInteraction || 0)}/10`, alignment: 'center', fillColor: '#E0F2F1' }
                 ]
               ]
             },
-            layout: {
-              fillColor: function (rowIndex) {
-                return rowIndex === 0 ? '#4DB6AC' : '#E0F2F1';
-              }
-            },
+            layout: 'lightHorizontalLines',
             margin: [0, 0, 0, 15]
           },
 
