@@ -1071,712 +1071,1078 @@ const QualityDashboard = () => {
 
         {/* Statistics Tab - نسخة كاملة من لوحة المدير */}
         <TabsContent value="statistics">
-          <div className="space-y-6">
-            {/* Time Filter */}
+          <>
+            {/* Filters */}
             <Card>
-              <CardHeader>
-                <CardTitle>التصفية</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">نوع التقرير</label>
-                      <Select value={reportTypeFilter} onValueChange={(value) => {
-                        setReportTypeFilter(value);
-                        setSelectedSpecificEmployee("all");
-                      }}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">جميع التقارير</SelectItem>
-                          <SelectItem value="vice_principal">الوكلاء</SelectItem>
-                          <SelectItem value="supervisor">المشرفين</SelectItem>
-                          <SelectItem value="activities">الأنشطة</SelectItem>
-                          <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
-                          <SelectItem value="quality">الجودة</SelectItem>
-                          <SelectItem value="educational_supervision">الإشراف التربوي</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
-                      <Select value={timeFilter} onValueChange={setTimeFilter}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">جميع الفترات</SelectItem>
-                          <SelectItem value="daily">اليوم</SelectItem>
-                          <SelectItem value="weekly">هذا الأسبوع</SelectItem>
-                          <SelectItem value="monthly">هذا الشهر</SelectItem>
-                          <SelectItem value="custom">فترة مخصصة</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {timeFilter === "custom" && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2">من تاريخ</label>
-                        <Input 
-                          type="date" 
-                          value={customStartDate}
-                          onChange={(e) => setCustomStartDate(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
-                        <Input 
-                          type="date" 
-                          value={customEndDate}
-                          onChange={(e) => setCustomEndDate(e.target.value)}
-                        />
-                      </div>
-                    </div>
-                  )}
+          <CardHeader>
+            <CardTitle>التصفية</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">نوع التقرير</label>
+                  <Select value={reportTypeFilter} onValueChange={(value) => {
+                    setReportTypeFilter(value);
+                    setSelectedSpecificEmployee("all");
+                    setSelectedVicePrincipal("all");
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر نوع التقرير" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع التقارير</SelectItem>
+                      <SelectItem value="vice_principal">الوكلاء</SelectItem>
+                      <SelectItem value="supervisor">المشرفين</SelectItem>
+                      <SelectItem value="activities">الأنشطة</SelectItem>
+                      <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
+                      <SelectItem value="quality">الجودة</SelectItem>
+                      <SelectItem value="educational_supervision">الإشراف التربوي</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              </CardContent>
-            </Card>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
+                  <Select value={timeFilter} onValueChange={setTimeFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="اختر الفترة الزمنية" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">جميع الفترات</SelectItem>
+                      <SelectItem value="daily">اليوم</SelectItem>
+                      <SelectItem value="weekly">هذا الأسبوع</SelectItem>
+                      <SelectItem value="monthly">هذا الشهر</SelectItem>
+                      <SelectItem value="custom">فترة مخصصة</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                {/* Branch filter - only for directors with branch="both" */}
+                {user && user.branch === "both" && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">الفرع</label>
+                    <Select value={branchFilter} onValueChange={setBranchFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الفرع" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الفروع</SelectItem>
+                        <SelectItem value="boys">البنين</SelectItem>
+                        <SelectItem value="girls">البنات</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                
+                {/* Filter for Vice Principals */}
+                {reportTypeFilter === "vice_principal" && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">اختيار الوكيل</label>
+                    <Select value={selectedVicePrincipal} onValueChange={setSelectedVicePrincipal}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الوكيل" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">كل الوكلاء</SelectItem>
+                        {users.filter(u => u.role === "vice_principal").map(vp => (
+                          <SelectItem key={vp.id} value={vp.id}>
+                            {vp.full_name || vp.username} ({vp.branch === "boys" ? "بنين" : "بنات"})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                
+                {/* Filter for other employees */}
+                {reportTypeFilter !== "all" && reportTypeFilter !== "vice_principal" && getEmployeesForReportType().length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium mb-2">اختيار الموظف</label>
+                    <Select value={selectedSpecificEmployee} onValueChange={setSelectedSpecificEmployee}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="اختر الموظف" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع الموظفين</SelectItem>
+                        {getEmployeesForReportType().map(emp => (
+                          <SelectItem key={emp.id} value={emp.id}>
+                            {emp.full_name || emp.username} ({emp.branch === "boys" ? "بنين" : "بنات"})
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+              </div>
 
-            {/* Toggle Button for Detailed Reports */}
-            <Card>
-              <CardContent className="p-4">
-                <Button 
-                  onClick={() => setShowDetailedReports(!showDetailedReports)}
-                  variant="outline"
-                  className="w-full border-blue-600 text-blue-600 hover:bg-blue-50"
-                >
-                  {showDetailedReports ? "إخفاء التقارير التفصيلية" : "عرض التقارير التفصيلية"}
-                </Button>
-              </CardContent>
-            </Card>
+              {timeFilter === "custom" && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">من تاريخ</label>
+                    <Input 
+                      type="date" 
+                      value={customStartDate}
+                      onChange={(e) => setCustomStartDate(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
+                    <Input 
+                      type="date" 
+                      value={customEndDate}
+                      onChange={(e) => setCustomEndDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex justify-between items-center mt-4 pt-4 border-t">
+              <Button 
+                onClick={exportToPDF}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                📄 تصدير التقرير إلى PDF
+              </Button>
+              
+              <Button 
+                onClick={() => setShowDetailedReports(!showDetailedReports)}
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50"
+              >
+                {showDetailedReports ? "إخفاء التقارير التفصيلية" : "عرض التقارير التفصيلية"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-            {(() => {
-              const stats = getOverallStatistics();
-              return (
-                <>
-                  {/* Supervisor Statistics */}
-                  {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
-                  <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
-                        <CardContent className="p-6">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون الغائبون</div>
-                          <div className="text-4xl font-bold text-red-700">{stats.totalAbsentTeachers}</div>
-                          <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
-                        </CardContent>
-                      </Card>
+        {(() => {
+          const stats = getOverallStatistics();
+          return (
+            <>
+              {/* Supervisor Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون الغائبون</div>
+                      <div className="text-4xl font-bold text-red-700">{stats.totalAbsentTeachers}</div>
+                      <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
+                    </CardContent>
+                  </Card>
 
-                      <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
-                        <CardContent className="p-6">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المتأخرون</div>
-                          <div className="text-4xl font-bold text-orange-700">{stats.totalLateTeachers}</div>
-                          <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
-                        </CardContent>
-                      </Card>
+                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المتأخرون</div>
+                      <div className="text-4xl font-bold text-orange-700">{stats.totalLateTeachers}</div>
+                      <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
+                    </CardContent>
+                  </Card>
 
-                      <Card className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
-                        <CardContent className="p-6">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المغطون</div>
-                          <div className="text-4xl font-bold text-green-700">{stats.totalCoveringTeachers}</div>
-                          <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
-                        </CardContent>
-                      </Card>
+                  <Card className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المغطون</div>
+                      <div className="text-4xl font-bold text-green-700">{stats.totalCoveringTeachers}</div>
+                      <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
+                    </CardContent>
+                  </Card>
 
-                      <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
-                        <CardContent className="p-6">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">الطلاب الغائبون</div>
-                          <div className="text-4xl font-bold text-blue-700">{stats.totalAbsentStudents}</div>
-                          <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
-                        </CardContent>
-                      </Card>
+                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">الطلاب الغائبون</div>
+                      <div className="text-4xl font-bold text-blue-700">{stats.totalAbsentStudents}</div>
+                      <p className="text-xs text-gray-600 mt-2">خلال {timeFilter === "daily" ? "اليوم" : timeFilter === "weekly" ? "الأسبوع" : timeFilter === "monthly" ? "الشهر" : "جميع الفترات"}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>متوسط الأداء العام</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500 p-4 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">انضباط الطلاب</div>
+                        <div className="text-3xl font-bold text-cyan-700">{stats.avgDiscipline}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500 p-4 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">نظافة الفصول</div>
+                        <div className="text-3xl font-bold text-blue-700">{stats.avgCleanliness}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500 p-4 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">التزام المعلمين</div>
+                        <div className="text-3xl font-bold text-purple-700">{stats.avgAttendance}/10</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 p-4 rounded-lg">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">السلوك العام</div>
+                        <div className="text-3xl font-bold text-green-700">{stats.avgBehavior}/10</div>
+                      </div>
                     </div>
+                  </CardContent>
+                </Card>
 
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>متوسط الأداء العام</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500 p-4 rounded-lg">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">انضباط الطلاب</div>
-                            <div className="text-3xl font-bold text-cyan-700">{stats.avgDiscipline}/10</div>
-                          </div>
-                          <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500 p-4 rounded-lg">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">نظافة الفصول</div>
-                            <div className="text-3xl font-bold text-blue-700">{stats.avgCleanliness}/10</div>
-                          </div>
-                          <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500 p-4 rounded-lg">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">التزام المعلمين</div>
-                            <div className="text-3xl font-bold text-purple-700">{stats.avgAttendance}/10</div>
-                          </div>
-                          <div className="stat-card bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500 p-4 rounded-lg">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">السلوك العام</div>
-                            <div className="text-3xl font-bold text-green-700">{stats.avgBehavior}/10</div>
-                          </div>
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">الحوادث والمخالفات</div>
+                      <div className="text-4xl font-bold text-yellow-700">{stats.totalIncidents}</div>
+                      <p className="text-xs text-gray-600 mt-2">إجمالي الحوادث المسجلة</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300">
+                    <CardContent className="p-6">
+                      <div className="text-sm text-gray-700 mb-1 font-semibold">تقارير المشرفين</div>
+                      <div className="text-4xl font-bold text-purple-700">{stats.supervisorReportsCount}</div>
+                      <p className="text-xs text-gray-600 mt-2">إجمالي تقارير المشرفين</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </>
+              )}
+
+              {/* Activities Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-purple-700">🎯 إحصائيات الأنشطة</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الأنشطة</div>
+                        <div className="text-4xl font-bold text-purple-700">{stats.totalActivities}</div>
+                        <p className="text-xs text-gray-600 mt-2">{stats.activitiesReportsCount} تقرير</p>
                       </CardContent>
                     </Card>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300">
-                        <CardContent className="p-6">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">الحوادث والمخالفات</div>
-                          <div className="text-4xl font-bold text-yellow-700">{stats.totalIncidents}</div>
-                          <p className="text-xs text-gray-600 mt-2">إجمالي الحوادث المسجلة</p>
-                        </CardContent>
-                      </Card>
+                    <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-l-4 border-indigo-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي المشاركين</div>
+                        <div className="text-4xl font-bold text-indigo-700">{stats.totalActivitiesParticipants}</div>
+                        <p className="text-xs text-gray-600 mt-2">في جميع الأنشطة</p>
+                      </CardContent>
+                    </Card>
 
-                      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-300">
-                        <CardContent className="p-6">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">تقارير المشرفين</div>
-                          <div className="text-4xl font-bold text-purple-700">{stats.supervisorReportsCount}</div>
-                          <p className="text-xs text-gray-600 mt-2">إجمالي تقارير المشرفين</p>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </>
-                  )}
+                    <Card className="bg-gradient-to-br from-violet-50 to-violet-100 border-l-4 border-violet-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط التفاعل</div>
+                        <div className="text-4xl font-bold text-violet-700">{stats.avgActivitiesInteraction}/10</div>
+                        <p className="text-xs text-gray-600 mt-2">معدل تفاعل الطلاب</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+              )}
 
-                  {/* Activities Statistics */}
-                  {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-purple-700">🎯 إحصائيات الأنشطة</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
-                          <CardContent className="p-6">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الأنشطة</div>
-                            <div className="text-4xl font-bold text-purple-700">{stats.totalActivities}</div>
-                            <p className="text-xs text-gray-600 mt-2">{stats.activitiesReportsCount} تقرير</p>
-                          </CardContent>
-                        </Card>
+              {/* Social Specialist Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-green-700">👥 إحصائيات الأخصائي الاجتماعي</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                    <Card className="bg-gradient-to-br from-rose-50 to-rose-100 border-l-4 border-rose-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">إجمالي الحالات</div>
+                        <div className="text-3xl font-bold text-rose-700">{stats.totalStudentCases}</div>
+                      </CardContent>
+                    </Card>
 
-                        <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-l-4 border-indigo-500">
-                          <CardContent className="p-6">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي المشاركين</div>
-                            <div className="text-4xl font-bold text-indigo-700">{stats.totalActivitiesParticipants}</div>
-                            <p className="text-xs text-gray-600 mt-2">في جميع الأنشطة</p>
-                          </CardContent>
-                        </Card>
+                    <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">حالات نفسية</div>
+                        <div className="text-3xl font-bold text-pink-700">{stats.totalPsychologicalCases}</div>
+                      </CardContent>
+                    </Card>
 
-                        <Card className="bg-gradient-to-br from-violet-50 to-violet-100 border-l-4 border-violet-500">
-                          <CardContent className="p-6">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط التفاعل</div>
-                            <div className="text-4xl font-bold text-violet-700">{stats.avgActivitiesInteraction}/10</div>
-                            <p className="text-xs text-gray-600 mt-2">معدل تفاعل الطلاب</p>
-                          </CardContent>
-                        </Card>
+                    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-amber-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">حالات أكاديمية</div>
+                        <div className="text-3xl font-bold text-amber-700">{stats.totalAcademicCases}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">حالات سلوكية</div>
+                        <div className="text-3xl font-bold text-red-700">{stats.totalBehavioralCases}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-l-4 border-emerald-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">الجلسات</div>
+                        <div className="text-3xl font-bold text-emerald-700">{stats.totalSessions}</div>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-l-4 border-teal-500">
+                      <CardContent className="p-4">
+                        <div className="text-xs text-gray-700 mb-1 font-semibold">تواصل مع الأسر</div>
+                        <div className="text-3xl font-bold text-teal-700">{stats.totalFamilyContacts}</div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      📊 إجمالي: {stats.socialReportsCount} تقرير من الأخصائي الاجتماعي
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              )}
+
+              {/* Quality Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "quality") && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-orange-700">⭐ إحصائيات الجودة</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الزيارات</div>
+                        <div className="text-4xl font-bold text-orange-700">{stats.totalQualityVisits}</div>
+                        <p className="text-xs text-gray-600 mt-2">زيارات الجودة للمعلمين</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-amber-500">
+                      <CardContent className="p-6">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط الأداء التدريسي</div>
+                        <div className="text-4xl font-bold text-amber-700">{stats.avgQualityTeachingRate}/10</div>
+                        <p className="text-xs text-gray-600 mt-2">معدل أداء المعلمين</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </CardContent>
+              </Card>
+              )}
+
+              {/* Charts Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>📊 الرسوم البيانية والتحليلات</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Teachers Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                      <div id="director-teachers-chart">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين (انقر للتفاصيل)</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={getTeachersChartData()}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={(entry) => `${entry.name}: ${entry.value}`}
+                              outerRadius={100}
+                              fill="#8884d8"
+                              dataKey="value"
+                              onClick={(data, index) => {
+                                const types = ['absent', 'late', 'covering'];
+                                if (types[index]) {
+                                  handleChartClick(types[index]);
+                                }
+                              }}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              {getTeachersChartData().map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend onClick={(e) => {
+                              const name = e.value;
+                              if (name === 'الغائبون') handleChartClick('absent');
+                              else if (name === 'المتأخرون') handleChartClick('late');
+                              else if (name === 'المغطون') handleChartClick('covering');
+                            }} wrapperStyle={{ cursor: 'pointer' }} />
+                          </PieChart>
+                        </ResponsiveContainer>
                       </div>
-                    </CardContent>
-                  </Card>
-                  )}
-
-                  {/* Social Specialist Statistics */}
-                  {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-green-700">👥 إحصائيات الأخصائي الاجتماعي</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                        <Card className="bg-gradient-to-br from-rose-50 to-rose-100 border-l-4 border-rose-500">
-                          <CardContent className="p-4">
-                            <div className="text-xs text-gray-700 mb-1 font-semibold">إجمالي الحالات</div>
-                            <div className="text-3xl font-bold text-rose-700">{stats.totalStudentCases}</div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500">
-                          <CardContent className="p-4">
-                            <div className="text-xs text-gray-700 mb-1 font-semibold">حالات نفسية</div>
-                            <div className="text-3xl font-bold text-pink-700">{stats.totalPsychologicalCases}</div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-amber-500">
-                          <CardContent className="p-4">
-                            <div className="text-xs text-gray-700 mb-1 font-semibold">حالات أكاديمية</div>
-                            <div className="text-3xl font-bold text-amber-700">{stats.totalAcademicCases}</div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
-                          <CardContent className="p-4">
-                            <div className="text-xs text-gray-700 mb-1 font-semibold">حالات سلوكية</div>
-                            <div className="text-3xl font-bold text-red-700">{stats.totalBehavioralCases}</div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-l-4 border-emerald-500">
-                          <CardContent className="p-4">
-                            <div className="text-xs text-gray-700 mb-1 font-semibold">الجلسات</div>
-                            <div className="text-3xl font-bold text-emerald-700">{stats.totalSessions}</div>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-l-4 border-teal-500">
-                          <CardContent className="p-4">
-                            <div className="text-xs text-gray-700 mb-1 font-semibold">تواصل مع الأسر</div>
-                            <div className="text-3xl font-bold text-teal-700">{stats.totalFamilyContacts}</div>
-                          </CardContent>
-                        </Card>
+                    )}
+                    
+                    {/* Performance Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                      <div id="director-performance-chart">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">متوسط الأداء العام</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={getPerformanceChartData()}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis domain={[0, 10]} />
+                            <Tooltip />
+                            <Legend />
+                            <Bar dataKey="value" fill="#3b82f6" />
+                          </BarChart>
+                        </ResponsiveContainer>
                       </div>
-                      <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <p className="text-sm text-green-800">
-                          📊 إجمالي: {stats.socialReportsCount} تقرير من الأخصائي الاجتماعي
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  )}
-
-                  {/* Quality Statistics */}
-                  {(reportTypeFilter === "all" || reportTypeFilter === "quality") && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-orange-700">⭐ إحصائيات الجودة</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
-                          <CardContent className="p-6">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">إجمالي الزيارات</div>
-                            <div className="text-4xl font-bold text-orange-700">{stats.totalQualityVisits}</div>
-                            <p className="text-xs text-gray-600 mt-2">زيارات الجودة للمعلمين</p>
-                          </CardContent>
-                        </Card>
-
-                        <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-l-4 border-amber-500">
-                          <CardContent className="p-6">
-                            <div className="text-sm text-gray-700 mb-1 font-semibold">متوسط الأداء التدريسي</div>
-                            <div className="text-4xl font-bold text-amber-700">{stats.avgQualityTeachingRate}/10</div>
-                            <p className="text-xs text-gray-600 mt-2">معدل أداء المعلمين</p>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  )}
-
-                  {/* Charts Section */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>📊 الرسوم البيانية والتحليلات</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-6">
-                        {/* Teachers Chart */}
-                        {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
-                          <div>
-                            <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين (انقر للتفاصيل)</h3>
-                            <ResponsiveContainer width="100%" height={300}>
-                              <PieChart>
-                                <Pie
-                                  data={getTeachersChartData()}
-                                  cx="50%"
-                                  cy="50%"
-                                  labelLine={false}
-                                  label={(entry) => `${entry.name}: ${entry.value}`}
-                                  outerRadius={100}
-                                  fill="#8884d8"
-                                  dataKey="value"
-                                  onClick={(data, index) => {
-                                    const types = ['absent', 'late', 'covering'];
-                                    if (types[index]) {
-                                      handleChartClick(types[index]);
-                                    }
-                                  }}
-                                  style={{ cursor: 'pointer' }}
-                                >
-                                  {getTeachersChartData().map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                                  ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend onClick={(e) => {
-                                  const name = e.value;
-                                  if (name === 'الغائبون') handleChartClick('absent');
-                                  else if (name === 'المتأخرون') handleChartClick('late');
-                                  else if (name === 'المغطون') handleChartClick('covering');
-                                }} wrapperStyle={{ cursor: 'pointer' }} />
-                              </PieChart>
-                            </ResponsiveContainer>
-                            <div className="text-center mt-4">
-                              <Button
-                                variant="outline"
-                                onClick={() => handleChartClick('absent')}
-                                className="mx-2"
-                              >
-                                👥 عرض قائمة المعلمين الغائبين
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                        
-                        {/* Performance Chart */}
-                        {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
-                          <div>
-                            <h3 className="text-lg font-semibold mb-4 text-gray-700">معدلات الأداء العام</h3>
-                            <ResponsiveContainer width="100%" height={300}>
-                              <BarChart data={getPerformanceChartData()}>
-                                <CartesianGrid strokeDasharray="3 3" />
-                                <XAxis dataKey="name" />
-                                <YAxis domain={[0, 10]} />
-                                <Tooltip />
-                                <Legend />
-                                <Bar dataKey="value" fill="#3b82f6" name="التقييم" />
-                              </BarChart>
-                            </ResponsiveContainer>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Teacher Progress Evaluation - Compact View - Only show for educational_supervision or all */}
-                  {(reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && (
-                    <Card>
-                      <CardHeader>
-                        <div className="flex justify-between items-center">
-                          <CardTitle className="text-lg text-gray-800">📈 تقييم تحسن المعلمين</CardTitle>
+                    )}
+                    
+                    {/* Absent Teachers Detailed Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor" || reportTypeFilter === "vice_principal") && (
+                      <div id="director-absent-teachers-chart">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">تفاصيل غياب المعلمين (عدد الأيام)</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={getAggregatedAbsentTeachers().slice(0, 10)}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
+                            <YAxis label={{ value: 'عدد أيام الغياب', angle: -90, position: 'insideLeft' }} />
+                            <Tooltip 
+                              content={({ active, payload }) => {
+                                if (active && payload && payload.length) {
+                                  return (
+                                    <div className="bg-white p-3 border border-gray-300 rounded shadow-lg">
+                                      <p className="font-semibold">{payload[0].payload.name}</p>
+                                      <p className="text-red-600">أيام الغياب: {payload[0].payload.totalDays}</p>
+                                      <p className="text-gray-600">عدد التقارير: {payload[0].payload.count}</p>
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                            <Legend />
+                            <Bar 
+                              dataKey="totalDays" 
+                              fill="#ef4444" 
+                              name="أيام الغياب"
+                              onClick={() => handleChartClick('absent')}
+                              style={{ cursor: 'pointer' }}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                        <div className="text-center mt-4">
                           <Button
                             variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              // Create a new tab or show full view
-                              // For now, we'll add a message
-                              toast.info("انتقل إلى تبويب الإشراف التربوي المنفصل لعرض التفاصيل الكاملة");
-                            }}
-                            className="text-blue-600 hover:text-blue-700"
+                            onClick={() => handleChartClick('absent')}
                           >
-                            عرض التفاصيل الكاملة →
+                            👥 عرض القائمة الكاملة للمعلمين الغائبين
                           </Button>
                         </div>
-                      </CardHeader>
-                      <CardContent>
-                        <TeacherProgressView compact={true} />
-                      </CardContent>
-                    </Card>
-                  )}
-
-                  {/* Overall Summary */}
-                  <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
-                    <CardContent className="p-6">
-                      <div className="text-center">
-                        <div className="text-sm mb-2 font-semibold opacity-90">إجمالي جميع التقارير</div>
-                        <div className="text-6xl font-bold">{stats.totalAllReports}</div>
-                        <p className="text-xs mt-3 opacity-80">
-                          مشرفين: {stats.supervisorReportsCount} | أنشطة: {stats.activitiesReportsCount} | 
-                          أخصائي: {stats.socialReportsCount} | جودة: {stats.qualityReportsCount}
-                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Detailed Reports Section */}
-                  <>
-                    {/* Supervisor Detailed Reports */}
-                    {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && supervisorReports.length > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-blue-700">📋 تقارير المشرفين التفصيلية</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            {filterReportsByTimeOnly(supervisorReports).slice(0, 5).map((report) => {
-                              const supervisor = users.find(u => u.id === report.user_id);
-                              return (
-                                <Card key={report.id} className="border-l-4 border-blue-500">
-                                  <CardContent className="p-4">
-                                    <div className="mb-3 pb-3 border-b">
-                                      <h3 className="text-md font-bold text-blue-700">المشرف: {supervisor?.username || 'غير معروف'}</h3>
-                                      <p className="text-xs text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                      <div className="bg-orange-50 p-2 rounded">
-                                        <p className="font-semibold text-orange-700">متأخرون: {report.late_teachers?.length || 0}</p>
-                                      </div>
-                                      <div className="bg-red-50 p-2 rounded">
-                                        <p className="font-semibold text-red-700">غائبون: {report.absent_teachers?.length || 0}</p>
-                                      </div>
-                                      <div className="bg-green-50 p-2 rounded">
-                                        <p className="font-semibold text-green-700">مغطون: {report.covering_teachers?.length || 0}</p>
-                                      </div>
-                                      <div className="bg-blue-50 p-2 rounded">
-                                        <p className="font-semibold text-blue-700">طلاب غائبون: {report.absent_students_count || 0}</p>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              );
-                            })}
-                            {filterReportsByTimeOnly(supervisorReports).length > 5 && (
-                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(supervisorReports).length - 5} تقرير إضافي</p>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
                     )}
-
-                    {/* Vice-Principal Detailed Reports */}
-                    {(reportTypeFilter === "all" || reportTypeFilter === "vice_principal") && vicePrincipalReports.length > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-cyan-700">📋 تقارير الوكلاء التفصيلية</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            {filterReportsByTimeOnly(vicePrincipalReports).slice(0, 5).map((report) => {
-                              const vp = users.find(u => u.id === report.user_id);
-                              return (
-                                <Card key={report.id} className="border-l-4 border-cyan-500">
-                                  <CardContent className="p-4">
-                                    <div className="mb-3 pb-3 border-b">
-                                      <h3 className="text-md font-bold text-cyan-700">الوكيل: {vp?.username || 'غير معروف'}</h3>
-                                      <p className="text-xs text-gray-600">
-                                        الفترة: {new Date(report.week_start).toLocaleDateString('ar-SA')} - {new Date(report.week_end).toLocaleDateString('ar-SA')}
-                                      </p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3 text-sm">
-                                      <div className="bg-orange-50 p-2 rounded">
-                                        <p className="font-semibold text-orange-700">مشاكل: {report.problems?.length || 0}</p>
-                                      </div>
-                                      <div className="bg-blue-50 p-2 rounded">
-                                        <p className="font-semibold text-blue-700">اقتراحات: {report.suggestions?.length || 0}</p>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              );
-                            })}
-                            {filterReportsByTimeOnly(vicePrincipalReports).length > 5 && (
-                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(vicePrincipalReports).length - 5} تقرير إضافي</p>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
+                    
+                    {/* Activities Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                      <div id="director-activities-chart">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة (انقر على "المشاركين" للتفاصيل)</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <BarChart data={getActivitiesChartData()} onClick={(e) => {
+                            if (e && e.activeLabel === 'المشاركين') {
+                              handleChartClick('activity');
+                            }
+                          }}>
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend onClick={(e) => {
+                              if (e.value === 'value' || e.dataKey === 'value') {
+                                // نفترض أن النقر على أي جزء يفتح قائمة المعلمين المشاركين
+                                handleChartClick('activity');
+                              }
+                            }} wrapperStyle={{ cursor: 'pointer' }} />
+                            <Bar dataKey="value" fill="#8b5cf6" onClick={() => handleChartClick('activity')} style={{ cursor: 'pointer' }} />
+                          </BarChart>
+                        </ResponsiveContainer>
+                        <div className="text-center mt-2">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleChartClick('activity')}
+                            className="text-xs"
+                          >
+                            👥 عرض قائمة المعلمين المشرفين
+                          </Button>
+                        </div>
+                      </div>
                     )}
-
-                    {/* Activities Detailed Reports */}
-                    {(reportTypeFilter === "all" || reportTypeFilter === "activities") && activitiesReports.length > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-purple-700">📋 تقارير الأنشطة التفصيلية</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            {filterReportsByTimeOnly(activitiesReports).slice(0, 5).map((report) => {
-                              const activityUser = users.find(u => u.id === report.user_id);
-                              return (
-                                <Card key={report.id} className="border-l-4 border-purple-500">
-                                  <CardContent className="p-4">
-                                    <div className="mb-3 pb-3 border-b">
-                                      <h3 className="text-md font-bold text-purple-700">مسؤول الأنشطة: {activityUser?.username || 'غير معروف'}</h3>
-                                      <p className="text-xs text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3 text-sm">
-                                      <div className="bg-purple-50 p-2 rounded">
-                                        <p className="font-semibold text-purple-700">عدد الأنشطة: {report.activities?.length || 0}</p>
-                                      </div>
-                                      <div className="bg-indigo-50 p-2 rounded">
-                                        <p className="font-semibold text-indigo-700">المشاركون: {report.activities?.reduce((sum, a) => sum + (a.participants_count || 0), 0) || 0}</p>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              );
-                            })}
-                            {filterReportsByTimeOnly(activitiesReports).length > 5 && (
-                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(activitiesReports).length - 5} تقرير إضافي</p>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
+                    
+                    {/* Social Cases Chart */}
+                    {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
+                      <div id="director-social-chart">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات الأخصائي الاجتماعي</h3>
+                        <ResponsiveContainer width="100%" height={300}>
+                          <PieChart>
+                            <Pie
+                              data={getSocialCasesChartData()}
+                              cx="50%"
+                              cy="50%"
+                              labelLine={false}
+                              label={(entry) => `${entry.name}: ${entry.value}`}
+                              outerRadius={100}
+                              fill="#8884d8"
+                              dataKey="value"
+                            >
+                              {getSocialCasesChartData().map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                            <Legend />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
                     )}
+                  </div>
+                </CardContent>
+              </Card>
 
-                    {/* Social Specialist Detailed Reports */}
-                    {(reportTypeFilter === "all" || reportTypeFilter === "social") && socialReports.length > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-green-700">📋 تقارير الأخصائي الاجتماعي التفصيلية</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            {filterReportsByTimeOnly(socialReports).slice(0, 5).map((report) => {
-                              const socialUser = users.find(u => u.id === report.user_id);
-                              return (
-                                <Card key={report.id} className="border-l-4 border-green-500">
-                                  <CardContent className="p-4">
-                                    <div className="mb-3 pb-3 border-b">
-                                      <h3 className="text-md font-bold text-green-700">الأخصائي: {socialUser?.username || 'غير معروف'}</h3>
-                                      <p className="text-xs text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                      <div className="bg-purple-50 p-2 rounded">
-                                        <p className="font-semibold text-purple-700">نفسية: {report.psychological_cases || 0}</p>
-                                      </div>
-                                      <div className="bg-blue-50 p-2 rounded">
-                                        <p className="font-semibold text-blue-700">أكاديمية: {report.academic_cases || 0}</p>
-                                      </div>
-                                      <div className="bg-red-50 p-2 rounded">
-                                        <p className="font-semibold text-red-700">سلوكية: {report.behavioral_cases || 0}</p>
-                                      </div>
-                                      <div className="bg-green-50 p-2 rounded">
-                                        <p className="font-semibold text-green-700">جلسات: {report.sessions_count || 0}</p>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              );
-                            })}
-                            {filterReportsByTimeOnly(socialReports).length > 5 && (
-                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(socialReports).length - 5} تقرير إضافي</p>
-                            )}
+              {/* Teacher Progress Section - Only show for educational_supervision or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && (
+                <Card className="bg-gradient-to-br from-cyan-50 to-blue-50 border-t-4 border-cyan-500">
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle className="text-xl">📈 تقييم تحسن المعلمين</CardTitle>
+                      <Button
+                        onClick={() => setActiveTab("teacher-progress")}
+                        variant="outline"
+                        size="sm"
+                        className="text-cyan-600 hover:text-cyan-700"
+                      >
+                        عرض التفاصيل الكاملة ←
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <TeacherProgressView branch={user.branch} compact={true} />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Activity Supervisors - Show for activities or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                <Card className="bg-gradient-to-br from-purple-50 to-indigo-50 border-t-4 border-purple-500">
+                  <CardHeader>
+                    <CardTitle className="text-xl">🎯 المعلمون المشرفون على الأنشطة</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ActivitySupervisorsView compact={true} />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Cooperating Teachers - Show for activities or all */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                <Card className="bg-gradient-to-br from-orange-50 to-yellow-50 border-t-4 border-orange-500">
+                  <CardHeader>
+                    <CardTitle className="text-xl">🤝 المعلمون المتعاونون في الأنشطة</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CooperatingTeachersView compact={true} />
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Detailed Reports Section */}
+              {showDetailedReports && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>📋 التقارير التفصيلية</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {(() => {
+                      const detailedReports = getDetailedReports();
+                      
+                      if (detailedReports.length === 0) {
+                        return (
+                          <div className="text-center py-8 text-gray-500">
+                            لا توجد تقارير متاحة بناءً على الفلاتر المحددة
                           </div>
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* Quality Detailed Reports */}
-                    {(reportTypeFilter === "all" || reportTypeFilter === "quality") && qualityReports.length > 0 && (
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-orange-700">📋 تقارير الجودة التفصيلية</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            {filterReportsByTimeOnly(qualityReports).slice(0, 5).map((report) => {
-                              const qualityUser = users.find(u => u.id === report.user_id);
-                              return (
-                                <Card key={report.id} className="border-l-4 border-orange-500">
-                                  <CardContent className="p-4">
-                                    <div className="mb-3 pb-3 border-b">
-                                      <h3 className="text-md font-bold text-orange-700">مسؤول الجودة: {qualityUser?.username || 'غير معروف'}</h3>
-                                      <p className="text-xs text-gray-600">التاريخ: {new Date(report.date).toLocaleDateString('ar-SA')}</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3 text-sm">
-                                      <div className="bg-blue-50 p-2 rounded">
-                                        <p className="font-semibold text-blue-700">المعلم: {report.teacher_name || '-'}</p>
-                                      </div>
-                                      <div className="bg-amber-50 p-2 rounded">
-                                        <p className="font-semibold text-amber-700">الأداء: {report.teaching_performance_rate || 0}/10</p>
-                                      </div>
-                                    </div>
-                                  </CardContent>
-                                </Card>
-                              );
-                            })}
-                            {filterReportsByTimeOnly(qualityReports).length > 5 && (
-                              <p className="text-sm text-gray-500 text-center">... و {filterReportsByTimeOnly(qualityReports).length - 5} تقرير إضافي</p>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </>
-
-                  {/* Detailed Reports Section */}
-                  {showDetailedReports && (
-                    <Card className="mt-6">
-                      <CardHeader>
-                        <CardTitle>📋 التقارير التفصيلية</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        {(() => {
-                          const detailedReports = getDetailedReports();
+                        );
+                      }
+                      
+                      return (
+                        <div className="space-y-4">
+                          <p className="text-sm text-gray-600 mb-4">
+                            إجمالي عدد التقارير: {detailedReports.length}
+                          </p>
                           
-                          if (detailedReports.length === 0) {
-                            return (
-                              <div className="text-center py-8 text-gray-500">
-                                لا توجد تقارير متاحة بناءً على الفلاتر المحددة
-                              </div>
-                            );
-                          }
-                          
-                          return (
-                            <div className="space-y-4">
-                              <p className="text-sm text-gray-600 mb-4">
-                                إجمالي عدد التقارير: {detailedReports.length}
-                              </p>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {detailedReports.map((report, index) => {
+                              const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
+                                                      report.type === "supervisor" ? "مشرف" :
+                                                      report.type === "activities" ? "أنشطة" :
+                                                      report.type === "social" ? "أخصائي اجتماعي" :
+                                                      report.type === "quality" ? "جودة" :
+                                                      report.type === "educational_supervision" ? "إشراف تربوي" : "";
                               
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {detailedReports.map((report, index) => {
-                                  const reportTypeArabic = report.type === "vice_principal" ? "وكيل" :
-                                                          report.type === "supervisor" ? "مشرف" :
-                                                          report.type === "activities" ? "أنشطة" :
-                                                          report.type === "social" ? "أخصائي اجتماعي" :
-                                                          report.type === "quality" ? "جودة" :
-                                                          report.type === "educational_supervision" ? "إشراف تربوي" : "";
-                                  
-                                  const bgColor = report.type === "vice_principal" ? "from-blue-50 to-blue-100 border-blue-500" :
-                                                report.type === "supervisor" ? "from-purple-50 to-purple-100 border-purple-500" :
-                                                report.type === "activities" ? "from-indigo-50 to-indigo-100 border-indigo-500" :
-                                                report.type === "social" ? "from-green-50 to-green-100 border-green-500" :
-                                                report.type === "quality" ? "from-orange-50 to-orange-100 border-orange-500" :
-                                                report.type === "educational_supervision" ? "from-cyan-50 to-cyan-100 border-cyan-500" : "";
-                                  
-                                  return (
-                                    <Card 
-                                      key={index} 
-                                      className={`bg-gradient-to-br ${bgColor} border-r-4 cursor-pointer hover:shadow-lg transition-shadow`}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedReport(report);
-                                        setShowReportModal(true);
-                                      }}
-                                    >
-                                      <CardContent className="p-4">
-                                        <div className="flex justify-between items-start mb-2">
-                                          <span className="text-xs font-semibold px-2 py-1 rounded bg-white shadow-sm">
-                                            {reportTypeArabic}
-                                          </span>
-                                          <span className="text-xs text-gray-600">
-                                            {report.date || report.week_start || 'غير محدد'}
-                                          </span>
-                                        </div>
-                                        <h3 className="font-bold text-gray-800 mb-1">{report.userName || 'غير معروف'}</h3>
-                                        <p className="text-xs text-gray-500 mb-2">
-                                          {users.find(u => u.id === report.user_id)?.branch === "boys" ? "قسم البنين" : "قسم البنات"}
-                                        </p>
-                                        {report.notes && (
-                                          <p className="text-xs text-gray-600 line-clamp-2">{report.notes}</p>
-                                        )}
-                                        {!report.notes && (
-                                          <p className="text-xs text-gray-500 italic">
-                                            {report.type === "supervisor" && `${report.late_teachers?.length || 0} متأخر، ${report.covering_teachers?.length || 0} مغطي`}
-                                            {report.type === "vice_principal" && `${report.absent_teachers?.length || 0} غائب`}
-                                            {report.type === "activities" && `${report.activities?.length || 0} نشاط`}
-                                            {report.type === "social" && `${(report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0)} حالة`}
-                                            {report.type === "quality" && `${report.visited_teachers?.length || 0} زيارة`}
-                                            {report.type === "educational_supervision" && `${report.teacher_evaluations?.length || 0} معلم مُقيّم`}
-                                          </p>
-                                        )}
-                                        <div className="mt-3 text-xs text-blue-600 font-medium">
-                                          👆 انقر لعرض التفاصيل الكاملة
-                                        </div>
-                                      </CardContent>
-                                    </Card>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          );
-                        })()}
-                      </CardContent>
-                    </Card>
+                              const bgColor = report.type === "vice_principal" ? "from-blue-50 to-blue-100 border-blue-500" :
+                                            report.type === "supervisor" ? "from-purple-50 to-purple-100 border-purple-500" :
+                                            report.type === "activities" ? "from-indigo-50 to-indigo-100 border-indigo-500" :
+                                            report.type === "social" ? "from-green-50 to-green-100 border-green-500" :
+                                            report.type === "quality" ? "from-orange-50 to-orange-100 border-orange-500" :
+                                            report.type === "educational_supervision" ? "from-cyan-50 to-cyan-100 border-cyan-500" : "";
+                              
+                              return (
+                                <Card 
+                                  key={index} 
+                                  className={`bg-gradient-to-br ${bgColor} border-r-4 cursor-pointer hover:shadow-lg transition-shadow`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    console.log("Card clicked, opening modal for report:", report.type, report.userName);
+                                    setSelectedReport(report);
+                                    setShowReportModal(true);
+                                  }}
+                                >
+                                  <CardContent className="p-4">
+                                    <div className="flex justify-between items-start mb-2">
+                                      <span className="text-xs font-semibold px-2 py-1 rounded bg-white shadow-sm">
+                                        {reportTypeArabic}
+                                      </span>
+                                      <span className="text-xs text-gray-600">
+                                        {report.date || report.week_start || 'غير محدد'}
+                                      </span>
+                                    </div>
+                                    <h3 className="font-bold text-gray-800 mb-1">{report.userName || 'غير معروف'}</h3>
+                                    <p className="text-xs text-gray-500 mb-2">
+                                      {users.find(u => u.id === report.user_id)?.branch === "boys" ? "قسم البنين" : "قسم البنات"}
+                                    </p>
+                                    {report.notes && (
+                                      <p className="text-xs text-gray-600 line-clamp-2">{report.notes}</p>
+                                    )}
+                                    {!report.notes && (
+                                      <p className="text-xs text-gray-500 italic">
+                                        {report.type === "supervisor" && `${report.late_teachers?.length || 0} متأخر، ${report.covering_teachers?.length || 0} مغطي`}
+                                        {report.type === "activities" && `${report.activities?.length || 0} نشاط`}
+                                        {report.type === "social" && `${(report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0)} حالة`}
+                                        {report.type === "quality" && `${report.visited_teachers?.length || 0} زيارة`}
+                                        {report.type === "educational_supervision" && `${report.teacher_evaluations?.length || 0} معلم مُقيّم`}
+                                      </p>
+                                    )}
+                                    <div className="mt-3 text-xs text-blue-600 font-medium">
+                                      👆 انقر لعرض التفاصيل الكاملة
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Overall Summary */}
+              <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
+                <CardContent className="p-6">
+                  <div className="text-center">
+                    <div className="text-sm mb-2 font-semibold opacity-90">إجمالي جميع التقارير</div>
+                    <div className="text-6xl font-bold">{stats.totalAllReports}</div>
+                    <p className="text-xs mt-3 opacity-80">
+                      مشرفين: {stats.supervisorReportsCount} | أنشطة: {stats.activitiesReportsCount} | 
+                      أخصائي: {stats.socialReportsCount} | جودة: {stats.qualityReportsCount}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          );
+        })()}
+        
+        {/* Report Details Modal */}
+        <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>تفاصيل التقرير الكامل</DialogTitle>
+            </DialogHeader>
+            
+            {selectedReport && (
+              <div className="space-y-4" dir="rtl">
+                <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div>
+                    <span className="font-semibold text-gray-700">اسم الموظف:</span>
+                    <p className="text-gray-900">{selectedReport.userName || 'غير معروف'}</p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">الجهة:</span>
+                    <p className="text-gray-900">
+                      {users.find(u => u.id === selectedReport.user_id)?.branch === "boys" ? "قسم البنين" : "قسم البنات"}
+                    </p>
+                  </div>
+                  <div>
+                    <span className="font-semibold text-gray-700">التاريخ:</span>
+                    <p className="text-gray-900">{selectedReport.date || selectedReport.week_start || 'غير محدد'}</p>
+                  </div>
+                  {selectedReport.week_end && (
+                    <div>
+                      <span className="font-semibold text-gray-700">نهاية الأسبوع:</span>
+                      <p className="text-gray-900">{selectedReport.week_end}</p>
+                    </div>
                   )}
-                </>
-              );
-            })()}
-          </div>
-        </TabsContent>
+                  <div>
+                    <span className="font-semibold text-gray-700">نوع التقرير:</span>
+                    <p className="text-gray-900">
+                      {selectedReport.type === "vice_principal" ? "وكيل" :
+                       selectedReport.type === "supervisor" ? "مشرف" :
+                       selectedReport.type === "activities" ? "أنشطة" :
+                       selectedReport.type === "social" ? "أخصائي اجتماعي" :
+                       selectedReport.type === "quality" ? "جودة" : ""}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Supervisor Report Details */}
+                {selectedReport.type === "supervisor" && (
+                  <div className="space-y-4">
+                    {selectedReport.late_teachers && Array.isArray(selectedReport.late_teachers) && selectedReport.late_teachers.length > 0 && (
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <h4 className="font-semibold text-orange-800 mb-2">المعلمون المتأخرون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.late_teachers.map((lt, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof lt === 'object' ? `${lt.teacher || ''} - ${lt.subject || ''} - ${lt.minutes_late || 0} دقيقة` : lt}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.covering_teachers && Array.isArray(selectedReport.covering_teachers) && selectedReport.covering_teachers.length > 0 && (
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-semibold text-green-800 mb-2">المعلمون المغطون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.covering_teachers.map((ct, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof ct === 'object' ? `${ct.teacher || ''} - ${ct.subject || ''} (الحصة ${ct.period || ''})` : ct}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.incidents && Array.isArray(selectedReport.incidents) && selectedReport.incidents.length > 0 && (
+                      <div className="p-4 bg-yellow-50 rounded-lg">
+                        <h4 className="font-semibold text-yellow-800 mb-2">الحوادث:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.incidents.map((inc, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof inc === 'object' && inc !== null ? 
+                                (inc.description || inc.action || JSON.stringify(inc)) : 
+                                inc
+                              }
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.student_movement && (
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold text-blue-800 mb-2">حركة الطلاب:</h4>
+                        <p className="text-sm">{selectedReport.student_movement}</p>
+                        {selectedReport.student_movement_notes && (
+                          <p className="text-xs text-gray-600 mt-2">ملاحظات: {selectedReport.student_movement_notes}</p>
+                        )}
+                      </div>
+                    )}
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <span className="text-xs text-gray-600">انضباط الطلاب</span>
+                        <p className="text-2xl font-bold text-blue-700">{selectedReport.student_discipline || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-cyan-50 rounded-lg">
+                        <span className="text-xs text-gray-600">نظافة الفصول</span>
+                        <p className="text-2xl font-bold text-cyan-700">{selectedReport.classroom_cleanliness || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-purple-50 rounded-lg">
+                        <span className="text-xs text-gray-600">التزام المعلمين</span>
+                        <p className="text-2xl font-bold text-purple-700">{selectedReport.teacher_attendance_rate || 0}/10</p>
+                      </div>
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <span className="text-xs text-gray-600">السلوك العام</span>
+                        <p className="text-2xl font-bold text-green-700">{selectedReport.general_behavior || 0}/10</p>
+                      </div>
+                    </div>
+                    
+                    {(selectedReport.general_notes || selectedReport.student_discipline_notes || selectedReport.classroom_cleanliness_notes || selectedReport.teacher_attendance_notes) && (
+                      <div className="p-4 bg-gray-50 rounded-lg">
+                        <h4 className="font-semibold text-gray-800 mb-2">الملاحظات:</h4>
+                        {selectedReport.student_discipline_notes && (
+                          <p className="text-sm mb-2"><strong>انضباط الطلاب:</strong> {selectedReport.student_discipline_notes}</p>
+                        )}
+                        {selectedReport.classroom_cleanliness_notes && (
+                          <p className="text-sm mb-2"><strong>نظافة الفصول:</strong> {selectedReport.classroom_cleanliness_notes}</p>
+                        )}
+                        {selectedReport.teacher_attendance_notes && (
+                          <p className="text-sm mb-2"><strong>التزام المعلمين:</strong> {selectedReport.teacher_attendance_notes}</p>
+                        )}
+                        {selectedReport.general_notes && (
+                          <p className="text-sm"><strong>ملاحظات عامة:</strong> {selectedReport.general_notes}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Activities Report Details */}
+                {selectedReport.type === "activities" && selectedReport.activities && (
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-purple-800">الأنشطة:</h4>
+                    {selectedReport.activities.map((activity, idx) => (
+                      <div key={idx} className="p-4 bg-purple-50 rounded-lg">
+                        <h5 className="font-semibold text-purple-900 mb-2">{activity.activity_name}</h5>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div><span className="font-medium">عدد المشاركين:</span> {activity.participants_count}</div>
+                          <div><span className="font-medium">معدل التفاعل:</span> {activity.interaction_rate}/10</div>
+                          {activity.supervising_teachers && activity.supervising_teachers.length > 0 && (
+                            <div className="col-span-2">
+                              <span className="font-medium">المعلمون المشرفون:</span> {activity.supervising_teachers.join(', ')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Social Specialist Report Details */}
+                {selectedReport.type === "social" && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-3 gap-4">
+                      <div className="p-3 bg-pink-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات نفسية</span>
+                        <p className="text-2xl font-bold text-pink-700">{selectedReport.psychological_cases || 0}</p>
+                      </div>
+                      <div className="p-3 bg-amber-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات أكاديمية</span>
+                        <p className="text-2xl font-bold text-amber-700">{selectedReport.academic_cases || 0}</p>
+                      </div>
+                      <div className="p-3 bg-red-50 rounded-lg">
+                        <span className="text-xs text-gray-600">حالات سلوكية</span>
+                        <p className="text-2xl font-bold text-red-700">{selectedReport.behavioral_cases || 0}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-3 bg-emerald-50 rounded-lg">
+                        <span className="text-xs text-gray-600">عدد الجلسات</span>
+                        <p className="text-2xl font-bold text-emerald-700">{selectedReport.sessions_count || 0}</p>
+                      </div>
+                      <div className="p-3 bg-teal-50 rounded-lg">
+                        <span className="text-xs text-gray-600">التواصل مع الأسر</span>
+                        <p className="text-2xl font-bold text-teal-700">{selectedReport.family_contacts || 0}</p>
+                      </div>
+                    </div>
+                    
+                    {selectedReport.actions && selectedReport.actions.length > 0 && (
+                      <div className="p-4 bg-green-50 rounded-lg">
+                        <h4 className="font-semibold text-green-800 mb-2">الإجراءات المتخذة:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.actions.map((action, idx) => (
+                            <li key={idx} className="text-sm">{action}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Quality Report Details */}
+                {selectedReport.type === "quality" && (
+                  <div className="space-y-4">
+                    <div className="p-3 bg-orange-50 rounded-lg">
+                      <span className="text-xs text-gray-600">معدل الأداء التدريسي</span>
+                      <p className="text-2xl font-bold text-orange-700">{selectedReport.teaching_performance_rate || 0}/10</p>
+                    </div>
+                    
+                    {selectedReport.visited_teachers && selectedReport.visited_teachers.length > 0 && (
+                      <div className="p-4 bg-amber-50 rounded-lg">
+                        <h4 className="font-semibold text-amber-800 mb-2">المعلمون المزارون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.visited_teachers.map((teacher, idx) => (
+                            <li key={idx} className="text-sm">{teacher}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Vice Principal Report Details */}
+                {selectedReport.type === "vice_principal" && (
+                  <div className="space-y-4">
+                    {selectedReport.late_teachers && selectedReport.late_teachers.length > 0 && (
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <h4 className="font-semibold text-orange-800 mb-2">المعلمون المتأخرون:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.late_teachers.map((lt, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof lt === 'object' ? `${lt.teacher} - ${lt.subject} - ${lt.minutes_late} دقيقة` : lt}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.problems && selectedReport.problems.length > 0 && (
+                      <div className="p-4 bg-red-50 rounded-lg">
+                        <h4 className="font-semibold text-red-800 mb-2">المشكلات:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.problems.map((problem, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof problem === 'object' ? `${problem.description} - ${problem.action || problem.actions}` : problem}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
+                    {selectedReport.suggestions && selectedReport.suggestions.length > 0 && (
+                      <div className="p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-semibold text-blue-800 mb-2">المقترحات:</h4>
+                        <ul className="list-disc list-inside space-y-1">
+                          {selectedReport.suggestions.map((suggestion, idx) => (
+                            <li key={idx} className="text-sm">
+                              {typeof suggestion === 'object' ? suggestion.description : suggestion}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Educational Supervision Report Details */}
+                {selectedReport.type === "educational_supervision" && selectedReport.teacher_evaluations && (
+                  <div className="space-y-4">
+                    <div className="bg-cyan-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-cyan-800 mb-3">تقييم تحسين المعلمين</h4>
+                      <TeacherProgressView branch={user.branch} compact={false} />
+                    </div>
+                  </div>
+                )}
+                
+                {/* Notes */}
+                {selectedReport.notes && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-gray-800 mb-2">ملاحظات:</h4>
+                    <p className="text-sm text-gray-700">{selectedReport.notes}</p>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            <DialogFooter>
+              <Button onClick={() => setShowReportModal(false)} variant="outline">
+                إغلاق
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {/* Teachers List Modal */}
+        <Dialog open={showTeachersListModal} onOpenChange={setShowTeachersListModal}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{teachersListData.title}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4" dir="rtl">
+              <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+                <span className="font-semibold text-blue-800">
+                  إجمالي عدد المعلمين: {teachersListData.teachers.length}
+                </span>
+                <Button 
+                  onClick={exportTeachersListToPDF}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  size="sm"
+                >
+                  📄 تصدير إلى PDF
+                </Button>
+              </div>
+              
+              {teachersListData.teachers.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border border-gray-300 px-4 py-2 text-center">#</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">اسم المعلم</th>
+                        <th className="border border-gray-300 px-4 py-2 text-center">
+                          {teachersListData.type === 'late' ? 'عدد مرات التأخير' :
+                           teachersListData.type === 'absent' ? 'عدد التقارير' :
+                           teachersListData.type === 'covering' ? 'عدد الحصص المغطاة' :
+                           teachersListData.type === 'activity' ? 'عدد الأنشطة' : 'عدد المرات'}
+                        </th>
+                        {teachersListData.type === 'late' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">مجموع الدقائق</th>
+                        )}
+                        {teachersListData.type === 'absent' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">إجمالي أيام الغياب</th>
+                        )}
+                        {teachersListData.type === 'covering' && (
+                          <th className="border border-gray-300 px-4 py-2 text-center">المواد</th>
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {teachersListData.teachers.map((teacher, index) => (
+                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
+                          <td className="border border-gray-300 px-4 py-2 text-center font-semibold">
+                            {teacher.name}
+                          </td>
+                          <td className="border border-gray-300 px-4 py-2 text-center">
+                            <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-bold">
+                              {teacher.count}
+                            </span>
+                          </td>
+                          {teachersListData.type === 'late' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center">
+                              <span className="inline-block bg-orange-100 text-orange-800 px-3 py-1 rounded-full font-bold">
+                                {teacher.totalMinutes} دقيقة
+                              </span>
+                            </td>
+                          )}
+                          {teachersListData.type === 'absent' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center">
+                              <span className="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full font-bold">
+                                {teacher.totalDays || 0} {teacher.totalDays === 1 ? 'يوم' : 'أيام'}
+                              </span>
+                            </td>
+                          )}
+                          {teachersListData.type === 'covering' && (
+                            <td className="border border-gray-300 px-4 py-2 text-center text-sm">
+                              {teacher.subjects || '-'}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  لا توجد بيانات متاحة
+                </div>
+              )}
+            </div>
+            
+            <DialogFooter>
+              <Button onClick={() => setShowTeachersListModal(false)} variant="outline">
+                إغلاق
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+          </>
+        )}
 
         <TabsContent value="teacher-progress">
           <TeacherProgressView />
