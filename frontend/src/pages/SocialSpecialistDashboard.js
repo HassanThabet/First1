@@ -352,30 +352,26 @@ const SocialSpecialistDashboard = () => {
             margin: [0, 0, 0, 10]
           },
 
-          // Cases Distribution
+          // Cases Distribution - Rebuilt without colSpan
+          {
+            text: 'توزيع الحالات',
+            style: 'sectionHeader',
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
           {
             table: {
-              widths: [125, 125, 125, 125], // Fixed widths instead of '*'
+              widths: [125, 125, 125, 125],
               body: [
                 [
-                  { text: 'توزيع الحالات', colSpan: 4, style: 'tableHeader', alignment: 'center' },
-                  {},
-                  {},
-                  {}
-                ],
-                [
-                  { text: `نفسية: ${String(stats.totalPsychological || 0)}`, alignment: 'center' },
-                  { text: `أكاديمية: ${String(stats.totalAcademic || 0)}`, alignment: 'center' },
-                  { text: `سلوكية: ${String(stats.totalBehavioral || 0)}`, alignment: 'center' },
-                  { text: `جلسات: ${String(stats.totalSessions || 0)}`, alignment: 'center' }
+                  { text: `نفسية: ${String(stats.totalPsychological || 0)}`, alignment: 'center', fillColor: '#E1F5FE' },
+                  { text: `أكاديمية: ${String(stats.totalAcademic || 0)}`, alignment: 'center', fillColor: '#E1F5FE' },
+                  { text: `سلوكية: ${String(stats.totalBehavioral || 0)}`, alignment: 'center', fillColor: '#E1F5FE' },
+                  { text: `جلسات: ${String(stats.totalSessions || 0)}`, alignment: 'center', fillColor: '#E1F5FE' }
                 ]
               ]
             },
-            layout: {
-              fillColor: function (rowIndex) {
-                return rowIndex === 0 ? '#9C27B0' : '#E1F5FE';
-              }
-            },
+            layout: 'lightHorizontalLines',
             margin: [0, 0, 0, 10]
           },
 
