@@ -292,6 +292,30 @@ frontend:
         agent: "main"
         comment: "FIXED: Changed ActivitySupervisorsView to fetch teachers from /api/teachers instead of /api/users with role filter. This matches the same data source used by ActivitiesDashboard and should now correctly match teacher IDs in activities.supervisors array."
 
+  - task: "CooperatingTeachersView component and integration"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/CooperatingTeachersView.js, frontend/src/pages/DirectorDashboard.js, frontend/src/pages/ChairmanDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "CREATED: New CooperatingTeachersView component that fetches cooperating teachers from activities reports. Integrated into Director and Chairman dashboards - displays only when 'Activities' or 'All Reports' filter is selected. Component shows teacher name and activity count with details expansion."
+
+  - task: "PDF export enhancements for cooperating teachers"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/DirectorDashboard.js, frontend/src/pages/ChairmanDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "ADDED: Created getCooperatingTeachers() function in both DirectorDashboard and ChairmanDashboard that aggregates cooperating teachers from activities reports. Added cooperating teachers table to PDF export (displays only for 'all' or 'activities' report types). Table shows teacher names and activity counts with orange header color for visual distinction from supervisors table."
+
   - task: "Social Specialist Dashboard with modal view and filtering"
     implemented: true
     working: "NA"
