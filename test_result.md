@@ -390,6 +390,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Implemented full CRUD operations for quality reports covering 5 sections (academic, supervision, discipline, activities, social specialist) with modal view"
+      - working: "NA"
+        agent: "main"
+        comment: "✅ REPLACED 'التقارير المدمجة' TAB WITH DIRECTOR DASHBOARD STATISTICS: Changed tab name from 'merged' to 'statistics' (الإحصائيات الإجمالية). Copied complete statistics view from DirectorDashboard including: 1) All state variables (supervisorReports, activitiesReports, socialReports, qualityReports, vicePrincipalReports, educationalSupervisionReports, users, teachers, filters), 2) fetchAllData() function to load all required data, 3) Helper functions (filterReportsByTimeOnly, filterReportsByTimeAndBranch, getOverallStatistics, chart data functions), 4) Statistics cards for all report types (supervisor, activities, social, quality, educational supervision), 5) Charts (teachers pie chart, performance bar chart, social cases pie chart), 6) Integrated TeacherProgressView, ActivitySupervisorsView, and CooperatingTeachersView components, 7) Comprehensive filters (report type, time period, branch, custom date range). Ready for frontend testing."
 
   - task: "Educational Supervision Dashboard with modal view and filtering"
     implemented: false
