@@ -1607,7 +1607,7 @@ const QualityDashboard = () => {
               ['حالات نفسية', stats.totalPsychologicalCases.toString()],
               ['حالات أكاديمية', stats.totalAcademicCases.toString()],
               ['حالات سلوكية', stats.totalBehavioralCases.toString()],
-              [{ text: 'إجمالي الحالات', bold: true }, { text: stats.totalStudentCases.toString(), bold: true, fillColor: '#dbeafe' }]
+              [{ text: 'إجمالي الحالات', fontSize: 11 }, { text: stats.totalStudentCases.toString(), fontSize: 11, fillColor: '#dbeafe' }]
             ],
             { showRowNumbers: false }
           );
