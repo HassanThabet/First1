@@ -389,7 +389,7 @@ const QualityDashboard = () => {
             body: [
               [
                 { text: '👨‍🏫 معدل الأداء التدريسي العام', bold: true },
-                { text: `${report.teaching_performance_rate}/10`, alignment: 'center', bold: true, color: '#2196F3' }
+                { text: `${report.social_specialist?.teaching_performance_rate || 0}/10`, alignment: 'center', bold: true, color: '#2196F3' }
               ]
             ]
           },
