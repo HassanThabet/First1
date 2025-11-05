@@ -1,22 +1,24 @@
 <analysis>
-The AI engineer's work involved an iterative process of modifying  to incorporate  content and functionality, coupled with extensive debugging. Initially, the goal was to replace a specific tab. This evolved into a complete overhaul, replacing much of  with  content, while preserving specific old Quality tabs. Persistent challenges included inadvertent file overwrites, browser caching issues, and crucially, data fetching failures often linked to authorization (401 errors) despite explicit permission adjustments in the backend. The engineer successfully implemented  to mitigate frontend toast errors but the core issue of data not displaying on dashboards for authorized users (even Director role) remains, indicating a deeper authorization or data filtering problem. The last finding points to 401 errors for all data requests for the logged-in  user.
+The AI engineer's work began by addressing a critical authorization issue causing 401 errors and empty dashboards for  and  roles. This involved modifying  to include  in relevant report endpoints. Following this, the user requested removing default '5' values from quality report fields, which necessitated extensive changes in  to clear initial state and update  and  logic. A significant challenge arose from a mismatch in data structure between frontend (flat) and backend (nested ) for quality reports, which was systematically resolved by modifying , , , and report display components in . The final outstanding issue is a  in PDF export functionality, specifically related to , which the engineer was actively investigating in  and .
 </analysis>
 
 <product_requirements>
-The مدارس الفجر الجديد الأهلية application is a role-based school management system supporting Arabic (RTL), CRUD operations, data visualization, and Excel/PDF exports, including an Educational Supervision module. The primary goal was to enhance the Quality Dashboard.
+The مدارس الفجر الجديد الأهلية application is a role-based school management system supporting Arabic (RTL), CRUD operations, data visualization, and Excel/PDF exports, including an Educational Supervision module. The primary goal was to enhance the Quality Dashboard and address data visibility issues across dashboards.
 
-Key requirements addressed:
-1.  **Quality Dashboard Update**: Initially, replace the الإحصائيات الإجمالية tab with content from , including PDF export. Later, this expanded to almost fully integrating  content into , but *retaining* the old إنشاء تقرير جودة and تقارير الجودة tabs.
-2.  **PDF Export Enhancement**: Add formatted PDF export for Quality reports, filterable by date.
-3.  **Data Visibility**: Ensure all necessary data is correctly fetched and displayed on the Quality, Director, and Chairman dashboards, resolving previous data not appearing issues. This includes addressing authorization errors.
+Key requirements addressed and implemented:
+1.  **Quality Dashboard Update**: Integrated  content into  while retaining إنشاء تقرير جودة and تقارير الجودة tabs. The الإحصائيات الإجمالية tab now displays Director's statistics.
+2.  **PDF Export Enhancement**: Added formatted PDF export for Quality reports, filterable by date (though still has a bug).
+3.  **Data Visibility & Authorization**: Resolved initial data not appearing issues by fixing 401 Unauthorized errors for  and  roles across dashboards.
+4.  **Quality Report Form Refinement**: Removed default values (5) from rating fields in the quality report creation/edit form to allow easier evaluation.
+5.  **Quality Report View/Edit Functionality**: Ensured that existing quality reports can be viewed and edited, with all saved data correctly pre-filled in the form and displayed in the modal.
 </product_requirements>
 
 <key_technical_concepts>
 -   **MERN-like Stack**: React (Frontend), FastAPI (Backend), MongoDB (Database).
 -   **RTL Support**:  with  fonts for Arabic PDF.
 -   **PDF Generation**:  for dynamic PDF reports.
--   **Component Reusability**: , , .
--   **Error Handling**:  checks,  for resilient API calls.
+-   **Error Handling**:  for resilient API calls.
+-   **Role-Based Access Control**: Backend endpoints use roles for authorization.
 </key_technical_concepts>
 
 <code_architecture>
@@ -26,21 +28,31 @@ The application uses a MERN-like stack: React for the frontend, FastAPI for the 
 
 
 
-**Key Files and Their Importance/Changes (post-initial setup):**
+**Key Files and Their Importance/Changes:**
 
 -   :
-    -   **Importance:** Central to the current task, aimed at integrating Director's dashboard functionality while retaining specific Quality features.
+    -   **Importance:** Contains the main logic, UI, and data handling for the Quality Dashboard, including report creation, editing, viewing, and PDF export.
     -   **Changes:**
-        -   Initially,  was largely replaced with  content by mistake and then reverted.
-        -   Later, it was significantly refactored: copied much of  content (e.g.,  hooks, , helper functions, data fetching logic,  function).
-        -   The الإحصائيات الإجمالية tab content was replaced with 's statistics, cards, and charts.
-        -   The إنشاء تقرير جديد and التقارير tabs were restored/re-implemented from the *original* Quality Dashboard logic, including a 5-section report creation form and report display.
-        -   Error handling for  was changed from  to  to prevent single API failures from stopping all data fetching and showing generic error toasts.
-        -   Added  icon import for PDF export buttons.
-        -   Changed the exported component name to .
+        -   Integrated much of  functionality, preserving Quality-specific tabs.
+        -   Replaced الإحصائيات الإجمالية tab with 's statistics.
+        -   Improved  error handling with .
+        -   Removed default  values from  hooks for report fields.
+        -   Removed  logic from  handlers for rating inputs to allow empty values.
+        -   Modified  to send nested report data (e.g., ) to match backend expectations.
+        -   Updated  to flatten nested report data from backend for pre-filling the edit form.
+        -   Adjusted  to process nested data received from the backend.
+        -   Updated the report display modal to correctly read and show nested report data (e.g., ).
+        -   Modified  to correctly read nested report data for PDF generation.
+        -   Fixed error messages for report creation/update.
+        -   Changed the submit button text based on edit/create mode.
 -   :
-    -   **Importance:** Defines API endpoints and handles role-based access control.
-    -   **Changes:** Reviewed and verified role-based access checks for  role on various report endpoints (, , ). No direct modifications to role permissions were explicitly made or shown, but the agent confirmed that  role was already included where necessary in the existing code.
+    -   **Importance:** Defines API endpoints and implements role-based access control.
+    -   **Changes:**
+        -   Modified several report endpoints (, , , , , ) to include  in the allowed roles list, resolving 401 errors for this role.
+        -   Updated the  Pydantic model to accept  for  instead of .
+-   :
+    -   **Importance:** Contains font definitions for PDF generation, especially for Arabic RTL support.
+    -   **Changes:** No direct changes were *completed* in the trajectory, but it was being examined due to .
 </code_architecture>
 
 <pending_tasks>
@@ -48,17 +60,14 @@ The application uses a MERN-like stack: React for the frontend, FastAPI for the 
 -   Implement remember me functionality for authentication.
 -   Complete PDF export enhancement for , , and .
 -   Create a dedicated detailed page for .
--   Investigate and resolve the persistent data fetching issue (401 Unauthorized errors) for authenticated  and  users across respective dashboards, leading to empty data displays.
+-   Resolve the  issue preventing PDF export functionality on the Quality Dashboard.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary, the AI engineer was actively debugging a critical regression: various dashboards (Quality, Director, Chairman) were showing no data, with console logs indicating Login failed and subsequent 401 (Unauthorized) errors for all API requests, even for successfully authenticated users (e.g.,  with  role).
-
-The engineer had previously addressed an issue where the  was showing an old version or failing to load data, which was resolved by ensuring the  content was correctly integrated, retaining the original Quality report tabs, and improving error handling with . PDF export functionality for Quality reports was also added.
-
-Despite these changes, the problem of empty data on dashboards has resurfaced, now clearly identified as an authorization issue impacting multiple dashboards, not just Quality. The last action was the AI engineer observing repeated 401 errors for API calls even after successful login, concluding that the  user, despite having the correct role in the database, is unable to access data due to permission failures.
+Immediately before this summary request, the AI engineer was debugging a persistent issue with PDF export functionality from the Quality Dashboard. The user reported that PDF export was still failing despite previous fixes. The console logs indicated a , suggesting a problem with how  or its font virtual file system () is being initialized or accessed within . The engineer had already updated the  function to correctly read the newly structured nested report data for the PDF content itself. The current focus is on understanding why  is undefined, potentially involving issues in 's imports or 's export structure. The engineer was in the process of examining  to diagnose the root cause.
 </current_work>
 
 <optional_next_step>
-Investigate why the  user () is receiving 401 Unauthorized errors for data fetching API calls on dashboards.
+Investigate and resolve the  error affecting PDF export.
 </optional_next_step>
+
