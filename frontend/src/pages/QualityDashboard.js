@@ -78,6 +78,7 @@ const QualityDashboard = () => {
 
   useEffect(() => {
     fetchReports();
+    fetchAllData();
   }, []);
 
   useEffect(() => {
@@ -91,6 +92,36 @@ const QualityDashboard = () => {
       setReports(res.data);
     } catch (error) {
       toast.error("فشل تحميل التقارير");
+    }
+  };
+
+  const fetchAllData = async () => {
+    try {
+      console.log("🔄 Fetching all data for statistics...");
+      const [usersRes, teachersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes, eduSupRes] = await Promise.all([
+        axios.get(`${API}/users`),
+        axios.get(`${API}/teachers`),
+        axios.get(`${API}/reports/supervisor`),
+        axios.get(`${API}/reports/activities`),
+        axios.get(`${API}/reports/social-specialist`),
+        axios.get(`${API}/reports/quality`),
+        axios.get(`${API}/reports/vice-principal`),
+        axios.get(`${API}/reports/educational-supervision`)
+      ]);
+      
+      console.log("✅ Data fetched successfully for statistics");
+      
+      setUsers(usersRes.data);
+      setTeachers(teachersRes.data);
+      setSupervisorReports(supervisorRes.data);
+      setActivitiesReports(activitiesRes.data);
+      setSocialReports(socialRes.data);
+      setQualityReports(qualityRes.data);
+      setVicePrincipalReports(vpRes.data);
+      setEducationalSupervisionReports(eduSupRes.data);
+    } catch (error) {
+      console.error("❌ Failed to fetch statistics data:", error);
+      toast.error("فشل تحميل بيانات الإحصائيات");
     }
   };
 
