@@ -423,6 +423,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "FIXING: Standardizing font usage in QualityDashboard PDF export to use Cairo-Regular for all styles. Will ensure defaultStyle explicitly specifies font family and all font definitions map to Cairo-Regular.ttf to prevent pdfMake from seeking undefined bold variants."
+      - working: "NA"
+        agent: "main"
+        comment: "✅ FIXED: Removed all 'bold: true' declarations from PDF export functions in QualityDashboard.js. Changes: 1) Updated exportQualityReportsToPDF: Removed bold from 'header' and 'sectionHeader' styles, replaced with explicit font: 'Cairo' declarations, 2) Updated exportTeachersListToPDF: Removed bold from header text, subheader, tableHeader, and tableCellBold styles, 3) Removed inline bold declarations from content sections including teaching performance table, general recommendations, teacher progress cards, and social statistics table, 4) All text now uses Cairo-Regular font consistently without attempting to access bold variants. PDF export should now work without font definition errors."
 
   - task: "Educational Supervision Dashboard with modal view and filtering"
     implemented: false
