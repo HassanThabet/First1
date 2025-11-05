@@ -12,7 +12,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { toast } from "sonner";
 import { Eye, FileText, BarChart3, FileDown } from "lucide-react";
-import pdfMake from '../utils/pdfConfig';
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import pdfMake from "@digicole/pdfmake-rtl";
+import pdfMakeFonts from "../fonts/vfs_fonts";
+import { 
+  createRTLTable, 
+  createStatsGrid, 
+  createSection,
+  createChartImage,
+  captureChartAsImage,
+  generatePDF
+} from "../utils/pdfTemplate";
+import TeacherProgressView from "../components/TeacherProgressView";
+import ActivitySupervisorsView from "../components/ActivitySupervisorsView";
+import CooperatingTeachersView from "../components/CooperatingTeachersView";
 
 const QualityDashboard = () => {
   const { user } = useContext(AuthContext);
