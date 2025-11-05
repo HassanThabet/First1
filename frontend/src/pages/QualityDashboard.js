@@ -117,6 +117,12 @@ const QualityDashboard = () => {
     }
   };
 
+  // Simple PDF Export
+  const exportToPDF = () => {
+    toast.info('جاري العمل على تصدير PDF...');
+    // TODO: Implement PDF export for Quality dashboard
+  };
+
   const filterReports = () => {
     let filtered = [...allReports];
 
