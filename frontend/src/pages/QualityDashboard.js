@@ -399,14 +399,14 @@ const QualityDashboard = () => {
         });
 
         // General recommendations
-        if (report.general_recommendations) {
+        if (report.social_specialist?.general_recommendations) {
           content.push({
             text: 'التوصيات العامة:',
             bold: true,
             margin: [0, 10, 0, 5]
           });
           content.push({
-            text: report.general_recommendations,
+            text: report.social_specialist.general_recommendations,
             margin: [10, 0, 0, 15],
             italics: true,
             color: '#555'
