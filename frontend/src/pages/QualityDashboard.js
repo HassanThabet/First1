@@ -2097,6 +2097,74 @@ const QualityDashboard = () => {
               </CardContent>
             </Card>
 
+            {/* Summary Statistics Card */}
+            {qualityReportsOwn.length > 0 && (
+              <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
+                <CardHeader>
+                  <CardTitle className="text-xl flex items-center gap-2">
+                    📊 ملخص الإحصائيات
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-sm text-gray-600 mb-1">إجمالي التقارير</p>
+                      <p className="text-3xl font-bold text-blue-600">{qualityReportsOwn.length}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-sm text-gray-600 mb-1">متوسط التقييم الأكاديمي</p>
+                      <p className="text-3xl font-bold text-green-600">
+                        {(qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.academic_performance?.rate) || 0), 0) / qualityReportsOwn.length).toFixed(1)}
+                      </p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-sm text-gray-600 mb-1">متوسط تقييم الإشراف</p>
+                      <p className="text-3xl font-bold text-purple-600">
+                        {(qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.educational_supervision?.rate) || 0), 0) / qualityReportsOwn.length).toFixed(1)}
+                      </p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-sm text-gray-600 mb-1">متوسط تقييم الانضباط</p>
+                      <p className="text-3xl font-bold text-orange-600">
+                        {(qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.discipline_behavior?.rate) || 0), 0) / qualityReportsOwn.length).toFixed(1)}
+                      </p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-sm text-gray-600 mb-1">متوسط تقييم الأنشطة</p>
+                      <p className="text-3xl font-bold text-pink-600">
+                        {(qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.activities_programs?.rate) || 0), 0) / qualityReportsOwn.length).toFixed(1)}
+                      </p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-sm text-gray-600 mb-1">متوسط تقييم الأخصائي</p>
+                      <p className="text-3xl font-bold text-teal-600">
+                        {(qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.rate) || 0), 0) / qualityReportsOwn.length).toFixed(1)}
+                      </p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-sm text-gray-600 mb-1">متوسط الأداء التدريسي</p>
+                      <p className="text-3xl font-bold text-indigo-600">
+                        {(qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.teaching_performance_rate) || 0), 0) / qualityReportsOwn.length).toFixed(1)}
+                      </p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-sm text-gray-600 mb-1">المعدل العام</p>
+                      <p className="text-3xl font-bold text-blue-700">
+                        {(() => {
+                          const avg1 = qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.academic_performance?.rate) || 0), 0) / qualityReportsOwn.length;
+                          const avg2 = qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.educational_supervision?.rate) || 0), 0) / qualityReportsOwn.length;
+                          const avg3 = qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.discipline_behavior?.rate) || 0), 0) / qualityReportsOwn.length;
+                          const avg4 = qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.activities_programs?.rate) || 0), 0) / qualityReportsOwn.length;
+                          const avg5 = qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.rate) || 0), 0) / qualityReportsOwn.length;
+                          return ((avg1 + avg2 + avg3 + avg4 + avg5) / 5).toFixed(1);
+                        })()}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="space-y-4">
               <h3 className="text-xl font-bold text-gray-800">
                 التقارير ({qualityReportsOwn.length})
