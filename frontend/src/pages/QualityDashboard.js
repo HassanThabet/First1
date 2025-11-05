@@ -388,8 +388,8 @@ const QualityDashboard = () => {
             widths: ['*', 100],
             body: [
               [
-                { text: '👨‍🏫 معدل الأداء التدريسي العام', bold: true },
-                { text: `${report.social_specialist?.teaching_performance_rate || 0}/10`, alignment: 'center', bold: true, color: '#2196F3' }
+                { text: '👨‍🏫 معدل الأداء التدريسي العام', fontSize: 12 },
+                { text: `${report.social_specialist?.teaching_performance_rate || 0}/10`, alignment: 'center', fontSize: 12, color: '#2196F3' }
               ]
             ]
           },
@@ -402,7 +402,7 @@ const QualityDashboard = () => {
         if (report.social_specialist?.general_recommendations) {
           content.push({
             text: 'التوصيات العامة:',
-            bold: true,
+            fontSize: 12,
             margin: [0, 10, 0, 5]
           });
           content.push({
