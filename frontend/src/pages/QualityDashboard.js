@@ -121,6 +121,99 @@ const QualityDashboard = () => {
     }
   };
 
+  const fetchQualityReports = async () => {
+    try {
+      const res = await axios.get(`${API}/reports/quality`);
+      setAllQualityReports(res.data);
+      setQualityReportsOwn(res.data);
+    } catch (error) {
+      toast.error("فشل تحميل تقارير الجودة");
+    }
+  };
+
+  const filterQualityReports = () => {
+    let filtered = [...allQualityReports];
+
+    if (viewMode === "daily" && dateFilter) {
+      filtered = filtered.filter(r => r.date === dateFilter);
+    }
+
+    if (viewMode === "monthly" && monthFilter) {
+      const [year, month] = monthFilter.split('-');
+      filtered = filtered.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate.getFullYear() === parseInt(year) && 
+               reportDate.getMonth() === parseInt(month) - 1;
+      });
+    }
+
+    setQualityReportsOwn(filtered);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (editingQualityReport) {
+        await axios.put(`${API}/reports/quality/${editingQualityReport.id}`, formData);
+        toast.success("تم تحديث التقرير بنجاح");
+        setEditingQualityReport(null);
+      } else {
+        await axios.post(`${API}/reports/quality`, formData);
+        toast.success("تم إنشاء التقرير بنجاح");
+      }
+      fetchQualityReports();
+      setActiveTab("quality-reports");
+      setFormData({
+        date: new Date().toISOString().split('T')[0],
+        psychological_cases: 0,
+        academic_cases: 0,
+        behavioral_cases: 0,
+        sessions_count: 0,
+        families_contacted: 0,
+        referrals_count: 0,
+        follow_ups_count: 0,
+        guidance_programs: "",
+        challenges: "",
+        recommendations: ""
+      });
+    } catch (error) {
+      toast.error("فشل إنشاء التقرير");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (report) => {
+    setEditingQualityReport(report);
+    setFormData({
+      date: report.date,
+      psychological_cases: report.psychological_cases,
+      academic_cases: report.academic_cases,
+      behavioral_cases: report.behavioral_cases,
+      sessions_count: report.sessions_count,
+      families_contacted: report.families_contacted,
+      referrals_count: report.referrals_count,
+      follow_ups_count: report.follow_ups_count,
+      guidance_programs: report.guidance_programs || "",
+      challenges: report.challenges || "",
+      recommendations: report.recommendations || ""
+    });
+    setActiveTab("quality-create");
+  };
+
+  const handleDelete = async (reportId) => {
+    if (window.confirm("هل أنت متأكد من حذف هذا التقرير؟")) {
+      try {
+        await axios.delete(`${API}/reports/quality/${reportId}`);
+        toast.success("تم حذف التقرير بنجاح");
+        fetchQualityReports();
+      } catch (error) {
+        toast.error("فشل حذف التقرير");
+      }
+    }
+  };
+
   // Get list of employees based on report type
   const getEmployeesForReportType = () => {
     if (reportTypeFilter === "vice_principal") {
