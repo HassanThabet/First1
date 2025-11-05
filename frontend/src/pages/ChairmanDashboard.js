@@ -2250,11 +2250,134 @@ const ChairmanDashboard = () => {
                 {/* Quality Report Details */}
                 {selectedReport.type === "quality" && (
                   <div className="space-y-4">
-                    <div className="p-3 bg-orange-50 rounded-lg">
-                      <span className="text-xs text-gray-600">معدل الأداء التدريسي</span>
-                      <p className="text-2xl font-bold text-orange-700">{selectedReport.teaching_performance_rate || 0}/10</p>
-                    </div>
-                    
+                    {/* Academic Performance Section */}
+                    {selectedReport.academic_performance && (
+                      <div className="p-4 bg-blue-50 rounded-lg border-r-4 border-blue-500">
+                        <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                          📚 القسم الأكاديمي
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center p-2 bg-white rounded">
+                            <span className="text-sm text-gray-700">التقييم:</span>
+                            <span className="text-lg font-bold text-blue-700">{selectedReport.academic_performance.rate || 0}/10</span>
+                          </div>
+                          {selectedReport.academic_performance.notes && (
+                            <div className="p-2 bg-white rounded">
+                              <span className="text-sm text-gray-700 font-semibold block mb-1">الملاحظات:</span>
+                              <p className="text-sm text-gray-600">{selectedReport.academic_performance.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Educational Supervision Section */}
+                    {selectedReport.educational_supervision && (
+                      <div className="p-4 bg-purple-50 rounded-lg border-r-4 border-purple-500">
+                        <h4 className="font-semibold text-purple-800 mb-3 flex items-center gap-2">
+                          👁️ قسم الإشراف التربوي
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center p-2 bg-white rounded">
+                            <span className="text-sm text-gray-700">التقييم:</span>
+                            <span className="text-lg font-bold text-purple-700">{selectedReport.educational_supervision.rate || 0}/10</span>
+                          </div>
+                          {selectedReport.educational_supervision.notes && (
+                            <div className="p-2 bg-white rounded">
+                              <span className="text-sm text-gray-700 font-semibold block mb-1">الملاحظات:</span>
+                              <p className="text-sm text-gray-600">{selectedReport.educational_supervision.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Discipline & Behavior Section */}
+                    {selectedReport.discipline_behavior && (
+                      <div className="p-4 bg-green-50 rounded-lg border-r-4 border-green-500">
+                        <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                          ⚖️ قسم الانضباط والسلوك
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center p-2 bg-white rounded">
+                            <span className="text-sm text-gray-700">التقييم:</span>
+                            <span className="text-lg font-bold text-green-700">{selectedReport.discipline_behavior.rate || 0}/10</span>
+                          </div>
+                          {selectedReport.discipline_behavior.notes && (
+                            <div className="p-2 bg-white rounded">
+                              <span className="text-sm text-gray-700 font-semibold block mb-1">الملاحظات:</span>
+                              <p className="text-sm text-gray-600">{selectedReport.discipline_behavior.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Activities & Programs Section */}
+                    {selectedReport.activities_programs && (
+                      <div className="p-4 bg-indigo-50 rounded-lg border-r-4 border-indigo-500">
+                        <h4 className="font-semibold text-indigo-800 mb-3 flex items-center gap-2">
+                          🎨 قسم الأنشطة والبرامج
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center p-2 bg-white rounded">
+                            <span className="text-sm text-gray-700">التقييم:</span>
+                            <span className="text-lg font-bold text-indigo-700">{selectedReport.activities_programs.rate || 0}/10</span>
+                          </div>
+                          {selectedReport.activities_programs.notes && (
+                            <div className="p-2 bg-white rounded">
+                              <span className="text-sm text-gray-700 font-semibold block mb-1">الملاحظات:</span>
+                              <p className="text-sm text-gray-600">{selectedReport.activities_programs.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Social Specialist Section */}
+                    {selectedReport.social_specialist && (
+                      <div className="p-4 bg-teal-50 rounded-lg border-r-4 border-teal-500">
+                        <h4 className="font-semibold text-teal-800 mb-3 flex items-center gap-2">
+                          💬 قسم الأخصائي الاجتماعي
+                        </h4>
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center p-2 bg-white rounded">
+                            <span className="text-sm text-gray-700">التقييم:</span>
+                            <span className="text-lg font-bold text-teal-700">{selectedReport.social_specialist.rate || 0}/10</span>
+                          </div>
+                          {selectedReport.social_specialist.notes && (
+                            <div className="p-2 bg-white rounded">
+                              <span className="text-sm text-gray-700 font-semibold block mb-1">الملاحظات:</span>
+                              <p className="text-sm text-gray-600">{selectedReport.social_specialist.notes}</p>
+                            </div>
+                          )}
+                          {selectedReport.social_specialist.teaching_performance_rate && (
+                            <div className="flex justify-between items-center p-2 bg-white rounded mt-2">
+                              <span className="text-sm text-gray-700">معدل الأداء التدريسي العام:</span>
+                              <span className="text-lg font-bold text-teal-700">{selectedReport.social_specialist.teaching_performance_rate}/10</span>
+                            </div>
+                          )}
+                          {selectedReport.social_specialist.general_recommendations && (
+                            <div className="p-2 bg-white rounded mt-2">
+                              <span className="text-sm text-gray-700 font-semibold block mb-1">التوصيات العامة:</span>
+                              <p className="text-sm text-gray-600 italic">{selectedReport.social_specialist.general_recommendations}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Overall Teaching Performance (if stored at root level) */}
+                    {selectedReport.teaching_performance_rate && (
+                      <div className="p-4 bg-orange-50 rounded-lg border-r-4 border-orange-500">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm text-gray-700 font-semibold">👨‍🏫 معدل الأداء التدريسي العام</span>
+                          <span className="text-2xl font-bold text-orange-700">{selectedReport.teaching_performance_rate}/10</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Visited Teachers */}
                     {selectedReport.visited_teachers && selectedReport.visited_teachers.length > 0 && (
                       <div className="p-4 bg-amber-50 rounded-lg">
                         <h4 className="font-semibold text-amber-800 mb-2">المعلمون المزارون:</h4>
