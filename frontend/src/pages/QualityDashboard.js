@@ -42,10 +42,25 @@ const QualityDashboard = () => {
   const [dateFilter, setDateFilter] = useState("");
   const [monthFilter, setMonthFilter] = useState("");
   
-  // Merged reports filters
-  const [mergedPeriod, setMergedPeriod] = useState("weekly");
-  const [mergedStartDate, setMergedStartDate] = useState("");
-  const [mergedEndDate, setMergedEndDate] = useState("");
+  // Statistics tab states (from DirectorDashboard)
+  const [supervisorReports, setSupervisorReports] = useState([]);
+  const [activitiesReports, setActivitiesReports] = useState([]);
+  const [socialReports, setSocialReports] = useState([]);
+  const [qualityReports, setQualityReports] = useState([]);
+  const [vicePrincipalReports, setVicePrincipalReports] = useState([]);
+  const [educationalSupervisionReports, setEducationalSupervisionReports] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [timeFilter, setTimeFilter] = useState("all");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+  const [reportTypeFilter, setReportTypeFilter] = useState("all");
+  const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all");
+  const [selectedVicePrincipal, setSelectedVicePrincipal] = useState("all");
+  const [branchFilter, setBranchFilter] = useState("all");
+  const [showDetailedReports, setShowDetailedReports] = useState(false);
+  const [showTeachersListModal, setShowTeachersListModal] = useState(false);
+  const [teachersListData, setTeachersListData] = useState({ title: "", teachers: [], type: "" });
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
