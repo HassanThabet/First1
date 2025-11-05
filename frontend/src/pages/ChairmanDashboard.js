@@ -1205,14 +1205,30 @@ const ChairmanDashboard = () => {
         }
       }
       
-      // === القسم 6: تفاصيل الجودة ===
+      // === القسم 6: تفاصيل الجودة - ملخص شامل ===
       if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
-        if (stats.qualityReportsCount > 0) {
+        const filteredQualityReports = filterReportsByTimeAndBranch([...qualityReports]);
+        if (filteredQualityReports.length > 0) {
+          // حساب المتوسطات لجميع الأقسام
+          const avgAcademic = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.academic_performance?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+          const avgSupervision = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.educational_supervision?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+          const avgDiscipline = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.discipline_behavior?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+          const avgActivities = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.activities_programs?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+          const avgSocial = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+          const avgTeaching = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.teaching_performance_rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+          const overallAvg = ((parseFloat(avgAcademic) + parseFloat(avgSupervision) + parseFloat(avgDiscipline) + parseFloat(avgActivities) + parseFloat(avgSocial)) / 5).toFixed(1);
+          
           const qualityStats = [
-            { label: 'إجمالي الزيارات', value: stats.totalQualityVisits.toString(), color: '#dbeafe' },
-            { label: 'متوسط الأداء التدريسي', value: `${stats.avgQualityTeachingRate}/10`, color: '#d1fae5' }
+            { label: 'إجمالي التقارير', value: filteredQualityReports.length.toString(), color: '#e9d5ff' },
+            { label: 'الأكاديمي', value: `${avgAcademic}/10`, color: '#d1fae5' },
+            { label: 'الإشراف', value: `${avgSupervision}/10`, color: '#dbeafe' },
+            { label: 'الانضباط', value: `${avgDiscipline}/10`, color: '#fed7aa' },
+            { label: 'الأنشطة', value: `${avgActivities}/10`, color: '#fce7f3' },
+            { label: 'الأخصائي', value: `${avgSocial}/10`, color: '#ccfbf1' },
+            { label: 'الأداء التدريسي', value: `${avgTeaching}/10`, color: '#e0e7ff' },
+            { label: 'المعدل العام', value: `${overallAvg}/10`, color: '#f3e8ff' }
           ];
-          content.push(createSection('✅ إحصائيات الجودة', createStatsGrid(qualityStats)));
+          content.push(createSection('🌟 ملخص إحصائيات الجودة الشامل', createStatsGrid(qualityStats)));
         }
       }
       
