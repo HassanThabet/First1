@@ -1244,200 +1244,332 @@ const QualityDashboard = () => {
           </Dialog>
         </TabsContent>
 
-        <TabsContent value="merged">
+        <TabsContent value="statistics">
           <div className="space-y-6">
-            {/* Period Filter */}
+            {/* Filters */}
             <Card>
               <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>فترة التقرير المدمج</CardTitle>
-                  <Button 
-                    onClick={exportToPDF}
-                    className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700"
-                  >
-                    <FileDown className="w-4 h-4 ml-2" />
-                    تصدير PDF
-                  </Button>
-                </div>
+                <CardTitle>التصفية</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label>الفترة</Label>
-                    <Select value={mergedPeriod} onValueChange={setMergedPeriod}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="weekly">هذا الأسبوع (السبت - الأربعاء)</SelectItem>
-                        <SelectItem value="monthly">هذا الشهر</SelectItem>
-                        <SelectItem value="custom">نطاق مخصص</SelectItem>
-                      </SelectContent>
-                    </Select>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">نوع التقرير</label>
+                      <Select value={reportTypeFilter} onValueChange={(value) => {
+                        setReportTypeFilter(value);
+                        setSelectedSpecificEmployee("all");
+                        setSelectedVicePrincipal("all");
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر نوع التقرير" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">جميع التقارير</SelectItem>
+                          <SelectItem value="vice_principal">الوكلاء</SelectItem>
+                          <SelectItem value="supervisor">المشرفين</SelectItem>
+                          <SelectItem value="activities">الأنشطة</SelectItem>
+                          <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
+                          <SelectItem value="quality">الجودة</SelectItem>
+                          <SelectItem value="educational_supervision">الإشراف التربوي</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
+                      <Select value={timeFilter} onValueChange={setTimeFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر الفترة الزمنية" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">جميع الفترات</SelectItem>
+                          <SelectItem value="daily">اليوم</SelectItem>
+                          <SelectItem value="weekly">هذا الأسبوع</SelectItem>
+                          <SelectItem value="monthly">هذا الشهر</SelectItem>
+                          <SelectItem value="custom">فترة مخصصة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {/* Branch filter - only for users with branch="both" */}
+                    {user && user.branch === "both" && (
+                      <div>
+                        <label className="block text-sm font-medium mb-2">الفرع</label>
+                        <Select value={branchFilter} onValueChange={setBranchFilter}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر الفرع" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">جميع الفروع</SelectItem>
+                            <SelectItem value="boys">البنين</SelectItem>
+                            <SelectItem value="girls">البنات</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
-                  
-                  {mergedPeriod === "custom" && (
-                    <>
+
+                  {timeFilter === "custom" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <Label>من تاريخ</Label>
-                        <Input
-                          type="date"
-                          value={mergedStartDate}
-                          onChange={(e) => setMergedStartDate(e.target.value)}
+                        <label className="block text-sm font-medium mb-2">من تاريخ</label>
+                        <Input 
+                          type="date" 
+                          value={customStartDate}
+                          onChange={(e) => setCustomStartDate(e.target.value)}
                         />
                       </div>
                       <div>
-                        <Label>إلى تاريخ</Label>
-                        <Input
-                          type="date"
-                          value={mergedEndDate}
-                          onChange={(e) => setMergedEndDate(e.target.value)}
+                        <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
+                        <Input 
+                          type="date" 
+                          value={customEndDate}
+                          onChange={(e) => setCustomEndDate(e.target.value)}
                         />
                       </div>
-                    </>
+                    </div>
                   )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Merged Statistics */}
+            {/* Overall Statistics */}
             {(() => {
-              const stats = getMergedStatistics();
-              const mergedReports = getMergedReports();
-              
+              const stats = getOverallStatistics();
               return (
                 <>
-                  {/* Total Cases */}
-                  <div className="p-6 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-300 shadow-lg">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-2xl font-bold text-purple-800 mb-2">📊 إجمالي الحالات الطلابية</p>
-                        <p className="text-sm text-purple-600">مجموع جميع الحالات في الفترة المحددة</p>
-                      </div>
-                      <div className="text-6xl font-extrabold bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        {stats.totalCases}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Cases Breakdown */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
-                      <CardContent className="p-6">
-                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات النفسية</div>
-                        <div className="text-4xl font-bold text-cyan-700">{stats.totalPsychological}</div>
-                        <p className="text-xs text-gray-600 mt-2">حالة</p>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
-                      <CardContent className="p-6">
-                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات الأكاديمية</div>
-                        <div className="text-4xl font-bold text-blue-700">{stats.totalAcademic}</div>
-                        <p className="text-xs text-gray-600 mt-2">حالة</p>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
-                      <CardContent className="p-6">
-                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات السلوكية</div>
-                        <div className="text-4xl font-bold text-purple-700">{stats.totalBehavioral}</div>
-                        <p className="text-xs text-gray-600 mt-2">حالة</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Actions Taken */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>الإجراءات المتخذة</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                  {/* Supervisor Statistics */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                    <>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                          <div className="text-sm font-bold text-green-800">الجلسات</div>
-                          <div className="text-3xl font-bold text-green-600 mt-2">{stats.totalSessions}</div>
-                        </div>
-                        <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                          <div className="text-sm font-bold text-blue-800">التواصل مع الأسر</div>
-                          <div className="text-3xl font-bold text-blue-600 mt-2">{stats.totalFamilies}</div>
-                        </div>
-                        <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                          <div className="text-sm font-bold text-orange-800">الإحالات</div>
-                          <div className="text-3xl font-bold text-orange-600 mt-2">{stats.totalReferrals}</div>
-                        </div>
-                        <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                          <div className="text-sm font-bold text-purple-800">المتابعات</div>
-                          <div className="text-3xl font-bold text-purple-600 mt-2">{stats.totalFollowUps}</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+                          <CardContent className="p-6">
+                            <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون الغائبون</div>
+                            <div className="text-4xl font-bold text-red-700">{stats.totalAbsentTeachers}</div>
+                            <p className="text-xs text-gray-600 mt-2">معلم</p>
+                          </CardContent>
+                        </Card>
 
-                  {/* All Reports Details */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>تفاصيل جميع التقارير ({stats.totalReports})</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {mergedReports.map((report, index) => (
-                          <div key={report.id} className="p-4 bg-gray-50 rounded-lg border hover:shadow-md transition-shadow">
-                            <div className="flex items-start justify-between mb-3">
-                              <div>
-                                <h4 className="font-bold text-gray-800 text-lg">
-                                  تقرير {index + 1} - {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                                </h4>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  إجمالي الحالات: {report.psychological_cases + report.academic_cases + report.behavioral_cases}
-                                </p>
-                              </div>
-                            </div>
-                            
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-                              <div className="text-sm">
-                                <span className="text-gray-600">نفسية:</span>
-                                <span className="font-bold text-cyan-700 mr-1">{report.psychological_cases}</span>
-                              </div>
-                              <div className="text-sm">
-                                <span className="text-gray-600">أكاديمية:</span>
-                                <span className="font-bold text-blue-700 mr-1">{report.academic_cases}</span>
-                              </div>
-                              <div className="text-sm">
-                                <span className="text-gray-600">سلوكية:</span>
-                                <span className="font-bold text-purple-700 mr-1">{report.behavioral_cases}</span>
-                              </div>
-                              <div className="text-sm">
-                                <span className="text-gray-600">جلسات:</span>
-                                <span className="font-bold text-green-700 mr-1">{report.sessions_count}</span>
-                              </div>
-                            </div>
-                            
-                            {report.guidance_programs && (
-                              <div className="mt-3 p-3 bg-cyan-50 rounded border border-cyan-200">
-                                <div className="text-xs font-bold text-cyan-800 mb-1">البرامج الإرشادية</div>
-                                <p className="text-sm text-gray-700">{report.guidance_programs}</p>
-                              </div>
-                            )}
-                            
-                            {report.challenges && (
-                              <div className="mt-2 p-3 bg-orange-50 rounded border border-orange-200">
-                                <div className="text-xs font-bold text-orange-800 mb-1">التحديات</div>
-                                <p className="text-sm text-gray-700">{report.challenges}</p>
-                              </div>
-                            )}
-                            
-                            {report.recommendations && (
-                              <div className="mt-2 p-3 bg-green-50 rounded border border-green-200">
-                                <div className="text-xs font-bold text-green-800 mb-1">التوصيات</div>
-                                <p className="text-sm text-gray-700">{report.recommendations}</p>
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+                          <CardContent className="p-6">
+                            <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المتأخرون</div>
+                            <div className="text-4xl font-bold text-orange-700">{stats.totalLateTeachers}</div>
+                            <p className="text-xs text-gray-600 mt-2">معلم</p>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+                          <CardContent className="p-6">
+                            <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المغطون</div>
+                            <div className="text-4xl font-bold text-green-700">{stats.totalCoveringTeachers}</div>
+                            <p className="text-xs text-gray-600 mt-2">معلم</p>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500">
+                          <CardContent className="p-6">
+                            <div className="text-sm text-gray-700 mb-1 font-semibold">الطلاب الغائبون</div>
+                            <div className="text-4xl font-bold text-pink-700">{stats.totalAbsentStudents}</div>
+                            <p className="text-xs text-gray-600 mt-2">طالب</p>
+                          </CardContent>
+                        </Card>
                       </div>
-                    </CardContent>
-                  </Card>
+
+                      {/* Charts */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Teachers Chart */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>توزيع حالات المعلمين</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <PieChart>
+                                <Pie
+                                  data={getTeachersChartData()}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  label={(entry) => `${entry.name}: ${entry.value}`}
+                                  outerRadius={80}
+                                  fill="#8884d8"
+                                  dataKey="value"
+                                >
+                                  {getTeachersChartData().map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </CardContent>
+                        </Card>
+
+                        {/* Performance Chart */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>مؤشرات الأداء العام</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <BarChart data={getPerformanceChartData()}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis domain={[0, 10]} />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="value" fill="#3b82f6" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Activities Statistics */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "activities") && stats.activitiesReportsCount > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>إحصائيات الأنشطة</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <div className="text-sm font-bold text-blue-800">إجمالي الأنشطة</div>
+                            <div className="text-3xl font-bold text-blue-600 mt-2">{stats.totalActivities}</div>
+                          </div>
+                          <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                            <div className="text-sm font-bold text-purple-800">إجمالي المشاركين</div>
+                            <div className="text-3xl font-bold text-purple-600 mt-2">{stats.totalActivitiesParticipants}</div>
+                          </div>
+                          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                            <div className="text-sm font-bold text-green-800">متوسط التفاعل</div>
+                            <div className="text-3xl font-bold text-green-600 mt-2">{stats.avgActivitiesInteraction}/10</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Social Specialist Statistics */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "social") && stats.socialReportsCount > 0 && (
+                    <>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>إحصائيات الأخصائي الاجتماعي</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="p-4 bg-pink-50 rounded-lg border border-pink-200">
+                              <div className="text-sm font-bold text-pink-800">حالات نفسية</div>
+                              <div className="text-3xl font-bold text-pink-600 mt-2">{stats.totalPsychologicalCases}</div>
+                            </div>
+                            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                              <div className="text-sm font-bold text-yellow-800">حالات أكاديمية</div>
+                              <div className="text-3xl font-bold text-yellow-600 mt-2">{stats.totalAcademicCases}</div>
+                            </div>
+                            <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+                              <div className="text-sm font-bold text-red-800">حالات سلوكية</div>
+                              <div className="text-3xl font-bold text-red-600 mt-2">{stats.totalBehavioralCases}</div>
+                            </div>
+                            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                              <div className="text-sm font-bold text-purple-800">إجمالي الحالات</div>
+                              <div className="text-3xl font-bold text-purple-600 mt-2">{stats.totalStudentCases}</div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Social Cases Chart */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>توزيع حالات الطلاب</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ResponsiveContainer width="100%" height={250}>
+                            <PieChart>
+                              <Pie
+                                data={getSocialCasesChartData()}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={(entry) => `${entry.name}: ${entry.value}`}
+                                outerRadius={80}
+                                fill="#8884d8"
+                                dataKey="value"
+                              >
+                                {getSocialCasesChartData().map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                                ))}
+                              </Pie>
+                              <Tooltip />
+                              <Legend />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </CardContent>
+                      </Card>
+                    </>
+                  )}
+
+                  {/* Quality Statistics */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "quality") && stats.qualityReportsCount > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>إحصائيات الجودة</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <div className="text-sm font-bold text-blue-800">إجمالي الزيارات</div>
+                            <div className="text-3xl font-bold text-blue-600 mt-2">{stats.totalQualityVisits}</div>
+                          </div>
+                          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                            <div className="text-sm font-bold text-green-800">متوسط الأداء التدريسي</div>
+                            <div className="text-3xl font-bold text-green-600 mt-2">{stats.avgQualityTeachingRate}/10</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Teacher Progress View */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>تقييم تحسن المعلمين</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <TeacherProgressView branch={user.branch} compact={true} />
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Activity Supervisors View */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>المعلمون المشرفون على الأنشطة</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ActivitySupervisorsView compact={true} />
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Cooperating Teachers View */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>المعلمون المتعاونون في الأنشطة</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <CooperatingTeachersView compact={true} />
+                      </CardContent>
+                    </Card>
+                  )}
                 </>
               );
             })()}
