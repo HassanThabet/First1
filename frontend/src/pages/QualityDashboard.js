@@ -238,17 +238,17 @@ const QualityDashboard = () => {
     setEditingQualityReport(report);
     setFormData({
       date: report.date,
-      academic_performance_rate: report.academic_performance_rate || "",
+      academic_performance_rate: report.academic_performance_rate?.toString() || "",
       academic_notes: report.academic_notes || "",
-      supervision_quality_rate: report.supervision_quality_rate || "",
+      supervision_quality_rate: report.supervision_quality_rate?.toString() || "",
       supervision_notes: report.supervision_notes || "",
-      discipline_rate: report.discipline_rate || "",
+      discipline_rate: report.discipline_rate?.toString() || "",
       discipline_notes: report.discipline_notes || "",
-      activities_quality_rate: report.activities_quality_rate || "",
+      activities_quality_rate: report.activities_quality_rate?.toString() || "",
       activities_notes: report.activities_notes || "",
-      social_specialist_performance_rate: report.social_specialist_performance_rate || "",
+      social_specialist_performance_rate: report.social_specialist_performance_rate?.toString() || "",
       social_specialist_notes: report.social_specialist_notes || "",
-      teaching_performance_rate: report.teaching_performance_rate || "",
+      teaching_performance_rate: report.teaching_performance_rate?.toString() || "",
       general_recommendations: report.general_recommendations || ""
     });
     setActiveTab("quality-create");
