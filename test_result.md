@@ -426,6 +426,12 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "✅ FIXED: Removed all 'bold: true' declarations from PDF export functions in QualityDashboard.js. Changes: 1) Updated exportQualityReportsToPDF: Removed bold from 'header' and 'sectionHeader' styles, replaced with explicit font: 'Cairo' declarations, 2) Updated exportTeachersListToPDF: Removed bold from header text, subheader, tableHeader, and tableCellBold styles, 3) Removed inline bold declarations from content sections including teaching performance table, general recommendations, teacher progress cards, and social statistics table, 4) All text now uses Cairo-Regular font consistently without attempting to access bold variants. PDF export should now work without font definition errors."
+      - working: false
+        agent: "user"
+        comment: "USER REPORTED TWO ISSUES: 1) PDF export shows empty values in summary statistics section, 2) User wants to add statistics summary display in the 'تقارير الجودة' (Quality Reports) tab."
+      - working: "NA"
+        agent: "main"
+        comment: "FIXING BOTH ISSUES: 1) PDF STATISTICS FIX: Lines 435-440 in exportQualityReportsToPDF function were accessing wrong data structure (r.academic_performance_rate instead of r.academic_performance.rate). Updated all 6 average calculations to correctly access nested data with parseFloat and fallback to 0, 2) SUMMARY IN REPORTS TAB: Added comprehensive statistics summary card in 'quality-reports' tab (after filters, before reports list) showing: total reports count, averages for all 5 sections (academic, supervision, discipline, activities, social), teaching performance average, and overall general average. Card uses gradient background with grid layout displaying 8 statistics boxes with color-coded values."
 
   - task: "Educational Supervision Dashboard with modal view and filtering"
     implemented: false
