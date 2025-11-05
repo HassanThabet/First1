@@ -49,9 +49,39 @@ const QualityDashboard = () => {
   const [showTeachersListModal, setShowTeachersListModal] = useState(false);
   const [teachersListData, setTeachersListData] = useState({ title: "", teachers: [], type: "" });
 
+  // Quality report specific states
+  const [qualityReportsOwn, setQualityReportsOwn] = useState([]);
+  const [allQualityReports, setAllQualityReports] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedQualityReport, setSelectedQualityReport] = useState(null);
+  const [showQualityReportModal, setShowQualityReportModal] = useState(false);
+  const [editingQualityReport, setEditingQualityReport] = useState(null);
+  const [viewMode, setViewMode] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
+  const [monthFilter, setMonthFilter] = useState("");
+
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    psychological_cases: 0,
+    academic_cases: 0,
+    behavioral_cases: 0,
+    sessions_count: 0,
+    families_contacted: 0,
+    referrals_count: 0,
+    follow_ups_count: 0,
+    guidance_programs: "",
+    challenges: "",
+    recommendations: ""
+  });
+
   useEffect(() => {
     fetchAllData();
+    fetchQualityReports();
   }, []);
+
+  useEffect(() => {
+    filterQualityReports();
+  }, [viewMode, dateFilter, monthFilter, allQualityReports]);
 
   const fetchAllData = async () => {
     try {
