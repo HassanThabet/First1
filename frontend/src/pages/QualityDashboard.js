@@ -881,7 +881,6 @@ const QualityDashboard = () => {
             text: 'مدارس الفجر الجديد الأهلية',
             alignment: 'center',
             fontSize: 18,
-            bold: true,
             color: '#1e40af',
             margin: [0, 30, 0, 0]
           }
