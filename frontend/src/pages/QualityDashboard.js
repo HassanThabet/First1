@@ -957,30 +957,32 @@ const QualityDashboard = () => {
       styles: {
         subheader: {
           fontSize: 16,
-          bold: true,
-          color: '#3b82f6'
+          color: '#3b82f6',
+          font: 'Cairo'
         },
         info: {
           fontSize: 9,
-          color: '#666666'
+          color: '#666666',
+          font: 'Cairo'
         },
         tableHeader: {
-          bold: true,
           alignment: 'center',
           fontSize: 11,
-          color: '#1e40af'
+          color: '#1e40af',
+          font: 'Cairo'
         },
         tableCell: {
-          fontSize: 10
+          fontSize: 10,
+          font: 'Cairo'
         },
         tableCellBold: {
           fontSize: 10,
-          bold: true
+          font: 'Cairo'
         },
         footer: {
           fontSize: 8,
           color: '#999999',
-          italics: true
+          font: 'Cairo'
         }
       }
     };
