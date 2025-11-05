@@ -1861,80 +1861,137 @@ const QualityDashboard = () => {
 
                 {selectedQualityReport && (
                   <div className="space-y-6 p-4">
-                    <div>
-                      <h4 className="text-lg font-bold text-gray-800 mb-4">الحالات الطلابية</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات النفسية</div>
-                          <div className="text-3xl font-bold text-cyan-700">{selectedQualityReport.psychological_cases}</div>
+                    {/* القسم الأكاديمي */}
+                    <Card className="border-l-4 border-blue-500">
+                      <CardHeader className="bg-blue-50 py-3">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          📚 القسم الأكاديمي
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-semibold">التقييم:</span>
+                          <span className="text-2xl font-bold text-blue-600">{selectedQualityReport.academic_performance_rate}/10</span>
                         </div>
-                        <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات الأكاديمية</div>
-                          <div className="text-3xl font-bold text-blue-700">{selectedQualityReport.academic_cases}</div>
+                        {selectedQualityReport.academic_notes && (
+                          <div className="p-3 bg-blue-50 rounded">
+                            <div className="text-xs font-semibold text-blue-800 mb-1">الملاحظات:</div>
+                            <p className="text-sm text-gray-700">{selectedQualityReport.academic_notes}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* قسم الإشراف */}
+                    <Card className="border-l-4 border-green-500">
+                      <CardHeader className="bg-green-50 py-3">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          👁️ قسم الإشراف
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-semibold">التقييم:</span>
+                          <span className="text-2xl font-bold text-green-600">{selectedQualityReport.supervision_quality_rate}/10</span>
                         </div>
-                        <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
-                          <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات السلوكية</div>
-                          <div className="text-3xl font-bold text-purple-700">{selectedQualityReport.behavioral_cases}</div>
+                        {selectedQualityReport.supervision_notes && (
+                          <div className="p-3 bg-green-50 rounded">
+                            <div className="text-xs font-semibold text-green-800 mb-1">الملاحظات:</div>
+                            <p className="text-sm text-gray-700">{selectedQualityReport.supervision_notes}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* قسم الانضباط */}
+                    <Card className="border-l-4 border-orange-500">
+                      <CardHeader className="bg-orange-50 py-3">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          ⚖️ قسم الانضباط
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-semibold">التقييم:</span>
+                          <span className="text-2xl font-bold text-orange-600">{selectedQualityReport.discipline_rate}/10</span>
                         </div>
-                      </div>
-                      
-                      <div className="p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-300 shadow-md">
+                        {selectedQualityReport.discipline_notes && (
+                          <div className="p-3 bg-orange-50 rounded">
+                            <div className="text-xs font-semibold text-orange-800 mb-1">الملاحظات:</div>
+                            <p className="text-sm text-gray-700">{selectedQualityReport.discipline_notes}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* قسم الأنشطة */}
+                    <Card className="border-l-4 border-purple-500">
+                      <CardHeader className="bg-purple-50 py-3">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          🎨 قسم الأنشطة
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-semibold">التقييم:</span>
+                          <span className="text-2xl font-bold text-purple-600">{selectedQualityReport.activities_quality_rate}/10</span>
+                        </div>
+                        {selectedQualityReport.activities_notes && (
+                          <div className="p-3 bg-purple-50 rounded">
+                            <div className="text-xs font-semibold text-purple-800 mb-1">الملاحظات:</div>
+                            <p className="text-sm text-gray-700">{selectedQualityReport.activities_notes}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* قسم الأخصائي الاجتماعي */}
+                    <Card className="border-l-4 border-pink-500">
+                      <CardHeader className="bg-pink-50 py-3">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          💬 قسم الأخصائي الاجتماعي
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <span className="font-semibold">التقييم:</span>
+                          <span className="text-2xl font-bold text-pink-600">{selectedQualityReport.social_specialist_performance_rate}/10</span>
+                        </div>
+                        {selectedQualityReport.social_specialist_notes && (
+                          <div className="p-3 bg-pink-50 rounded">
+                            <div className="text-xs font-semibold text-pink-800 mb-1">الملاحظات:</div>
+                            <p className="text-sm text-gray-700">{selectedQualityReport.social_specialist_notes}</p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* الأداء التدريسي العام */}
+                    <Card className="border-l-4 border-cyan-500">
+                      <CardHeader className="bg-cyan-50 py-3">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          👨‍🏫 الأداء التدريسي العام
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-4">
                         <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-lg font-bold text-purple-800 mb-1">📊 إجمالي عدد الحالات الطلابية</p>
-                            <p className="text-sm text-purple-600">مجموع جميع الحالات المسجلة في التقرير</p>
-                          </div>
-                          <div className="text-5xl font-extrabold bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                            {selectedQualityReport.psychological_cases + selectedQualityReport.academic_cases + selectedQualityReport.behavioral_cases}
-                          </div>
+                          <span className="font-semibold">معدل الأداء:</span>
+                          <span className="text-2xl font-bold text-cyan-600">{selectedQualityReport.teaching_performance_rate}/10</span>
                         </div>
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
 
-                    <div>
-                      <h4 className="text-lg font-bold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">الإجراءات المتخذة</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                          <div className="text-sm font-bold text-green-800">الجلسات</div>
-                          <div className="text-2xl font-bold text-green-600 mt-1">{selectedQualityReport.sessions_count}</div>
-                        </div>
-                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                          <div className="text-sm font-bold text-blue-800">التواصل مع الأسر</div>
-                          <div className="text-2xl font-bold text-blue-600 mt-1">{selectedQualityReport.families_contacted}</div>
-                        </div>
-                        <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
-                          <div className="text-sm font-bold text-orange-800">الإحالات</div>
-                          <div className="text-2xl font-bold text-orange-600 mt-1">{selectedQualityReport.referrals_count}</div>
-                        </div>
-                        <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                          <div className="text-sm font-bold text-purple-800">المتابعات</div>
-                          <div className="text-2xl font-bold text-purple-600 mt-1">{selectedQualityReport.follow_ups_count}</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      {selectedQualityReport.guidance_programs && (
-                        <div className="p-4 bg-cyan-50 rounded-lg border border-cyan-200">
-                          <div className="text-sm font-bold text-cyan-800 mb-2">البرامج الإرشادية</div>
-                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.guidance_programs}</p>
-                        </div>
-                      )}
-
-                      {selectedQualityReport.challenges && (
-                        <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
-                          <div className="text-sm font-bold text-orange-800 mb-2">التحديات</div>
-                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.challenges}</p>
-                        </div>
-                      )}
-
-                      {selectedQualityReport.recommendations && (
-                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                          <div className="text-sm font-bold text-green-800 mb-2">التوصيات</div>
-                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.recommendations}</p>
-                        </div>
-                      )}
-                    </div>
+                    {/* التوصيات العامة */}
+                    {selectedQualityReport.general_recommendations && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">التوصيات العامة</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.general_recommendations}</p>
+                        </CardContent>
+                      </Card>
+                    )}
                   </div>
                 )}
               </DialogContent>
