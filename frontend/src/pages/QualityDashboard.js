@@ -223,6 +223,240 @@ const QualityDashboard = () => {
     }
   };
 
+  // Export Quality Reports to PDF
+  const exportQualityReportsToPDF = () => {
+    try {
+      // Filter reports based on current filters
+      const reportsToExport = qualityReportsOwn;
+
+      if (reportsToExport.length === 0) {
+        toast.error("لا توجد تقارير للتصدير");
+        return;
+      }
+
+      // Prepare PDF content
+      const content = [];
+
+      // Title
+      content.push({
+        text: 'تقارير الجودة - مدارس الفجر الجديد الأهلية',
+        style: 'header',
+        alignment: 'center',
+        margin: [0, 0, 0, 20]
+      });
+
+      // Filter info
+      let filterText = 'الفترة: ';
+      if (viewMode === 'all') {
+        filterText += 'جميع التقارير';
+      } else if (viewMode === 'daily' && dateFilter) {
+        filterText += `يوم ${new Date(dateFilter).toLocaleDateString('ar-SA')}`;
+      } else if (viewMode === 'monthly' && monthFilter) {
+        const [year, month] = monthFilter.split('-');
+        filterText += `شهر ${month}/${year}`;
+      }
+
+      content.push({
+        text: filterText,
+        alignment: 'center',
+        margin: [0, 0, 0, 15],
+        fontSize: 11,
+        color: '#555'
+      });
+
+      // Loop through reports
+      reportsToExport.forEach((report, index) => {
+        // Report header
+        content.push({
+          text: `تقرير ${index + 1} - ${new Date(report.date).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`,
+          style: 'sectionHeader',
+          margin: [0, 15, 0, 10],
+          fillColor: '#e3f2fd'
+        });
+
+        // Sections table
+        const sectionsData = [
+          ['القسم', 'التقييم', 'الملاحظات'],
+          [
+            '📚 القسم الأكاديمي',
+            `${report.academic_performance_rate}/10`,
+            report.academic_notes || 'لا توجد ملاحظات'
+          ],
+          [
+            '👁️ قسم الإشراف',
+            `${report.supervision_quality_rate}/10`,
+            report.supervision_notes || 'لا توجد ملاحظات'
+          ],
+          [
+            '⚖️ قسم الانضباط',
+            `${report.discipline_rate}/10`,
+            report.discipline_notes || 'لا توجد ملاحظات'
+          ],
+          [
+            '🎨 قسم الأنشطة',
+            `${report.activities_quality_rate}/10`,
+            report.activities_notes || 'لا توجد ملاحظات'
+          ],
+          [
+            '💬 قسم الأخصائي الاجتماعي',
+            `${report.social_specialist_performance_rate}/10`,
+            report.social_specialist_notes || 'لا توجد ملاحظات'
+          ]
+        ];
+
+        content.push({
+          table: {
+            headerRows: 1,
+            widths: [150, 80, '*'],
+            body: sectionsData
+          },
+          layout: {
+            fillColor: function (rowIndex) {
+              return rowIndex === 0 ? '#2196F3' : (rowIndex % 2 === 0 ? '#f5f5f5' : null);
+            },
+            hLineWidth: function () { return 0.5; },
+            vLineWidth: function () { return 0.5; },
+            hLineColor: function () { return '#ddd'; },
+            vLineColor: function () { return '#ddd'; }
+          },
+          margin: [0, 0, 0, 10]
+        });
+
+        // Teaching performance
+        content.push({
+          table: {
+            widths: ['*', 100],
+            body: [
+              [
+                { text: '👨‍🏫 معدل الأداء التدريسي العام', bold: true },
+                { text: `${report.teaching_performance_rate}/10`, alignment: 'center', bold: true, color: '#2196F3' }
+              ]
+            ]
+          },
+          layout: 'noBorders',
+          fillColor: '#e8f5e9',
+          margin: [0, 5, 0, 10]
+        });
+
+        // General recommendations
+        if (report.general_recommendations) {
+          content.push({
+            text: 'التوصيات العامة:',
+            bold: true,
+            margin: [0, 10, 0, 5]
+          });
+          content.push({
+            text: report.general_recommendations,
+            margin: [10, 0, 0, 15],
+            italics: true,
+            color: '#555'
+          });
+        }
+
+        // Separator between reports
+        if (index < reportsToExport.length - 1) {
+          content.push({
+            canvas: [
+              {
+                type: 'line',
+                x1: 0, y1: 0,
+                x2: 515, y2: 0,
+                lineWidth: 1,
+                lineColor: '#ccc'
+              }
+            ],
+            margin: [0, 15, 0, 0]
+          });
+        }
+      });
+
+      // Summary statistics
+      const totalReports = reportsToExport.length;
+      const avgAcademic = (reportsToExport.reduce((sum, r) => sum + r.academic_performance_rate, 0) / totalReports).toFixed(1);
+      const avgSupervision = (reportsToExport.reduce((sum, r) => sum + r.supervision_quality_rate, 0) / totalReports).toFixed(1);
+      const avgDiscipline = (reportsToExport.reduce((sum, r) => sum + r.discipline_rate, 0) / totalReports).toFixed(1);
+      const avgActivities = (reportsToExport.reduce((sum, r) => sum + r.activities_quality_rate, 0) / totalReports).toFixed(1);
+      const avgSocial = (reportsToExport.reduce((sum, r) => sum + r.social_specialist_performance_rate, 0) / totalReports).toFixed(1);
+      const avgTeaching = (reportsToExport.reduce((sum, r) => sum + r.teaching_performance_rate, 0) / totalReports).toFixed(1);
+
+      content.push({
+        text: '\nملخص الإحصائيات',
+        style: 'sectionHeader',
+        margin: [0, 20, 0, 10],
+        fillColor: '#fff3e0'
+      });
+
+      content.push({
+        table: {
+          widths: ['*', 100],
+          body: [
+            ['إجمالي التقارير', totalReports],
+            ['متوسط التقييم الأكاديمي', avgAcademic],
+            ['متوسط تقييم الإشراف', avgSupervision],
+            ['متوسط تقييم الانضباط', avgDiscipline],
+            ['متوسط تقييم الأنشطة', avgActivities],
+            ['متوسط تقييم الأخصائي الاجتماعي', avgSocial],
+            ['متوسط الأداء التدريسي العام', avgTeaching]
+          ]
+        },
+        layout: {
+          fillColor: function (rowIndex) {
+            return rowIndex % 2 === 0 ? '#f5f5f5' : null;
+          }
+        },
+        margin: [0, 0, 0, 20]
+      });
+
+      // Footer
+      content.push({
+        text: `تم التصدير في: ${new Date().toLocaleDateString('ar-SA', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`,
+        alignment: 'center',
+        fontSize: 9,
+        color: '#999',
+        margin: [0, 20, 0, 0]
+      });
+
+      // Generate PDF
+      const docDefinition = {
+        content: content,
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            color: '#1976D2'
+          },
+          sectionHeader: {
+            fontSize: 14,
+            bold: true,
+            color: '#333'
+          }
+        },
+        defaultStyle: {
+          font: 'Cairo',
+          fontSize: 11
+        },
+        pageOrientation: 'portrait',
+        pageMargins: [40, 60, 40, 60]
+      };
+
+      pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+      pdfMake.fonts = {
+        Cairo: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Bold.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Bold.ttf'
+        }
+      };
+
+      pdfMake.createPdf(docDefinition).download(`تقارير_الجودة_${new Date().toISOString().split('T')[0]}.pdf`);
+      toast.success("تم تصدير التقارير بنجاح");
+    } catch (error) {
+      console.error("PDF Export Error:", error);
+      toast.error("فشل تصدير التقارير");
+    }
+  };
+
   // Get list of employees based on report type
   const getEmployeesForReportType = () => {
     if (reportTypeFilter === "vice_principal") {
