@@ -559,8 +559,8 @@ async def get_supervisor_reports(user_id: Optional[str] = None, branch: Optional
         supervisors = await db.users.find({"assigned_to": current_user["id"]}, {"_id": 0}).to_list(100)
         supervisor_ids = [s["id"] for s in supervisors]
         query["user_id"] = {"$in": supervisor_ids}
-    elif current_user["role"] in ["director", "quality", "educational_supervision"]:
-        # Directors with "both" branch can see all reports, otherwise filter by branch
+    elif current_user["role"] in ["chairman", "director", "quality", "educational_supervision"]:
+        # Chairman/Directors with "both" branch can see all reports, otherwise filter by branch
         if current_user["branch"] != "both":
             query["branch"] = current_user["branch"]
     
