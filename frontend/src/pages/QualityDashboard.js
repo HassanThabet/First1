@@ -1496,136 +1496,193 @@ const QualityDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>الحالات الطلابية</CardTitle>
+            {/* القسم الأكاديمي */}
+            <Card className="border-l-4 border-blue-500">
+              <CardHeader className="bg-blue-50">
+                <CardTitle className="flex items-center gap-2">
+                  📚 القسم الأكاديمي
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label>الحالات النفسية</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={formData.psychological_cases}
-                      onChange={(e) => setFormData({ ...formData, psychological_cases: parseInt(e.target.value) || 0 })}
-                    />
-                  </div>
-                  <div>
-                    <Label>الحالات الأكاديمية</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={formData.academic_cases}
-                      onChange={(e) => setFormData({ ...formData, academic_cases: parseInt(e.target.value) || 0 })}
-                    />
-                  </div>
-                  <div>
-                    <Label>الحالات السلوكية</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={formData.behavioral_cases}
-                      onChange={(e) => setFormData({ ...formData, behavioral_cases: parseInt(e.target.value) || 0 })}
-                    />
-                  </div>
-                </div>
-                
-                <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border-2 border-purple-300">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-semibold text-purple-800 mb-1">إجمالي عدد الحالات الطلابية</p>
-                      <p className="text-xs text-purple-600">مجموع جميع الحالات (نفسية + أكاديمية + سلوكية)</p>
-                    </div>
-                    <div className="text-4xl font-bold text-purple-700">
-                      {(formData.psychological_cases || 0) + (formData.academic_cases || 0) + (formData.behavioral_cases || 0)}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>الإجراءات المتخذة</CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="space-y-4 pt-4">
                 <div>
-                  <Label>عدد الجلسات</Label>
+                  <Label>تقييم الأداء الأكاديمي (من 1 إلى 10)</Label>
                   <Input
                     type="number"
-                    min="0"
-                    value={formData.sessions_count}
-                    onChange={(e) => setFormData({ ...formData, sessions_count: parseInt(e.target.value) || 0 })}
+                    min="1"
+                    max="10"
+                    value={formData.academic_performance_rate}
+                    onChange={(e) => setFormData({ ...formData, academic_performance_rate: parseInt(e.target.value) || 5 })}
+                    required
                   />
                 </div>
                 <div>
-                  <Label>التواصل مع الأسر</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.families_contacted}
-                    onChange={(e) => setFormData({ ...formData, families_contacted: parseInt(e.target.value) || 0 })}
-                  />
-                </div>
-                <div>
-                  <Label>عدد الإحالات</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.referrals_count}
-                    onChange={(e) => setFormData({ ...formData, referrals_count: parseInt(e.target.value) || 0 })}
-                  />
-                </div>
-                <div>
-                  <Label>المتابعات</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={formData.follow_ups_count}
-                    onChange={(e) => setFormData({ ...formData, follow_ups_count: parseInt(e.target.value) || 0 })}
+                  <Label>ملاحظات القسم الأكاديمي</Label>
+                  <Textarea
+                    value={formData.academic_notes}
+                    onChange={(e) => setFormData({ ...formData, academic_notes: e.target.value })}
+                    placeholder="أضف ملاحظاتك حول الأداء الأكاديمي"
+                    rows={3}
                   />
                 </div>
               </CardContent>
             </Card>
 
+            {/* قسم الإشراف */}
+            <Card className="border-l-4 border-green-500">
+              <CardHeader className="bg-green-50">
+                <CardTitle className="flex items-center gap-2">
+                  👁️ قسم الإشراف
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-4">
+                <div>
+                  <Label>تقييم جودة الإشراف (من 1 إلى 10)</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={formData.supervision_quality_rate}
+                    onChange={(e) => setFormData({ ...formData, supervision_quality_rate: parseInt(e.target.value) || 5 })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>ملاحظات الإشراف</Label>
+                  <Textarea
+                    value={formData.supervision_notes}
+                    onChange={(e) => setFormData({ ...formData, supervision_notes: e.target.value })}
+                    placeholder="أضف ملاحظاتك حول جودة الإشراف"
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* قسم الانضباط */}
+            <Card className="border-l-4 border-orange-500">
+              <CardHeader className="bg-orange-50">
+                <CardTitle className="flex items-center gap-2">
+                  ⚖️ قسم الانضباط
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-4">
+                <div>
+                  <Label>تقييم الانضباط (من 1 إلى 10)</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={formData.discipline_rate}
+                    onChange={(e) => setFormData({ ...formData, discipline_rate: parseInt(e.target.value) || 5 })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>ملاحظات الانضباط</Label>
+                  <Textarea
+                    value={formData.discipline_notes}
+                    onChange={(e) => setFormData({ ...formData, discipline_notes: e.target.value })}
+                    placeholder="أضف ملاحظاتك حول الانضباط"
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* قسم الأنشطة */}
+            <Card className="border-l-4 border-purple-500">
+              <CardHeader className="bg-purple-50">
+                <CardTitle className="flex items-center gap-2">
+                  🎨 قسم الأنشطة
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-4">
+                <div>
+                  <Label>تقييم جودة الأنشطة (من 1 إلى 10)</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={formData.activities_quality_rate}
+                    onChange={(e) => setFormData({ ...formData, activities_quality_rate: parseInt(e.target.value) || 5 })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>ملاحظات الأنشطة</Label>
+                  <Textarea
+                    value={formData.activities_notes}
+                    onChange={(e) => setFormData({ ...formData, activities_notes: e.target.value })}
+                    placeholder="أضف ملاحظاتك حول الأنشطة"
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* قسم الأخصائي الاجتماعي */}
+            <Card className="border-l-4 border-pink-500">
+              <CardHeader className="bg-pink-50">
+                <CardTitle className="flex items-center gap-2">
+                  💬 قسم الأخصائي الاجتماعي
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-4">
+                <div>
+                  <Label>تقييم أداء الأخصائي الاجتماعي (من 1 إلى 10)</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={formData.social_specialist_performance_rate}
+                    onChange={(e) => setFormData({ ...formData, social_specialist_performance_rate: parseInt(e.target.value) || 5 })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label>ملاحظات الأخصائي الاجتماعي</Label>
+                  <Textarea
+                    value={formData.social_specialist_notes}
+                    onChange={(e) => setFormData({ ...formData, social_specialist_notes: e.target.value })}
+                    placeholder="أضف ملاحظاتك حول أداء الأخصائي الاجتماعي"
+                    rows={3}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* معدل الأداء التدريسي العام */}
+            <Card className="border-l-4 border-cyan-500">
+              <CardHeader className="bg-cyan-50">
+                <CardTitle className="flex items-center gap-2">
+                  👨‍🏫 الأداء التدريسي العام
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 pt-4">
+                <div>
+                  <Label>معدل الأداء التدريسي (من 1 إلى 10)</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={formData.teaching_performance_rate}
+                    onChange={(e) => setFormData({ ...formData, teaching_performance_rate: parseInt(e.target.value) || 5 })}
+                    required
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* التوصيات العامة */}
             <Card>
               <CardHeader>
-                <CardTitle>البرامج الإرشادية</CardTitle>
+                <CardTitle>التوصيات العامة</CardTitle>
               </CardHeader>
               <CardContent>
                 <Textarea
-                  value={formData.guidance_programs}
-                  onChange={(e) => setFormData({ ...formData, guidance_programs: e.target.value })}
-                  placeholder="وصف البرامج الإرشادية المنفذة"
-                  rows={4}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>التحديات</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  value={formData.challenges}
-                  onChange={(e) => setFormData({ ...formData, challenges: e.target.value })}
-                  placeholder="التحديات التي واجهتها"
-                  rows={4}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>التوصيات</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Textarea
-                  value={formData.recommendations}
-                  onChange={(e) => setFormData({ ...formData, recommendations: e.target.value })}
-                  placeholder="التوصيات المقترحة"
+                  value={formData.general_recommendations}
+                  onChange={(e) => setFormData({ ...formData, general_recommendations: e.target.value })}
+                  placeholder="أضف التوصيات العامة"
                   rows={4}
                 />
               </CardContent>
@@ -1642,16 +1699,18 @@ const QualityDashboard = () => {
                   setEditingQualityReport(null);
                   setFormData({
                     date: new Date().toISOString().split('T')[0],
-                    psychological_cases: 0,
-                    academic_cases: 0,
-                    behavioral_cases: 0,
-                    sessions_count: 0,
-                    families_contacted: 0,
-                    referrals_count: 0,
-                    follow_ups_count: 0,
-                    guidance_programs: "",
-                    challenges: "",
-                    recommendations: ""
+                    academic_performance_rate: 5,
+                    academic_notes: "",
+                    supervision_quality_rate: 5,
+                    supervision_notes: "",
+                    discipline_rate: 5,
+                    discipline_notes: "",
+                    activities_quality_rate: 5,
+                    activities_notes: "",
+                    social_specialist_performance_rate: 5,
+                    social_specialist_notes: "",
+                    teaching_performance_rate: 5,
+                    general_recommendations: ""
                   });
                 }}
                 variant="outline"
