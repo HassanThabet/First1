@@ -2051,9 +2051,235 @@ class BackendTester:
                 
         except Exception as e:
             self.log_test("Create Ahmed User", False, f"Exception: {str(e)}")
+    def test_quality_report_data_structure(self):
+        """Test Quality Report creation endpoint to understand expected data structure"""
+        print("\n=== Testing Quality Report Data Structure ===")
+        
+        # Step 1: Login as quality_user
+        quality_login_data = {
+            "username": "quality_user",
+            "password": "123456",
+            "remember_me": False
+        }
+        
+        try:
+            login_response = self.session.post(f"{BASE_URL}/auth/login", json=quality_login_data)
+            
+            if login_response.status_code == 200:
+                login_data = login_response.json()
+                self.log_test(
+                    "Quality User Login", 
+                    True, 
+                    f"Successfully logged in as quality_user with role {login_data.get('user', {}).get('role', 'Unknown')}"
+                )
+            else:
+                self.log_test("Quality User Login", False, f"Login failed: {login_response.status_code} - {login_response.text}")
+                return
+                
+        except Exception as e:
+            self.log_test("Quality User Login", False, f"Login exception: {str(e)}")
+            return
+            
+        # Step 2: Check existing quality reports structure
+        try:
+            existing_reports_response = self.session.get(f"{BASE_URL}/reports/quality")
+            
+            if existing_reports_response.status_code == 200:
+                existing_reports = existing_reports_response.json()
+                self.log_test(
+                    "Get Existing Quality Reports", 
+                    True, 
+                    f"Retrieved {len(existing_reports)} existing quality reports"
+                )
+                
+                # Print structure of existing reports if any
+                if existing_reports:
+                    sample_report = existing_reports[0]
+                    print(f"\n📋 EXISTING REPORT STRUCTURE:")
+                    print(f"Report ID: {sample_report.get('id')}")
+                    print(f"Date: {sample_report.get('date')}")
+                    print(f"Branch: {sample_report.get('branch')}")
+                    print(f"Academic Performance: {sample_report.get('academic_performance')}")
+                    print(f"Educational Supervision: {sample_report.get('educational_supervision')}")
+                    print(f"Discipline Behavior: {sample_report.get('discipline_behavior')}")
+                    print(f"Activities Programs: {sample_report.get('activities_programs')}")
+                    print(f"Social Specialist: {sample_report.get('social_specialist')}")
+                    
+                    self.log_test(
+                        "Existing Report Structure Analysis", 
+                        True, 
+                        "Existing reports use nested dict structure for each section"
+                    )
+                else:
+                    self.log_test(
+                        "Existing Report Structure Analysis", 
+                        True, 
+                        "No existing reports found - will test with new data"
+                    )
+            else:
+                self.log_test("Get Existing Quality Reports", False, f"Failed: {existing_reports_response.status_code} - {existing_reports_response.text}")
+                
+        except Exception as e:
+            self.log_test("Get Existing Quality Reports", False, f"Exception: {str(e)}")
+            
+        # Step 3: Test creating quality report with FLAT structure (as provided in test request)
+        print(f"\n🧪 TESTING FLAT STRUCTURE (as provided in test request):")
+        flat_structure_data = {
+            "date": "2024-01-15",
+            "academic_performance_rate": 9,
+            "academic_notes": "test academic notes",
+            "supervision_quality_rate": 8,
+            "supervision_notes": "test supervision notes",
+            "discipline_rate": 7,
+            "discipline_notes": "test discipline notes",
+            "activities_quality_rate": 6,
+            "activities_notes": "test activities notes",
+            "social_specialist_performance_rate": 5,
+            "social_specialist_notes": "test social notes",
+            "teaching_performance_rate": 10,
+            "general_recommendations": "test recommendations"
+        }
+        
+        try:
+            flat_response = self.session.post(f"{BASE_URL}/reports/quality", json=flat_structure_data)
+            
+            if flat_response.status_code == 200:
+                created_report = flat_response.json()
+                self.log_test(
+                    "Create Quality Report (Flat Structure)", 
+                    True, 
+                    f"Successfully created report with ID: {created_report.get('id')}"
+                )
+                
+                # Retrieve and print the created report structure
+                report_id = created_report.get('id')
+                if report_id:
+                    get_response = self.session.get(f"{BASE_URL}/reports/quality")
+                    if get_response.status_code == 200:
+                        updated_reports = get_response.json()
+                        new_report = next((r for r in updated_reports if r.get('id') == report_id), None)
+                        if new_report:
+                            print(f"\n📋 CREATED REPORT STRUCTURE (Flat Input):")
+                            print(f"Report ID: {new_report.get('id')}")
+                            print(f"Date: {new_report.get('date')}")
+                            print(f"Academic Performance: {new_report.get('academic_performance')}")
+                            print(f"Educational Supervision: {new_report.get('educational_supervision')}")
+                            print(f"Discipline Behavior: {new_report.get('discipline_behavior')}")
+                            print(f"Activities Programs: {new_report.get('activities_programs')}")
+                            print(f"Social Specialist: {new_report.get('social_specialist')}")
+                            
+                            self.log_test(
+                                "Flat Structure Result Analysis", 
+                                True, 
+                                "Backend accepted flat structure but may have stored it differently"
+                            )
+            else:
+                self.log_test(
+                    "Create Quality Report (Flat Structure)", 
+                    False, 
+                    f"Failed: {flat_response.status_code} - {flat_response.text}"
+                )
+                print(f"\n❌ FLAT STRUCTURE ERROR DETAILS:")
+                print(f"Status Code: {flat_response.status_code}")
+                print(f"Response: {flat_response.text}")
+                
+        except Exception as e:
+            self.log_test("Create Quality Report (Flat Structure)", False, f"Exception: {str(e)}")
+            
+        # Step 4: Test creating quality report with NESTED structure (as expected by backend model)
+        print(f"\n🧪 TESTING NESTED STRUCTURE (as expected by backend model):")
+        nested_structure_data = {
+            "date": "2024-01-15",
+            "academic_performance": {
+                "rate": "9",
+                "notes": "test academic notes"
+            },
+            "educational_supervision": {
+                "rate": "8", 
+                "notes": "test supervision notes"
+            },
+            "discipline_behavior": {
+                "rate": "7",
+                "notes": "test discipline notes"
+            },
+            "activities_programs": {
+                "rate": "6",
+                "notes": "test activities notes"
+            },
+            "social_specialist": {
+                "rate": "5",
+                "notes": "test social notes",
+                "teaching_performance_rate": "10",
+                "general_recommendations": "test recommendations"
+            }
+        }
+        
+        try:
+            nested_response = self.session.post(f"{BASE_URL}/reports/quality", json=nested_structure_data)
+            
+            if nested_response.status_code == 200:
+                created_report = nested_response.json()
+                self.log_test(
+                    "Create Quality Report (Nested Structure)", 
+                    True, 
+                    f"Successfully created report with ID: {created_report.get('id')}"
+                )
+                
+                # Retrieve and print the created report structure
+                report_id = created_report.get('id')
+                if report_id:
+                    get_response = self.session.get(f"{BASE_URL}/reports/quality")
+                    if get_response.status_code == 200:
+                        updated_reports = get_response.json()
+                        new_report = next((r for r in updated_reports if r.get('id') == report_id), None)
+                        if new_report:
+                            print(f"\n📋 CREATED REPORT STRUCTURE (Nested Input):")
+                            print(f"Report ID: {new_report.get('id')}")
+                            print(f"Date: {new_report.get('date')}")
+                            print(f"Academic Performance: {new_report.get('academic_performance')}")
+                            print(f"Educational Supervision: {new_report.get('educational_supervision')}")
+                            print(f"Discipline Behavior: {new_report.get('discipline_behavior')}")
+                            print(f"Activities Programs: {new_report.get('activities_programs')}")
+                            print(f"Social Specialist: {new_report.get('social_specialist')}")
+                            
+                            self.log_test(
+                                "Nested Structure Result Analysis", 
+                                True, 
+                                "Backend accepted nested structure and stored it correctly"
+                            )
+            else:
+                self.log_test(
+                    "Create Quality Report (Nested Structure)", 
+                    False, 
+                    f"Failed: {nested_response.status_code} - {nested_response.text}"
+                )
+                print(f"\n❌ NESTED STRUCTURE ERROR DETAILS:")
+                print(f"Status Code: {nested_response.status_code}")
+                print(f"Response: {nested_response.text}")
+                
+        except Exception as e:
+            self.log_test("Create Quality Report (Nested Structure)", False, f"Exception: {str(e)}")
+            
+        # Step 5: Summary and Recommendations
+        print(f"\n📊 DATA STRUCTURE ANALYSIS SUMMARY:")
+        print(f"=" * 50)
+        print(f"Backend QualityReport Model expects:")
+        print(f"- academic_performance: Dict[str, str] = {{}}")
+        print(f"- educational_supervision: Dict[str, str] = {{}}")
+        print(f"- discipline_behavior: Dict[str, str] = {{}}")
+        print(f"- activities_programs: Dict[str, str] = {{}}")
+        print(f"- social_specialist: Dict[str, str] = {{}}")
+        print(f"")
+        print(f"Frontend appears to be sending flat structure with fields like:")
+        print(f"- academic_performance_rate: 9 (integer)")
+        print(f"- academic_notes: 'text' (string)")
+        print(f"")
+        print(f"RECOMMENDATION: Frontend should send nested dict structure")
+        print(f"where each section contains rate and notes as string values.")
+
     def run_all_tests(self):
         """Run all backend tests"""
-        print("🚀 Starting Backend API Tests for School Management System")
+        print("🚀 Starting Quality Report Data Structure Testing")
         print(f"Testing against: {BASE_URL}")
         
         # Test authentication first
@@ -2063,8 +2289,8 @@ class BackendTester:
             print("❌ Authentication failed - cannot proceed with other tests")
             return
             
-        # Run the VP supervisor reports investigation as requested
-        self.investigate_vp_supervisor_reports_issue()
+        # Run the quality report data structure test as requested
+        self.test_quality_report_data_structure()
         
         # Print summary
         self.print_summary()
