@@ -1804,7 +1804,7 @@ const QualityDashboard = () => {
                             تقرير {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                           </h4>
                           <p className="text-sm text-gray-500">
-                            إجمالي الحالات: {report.psychological_cases + report.academic_cases + report.behavioral_cases}
+                            معدل الأداء التدريسي: {report.teaching_performance_rate || 0}/10
                           </p>
                         </div>
 
