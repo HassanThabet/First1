@@ -187,12 +187,23 @@ const QualityDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Convert empty strings to numbers for rating fields
+      const dataToSubmit = {
+        ...formData,
+        academic_performance_rate: formData.academic_performance_rate ? parseInt(formData.academic_performance_rate) : 0,
+        supervision_quality_rate: formData.supervision_quality_rate ? parseInt(formData.supervision_quality_rate) : 0,
+        discipline_rate: formData.discipline_rate ? parseInt(formData.discipline_rate) : 0,
+        activities_quality_rate: formData.activities_quality_rate ? parseInt(formData.activities_quality_rate) : 0,
+        social_specialist_performance_rate: formData.social_specialist_performance_rate ? parseInt(formData.social_specialist_performance_rate) : 0,
+        teaching_performance_rate: formData.teaching_performance_rate ? parseInt(formData.teaching_performance_rate) : 0
+      };
+      
       if (editingQualityReport) {
-        await axios.put(`${API}/reports/quality/${editingQualityReport.id}`, formData);
+        await axios.put(`${API}/reports/quality/${editingQualityReport.id}`, dataToSubmit);
         toast.success("تم تحديث التقرير بنجاح");
         setEditingQualityReport(null);
       } else {
-        await axios.post(`${API}/reports/quality`, formData);
+        await axios.post(`${API}/reports/quality`, dataToSubmit);
         toast.success("تم إنشاء التقرير بنجاح");
       }
       fetchQualityReports();
