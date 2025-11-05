@@ -690,8 +690,8 @@ async def get_activities_reports(user_id: Optional[str] = None, branch: Optional
     
     if current_user["role"] == "activities":
         query["user_id"] = current_user["id"]
-    elif current_user["role"] in ["director", "quality"]:
-        # Directors with "both" branch can see all reports, otherwise filter by branch
+    elif current_user["role"] in ["chairman", "director", "quality"]:
+        # Chairman/Directors with "both" branch can see all reports, otherwise filter by branch
         if current_user["branch"] != "both":
             query["branch"] = current_user["branch"]
     
