@@ -252,20 +252,21 @@ const QualityDashboard = () => {
 
   const handleEdit = (report) => {
     setEditingQualityReport(report);
+    // Convert nested dict structure from backend to flat structure for form
     setFormData({
       date: report.date,
-      academic_performance_rate: report.academic_performance_rate?.toString() || "",
-      academic_notes: report.academic_notes || "",
-      supervision_quality_rate: report.supervision_quality_rate?.toString() || "",
-      supervision_notes: report.supervision_notes || "",
-      discipline_rate: report.discipline_rate?.toString() || "",
-      discipline_notes: report.discipline_notes || "",
-      activities_quality_rate: report.activities_quality_rate?.toString() || "",
-      activities_notes: report.activities_notes || "",
-      social_specialist_performance_rate: report.social_specialist_performance_rate?.toString() || "",
-      social_specialist_notes: report.social_specialist_notes || "",
-      teaching_performance_rate: report.teaching_performance_rate?.toString() || "",
-      general_recommendations: report.general_recommendations || ""
+      academic_performance_rate: report.academic_performance?.rate || "",
+      academic_notes: report.academic_performance?.notes || "",
+      supervision_quality_rate: report.educational_supervision?.rate || "",
+      supervision_notes: report.educational_supervision?.notes || "",
+      discipline_rate: report.discipline_behavior?.rate || "",
+      discipline_notes: report.discipline_behavior?.notes || "",
+      activities_quality_rate: report.activities_programs?.rate || "",
+      activities_notes: report.activities_programs?.notes || "",
+      social_specialist_performance_rate: report.social_specialist?.rate || "",
+      social_specialist_notes: report.social_specialist?.notes || "",
+      teaching_performance_rate: report.social_specialist?.teaching_performance_rate || "",
+      general_recommendations: report.social_specialist?.general_recommendations || ""
     });
     setActiveTab("quality-create");
   };
