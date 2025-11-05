@@ -1773,7 +1773,7 @@ const QualityDashboard = () => {
                     min="1"
                     max="10"
                     value={formData.academic_performance_rate}
-                    onChange={(e) => setFormData({ ...formData, academic_performance_rate: parseInt(e.target.value) || 5 })}
+                    onChange={(e) => setFormData({ ...formData, academic_performance_rate: e.target.value ? parseInt(e.target.value) : "" })}
                     required
                   />
                 </div>
