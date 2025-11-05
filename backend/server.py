@@ -1078,8 +1078,8 @@ async def get_teacher_evaluations(branch: Optional[str] = None, current_user: di
 # Clean orphaned reports - Delete reports with non-existent user_ids
 @api_router.post("/admin/clean-orphaned-reports")
 async def clean_orphaned_reports(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="صلاحيات المسؤول فقط")
+    if current_user["role"] not in ["admin", "chairman"]:
+        raise HTTPException(status_code=403, detail="صلاحيات المسؤول أو رئيس المجلس فقط")
     
     # Get all valid user IDs
     all_users = await db.users.find().to_list(length=None)
