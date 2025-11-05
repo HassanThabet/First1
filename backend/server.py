@@ -85,17 +85,17 @@ class SupervisorReport(BaseModel):
     user_id: str
     branch: str
     date: str
-    student_discipline: int
+    student_discipline: float  # Allow float for decimal ratings
     student_discipline_notes: Optional[str] = None
-    classroom_cleanliness: int
+    classroom_cleanliness: float  # Allow float for decimal ratings
     classroom_cleanliness_notes: Optional[str] = None
-    teacher_attendance_rate: int
+    teacher_attendance_rate: float  # Allow float for decimal ratings
     late_teachers: List[Dict[str, Any]] = []
     teacher_attendance_notes: Optional[str] = None
     student_movement: Optional[str] = None
     student_movement_classes: List[str] = []
     student_movement_notes: Optional[str] = None
-    general_behavior: int
+    general_behavior: float  # Allow float for decimal ratings
     general_notes: Optional[str] = None
     incidents: List[Dict[str, str]] = []
     absent_teachers: List[Dict[str, Any]] = []
