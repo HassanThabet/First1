@@ -499,7 +499,7 @@ const QualityDashboard = () => {
         pageMargins: [40, 60, 40, 60]
       };
 
-      pdfMake.vfs = pdfMakeFonts.pdfMake.vfs;
+      pdfMake.vfs = pdfMakeFonts;
       pdfMake.fonts = {
         Cairo: {
           normal: 'Cairo-Regular.ttf',
