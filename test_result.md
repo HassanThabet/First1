@@ -453,7 +453,7 @@ frontend:
 
   - task: "Director Dashboard with modal view and filtering"
     implemented: true
-    working: false
+    working: "NA"
     file: "frontend/src/pages/DirectorDashboard.js"
     stuck_count: 3
     priority: "high"
