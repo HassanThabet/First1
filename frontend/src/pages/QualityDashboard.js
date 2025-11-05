@@ -187,15 +187,31 @@ const QualityDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Convert string values to numbers for rating fields
+      // Convert flat structure to nested dict structure expected by backend
       const dataToSubmit = {
-        ...formData,
-        academic_performance_rate: parseInt(formData.academic_performance_rate) || 0,
-        supervision_quality_rate: parseInt(formData.supervision_quality_rate) || 0,
-        discipline_rate: parseInt(formData.discipline_rate) || 0,
-        activities_quality_rate: parseInt(formData.activities_quality_rate) || 0,
-        social_specialist_performance_rate: parseInt(formData.social_specialist_performance_rate) || 0,
-        teaching_performance_rate: parseInt(formData.teaching_performance_rate) || 0
+        date: formData.date,
+        academic_performance: {
+          rate: formData.academic_performance_rate?.toString() || "0",
+          notes: formData.academic_notes || ""
+        },
+        educational_supervision: {
+          rate: formData.supervision_quality_rate?.toString() || "0",
+          notes: formData.supervision_notes || ""
+        },
+        discipline_behavior: {
+          rate: formData.discipline_rate?.toString() || "0",
+          notes: formData.discipline_notes || ""
+        },
+        activities_programs: {
+          rate: formData.activities_quality_rate?.toString() || "0",
+          notes: formData.activities_notes || ""
+        },
+        social_specialist: {
+          rate: formData.social_specialist_performance_rate?.toString() || "0",
+          notes: formData.social_specialist_notes || "",
+          teaching_performance_rate: formData.teaching_performance_rate?.toString() || "0",
+          general_recommendations: formData.general_recommendations || ""
+        }
       };
       
       if (editingQualityReport) {
