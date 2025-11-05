@@ -1866,7 +1866,7 @@ const QualityDashboard = () => {
                     min="1"
                     max="10"
                     value={formData.activities_quality_rate}
-                    onChange={(e) => setFormData({ ...formData, activities_quality_rate: parseInt(e.target.value) || 5 })}
+                    onChange={(e) => setFormData({ ...formData, activities_quality_rate: e.target.value ? parseInt(e.target.value) : "" })}
                     required
                   />
                 </div>
