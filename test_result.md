@@ -483,6 +483,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "🔧 FIXED filterReportsByTimeOnly FUNCTION: The root cause was identified - filterReportsByTimeOnly function was returning users filtered by role instead of reports filtered by time. Replaced the entire function (lines 380-442) with correct implementation from QualityDashboard.js that properly filters reports by daily/weekly/monthly/custom date ranges. Applied same fix to ChairmanDashboard.js. Ready for frontend testing to verify statistics now display correctly."
+      - working: "NA"
+        agent: "main"
+        comment: "🔧 CRITICAL FIX - AUTHORIZATION ISSUE RESOLVED: Identified root cause of 401 errors across Director, Chairman, and Quality dashboards. The 'chairman' role was missing from authorization checks in ALL report endpoints. FIXED: Added 'chairman' to allowed roles list in 6 GET endpoints: /reports/supervisor (line 562), /reports/vice-principal (line 632), /reports/activities (line 693), /reports/educational-supervision (line 756), /reports/social-specialist (line 815), /reports/quality (line 878). Backend restarted successfully. This fix allows chairman role to access all reports just like director role. Ready for comprehensive backend testing to verify all three dashboards (Director, Chairman, Quality) can now fetch data without 401 errors."
 
   - task: "Chairman Dashboard with modal view and filtering"
     implemented: true
