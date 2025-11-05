@@ -2000,7 +2000,7 @@ const QualityDashboard = () => {
                     </div>
                   )}
 
-                  <div className="flex items-end">
+                  <div className="flex items-end gap-2">
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -2010,6 +2010,13 @@ const QualityDashboard = () => {
                       }}
                     >
                       إعادة تعيين
+                    </Button>
+                    <Button
+                      onClick={exportQualityReportsToPDF}
+                      className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700"
+                    >
+                      <FileDown className="w-4 h-4 ml-2" />
+                      تصدير PDF
                     </Button>
                   </div>
                 </div>
