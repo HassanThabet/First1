@@ -1122,6 +1122,43 @@ async def clean_orphaned_reports(current_user: dict = Depends(get_current_user))
         "total_deleted": total_deleted
     }
 
+# Clean empty quality reports - Delete quality reports with all empty sections
+@api_router.post("/admin/clean-empty-quality-reports")
+async def clean_empty_quality_reports(current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "chairman", "quality"]:
+        raise HTTPException(status_code=403, detail="صلاحيات المسؤول أو رئيس المجلس أو الجودة فقط")
+    
+    # Find all quality reports
+    all_reports = await db.quality_reports.find().to_list(length=None)
+    
+    empty_count = 0
+    
+    for report in all_reports:
+        # Check if all sections are empty
+        academic = report.get("academic_performance", {})
+        supervision = report.get("educational_supervision", {})
+        discipline = report.get("discipline_behavior", {})
+        activities = report.get("activities_programs", {})
+        social = report.get("social_specialist", {})
+        
+        # Consider a section empty if it has no rate or the rate is empty string
+        is_academic_empty = not academic or not academic.get("rate") or academic.get("rate") == ""
+        is_supervision_empty = not supervision or not supervision.get("rate") or supervision.get("rate") == ""
+        is_discipline_empty = not discipline or not discipline.get("rate") or discipline.get("rate") == ""
+        is_activities_empty = not activities or not activities.get("rate") or activities.get("rate") == ""
+        is_social_empty = not social or not social.get("rate") or social.get("rate") == ""
+        
+        # If all sections are empty, delete the report
+        if (is_academic_empty and is_supervision_empty and is_discipline_empty and 
+            is_activities_empty and is_social_empty):
+            await db.quality_reports.delete_one({"id": report["id"]})
+            empty_count += 1
+    
+    return {
+        "message": f"تم حذف {empty_count} تقرير جودة فارغ بنجاح",
+        "total_deleted": empty_count
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
