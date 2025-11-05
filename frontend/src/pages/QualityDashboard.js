@@ -2214,12 +2214,12 @@ const QualityDashboard = () => {
                       <CardContent className="pt-4">
                         <div className="flex items-center justify-between mb-3">
                           <span className="font-semibold">التقييم:</span>
-                          <span className="text-2xl font-bold text-orange-600">{selectedQualityReport.discipline_rate}/10</span>
+                          <span className="text-2xl font-bold text-orange-600">{selectedQualityReport.discipline_behavior?.rate || 0}/10</span>
                         </div>
-                        {selectedQualityReport.discipline_notes && (
+                        {selectedQualityReport.discipline_behavior?.notes && (
                           <div className="p-3 bg-orange-50 rounded">
                             <div className="text-xs font-semibold text-orange-800 mb-1">الملاحظات:</div>
-                            <p className="text-sm text-gray-700">{selectedQualityReport.discipline_notes}</p>
+                            <p className="text-sm text-gray-700">{selectedQualityReport.discipline_behavior.notes}</p>
                           </div>
                         )}
                       </CardContent>
