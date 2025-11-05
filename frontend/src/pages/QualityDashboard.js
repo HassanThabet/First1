@@ -2193,12 +2193,12 @@ const QualityDashboard = () => {
                       <CardContent className="pt-4">
                         <div className="flex items-center justify-between mb-3">
                           <span className="font-semibold">التقييم:</span>
-                          <span className="text-2xl font-bold text-green-600">{selectedQualityReport.supervision_quality_rate}/10</span>
+                          <span className="text-2xl font-bold text-green-600">{selectedQualityReport.educational_supervision?.rate || 0}/10</span>
                         </div>
-                        {selectedQualityReport.supervision_notes && (
+                        {selectedQualityReport.educational_supervision?.notes && (
                           <div className="p-3 bg-green-50 rounded">
                             <div className="text-xs font-semibold text-green-800 mb-1">الملاحظات:</div>
-                            <p className="text-sm text-gray-700">{selectedQualityReport.supervision_notes}</p>
+                            <p className="text-sm text-gray-700">{selectedQualityReport.educational_supervision.notes}</p>
                           </div>
                         )}
                       </CardContent>
