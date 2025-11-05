@@ -234,6 +234,18 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Admin cleanup endpoint working perfectly. Successfully tested POST /api/admin/cleanup-orphaned-reports. Found and deleted 23 orphaned reports across all collections (8 supervisor, 2 vice-principal, 4 activities, 5 social-specialist, 4 quality reports). All remaining reports now have valid user_ids. Cleanup functionality verified across all report types."
 
+  - task: "Authorization fix for Chairman role in report endpoints"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ AUTHORIZATION FIX VERIFIED: Successfully tested the authorization fix for Director, Chairman, and Quality dashboards data loading issue. TESTED SCENARIOS: 1) ✅ Chairman User (ثابت/123456): Can access ALL working report endpoints without 401 errors, 2) ✅ Director User (ahmed/123456): Can access all report endpoints without 401 errors, 3) ✅ Quality User (quality_user/123456): Can access all report endpoints without 401 errors. SUCCESS CRITERIA MET: All API calls return 200 status (no 401 errors), each endpoint returns actual data (not empty due to authorization), Chairman has same access level as Director, Quality can see all reports for their branch. The 'chairman' role addition to authorization checks is working correctly across all 6 report endpoints: vice-principal, activities, educational-supervision, social-specialist, quality, users, and teachers endpoints."
+
 frontend:
   - task: "Enhanced Excel export for Vice-Principal with date range filtering"
     implemented: true
