@@ -875,8 +875,8 @@ async def get_quality_reports(user_id: Optional[str] = None, branch: Optional[st
     
     if current_user["role"] == "quality":
         query["user_id"] = current_user["id"]
-    elif current_user["role"] == "director":
-        # Directors with "both" branch can see all reports, otherwise filter by branch
+    elif current_user["role"] in ["chairman", "director"]:
+        # Chairman/Directors with "both" branch can see all reports, otherwise filter by branch
         if current_user["branch"] != "both":
             query["branch"] = current_user["branch"]
     
