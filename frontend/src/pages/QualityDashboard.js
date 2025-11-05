@@ -2959,4 +2959,4 @@ const QualityDashboard = () => {
   );
 };
 
-export default DirectorDashboard;
+export default QualityDashboard;
