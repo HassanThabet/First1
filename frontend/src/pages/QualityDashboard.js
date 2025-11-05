@@ -1928,7 +1928,7 @@ const QualityDashboard = () => {
                     min="1"
                     max="10"
                     value={formData.teaching_performance_rate}
-                    onChange={(e) => setFormData({ ...formData, teaching_performance_rate: parseInt(e.target.value) || 5 })}
+                    onChange={(e) => setFormData({ ...formData, teaching_performance_rate: e.target.value ? parseInt(e.target.value) : "" })}
                     required
                   />
                 </div>
