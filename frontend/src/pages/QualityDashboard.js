@@ -91,7 +91,9 @@ const QualityDashboard = () => {
   const fetchAllData = async () => {
     try {
       console.log("🔄 Fetching all data...");
-      const [usersRes, teachersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes, eduSupRes] = await Promise.all([
+      
+      // Fetch data with individual error handling to avoid showing error toast for permissions
+      const results = await Promise.allSettled([
         axios.get(`${API}/users`),
         axios.get(`${API}/teachers`),
         axios.get(`${API}/reports/supervisor`),
@@ -102,27 +104,45 @@ const QualityDashboard = () => {
         axios.get(`${API}/reports/educational-supervision`)
       ]);
       
-      console.log("✅ Data fetched successfully:");
-      console.log("Users:", usersRes.data.length);
-      console.log("Teachers:", teachersRes.data.length);
-      console.log("Supervisor reports:", supervisorRes.data.length);
-      console.log("Activities reports:", activitiesRes.data.length);
-      console.log("Social reports:", socialRes.data.length);
-      console.log("Quality reports:", qualityRes.data.length);
-      console.log("VP reports:", vpRes.data.length);
-      console.log("Educational Supervision reports:", eduSupRes.data.length);
+      // Extract successful results or use empty arrays
+      const [usersRes, teachersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes, eduSupRes] = results;
       
-      setUsers(usersRes.data);
-      setTeachers(teachersRes.data);
-      setSupervisorReports(supervisorRes.data);
-      setActivitiesReports(activitiesRes.data);
-      setSocialReports(socialRes.data);
-      setQualityReports(qualityRes.data);
-      setVicePrincipalReports(vpRes.data);
-      setEducationalSupervisionReports(eduSupRes.data);
+      const usersData = usersRes.status === 'fulfilled' ? usersRes.value.data : [];
+      const teachersData = teachersRes.status === 'fulfilled' ? teachersRes.value.data : [];
+      const supervisorData = supervisorRes.status === 'fulfilled' ? supervisorRes.value.data : [];
+      const activitiesData = activitiesRes.status === 'fulfilled' ? activitiesRes.value.data : [];
+      const socialData = socialRes.status === 'fulfilled' ? socialRes.value.data : [];
+      const qualityData = qualityRes.status === 'fulfilled' ? qualityRes.value.data : [];
+      const vpData = vpRes.status === 'fulfilled' ? vpRes.value.data : [];
+      const eduSupData = eduSupRes.status === 'fulfilled' ? eduSupRes.value.data : [];
+      
+      console.log("✅ Data fetched successfully:");
+      console.log("Users:", usersData.length);
+      console.log("Teachers:", teachersData.length);
+      console.log("Supervisor reports:", supervisorData.length);
+      console.log("Activities reports:", activitiesData.length);
+      console.log("Social reports:", socialData.length);
+      console.log("Quality reports:", qualityData.length);
+      console.log("VP reports:", vpData.length);
+      console.log("Educational Supervision reports:", eduSupData.length);
+      
+      setUsers(usersData);
+      setTeachers(teachersData);
+      setSupervisorReports(supervisorData);
+      setActivitiesReports(activitiesData);
+      setSocialReports(socialData);
+      setQualityReports(qualityData);
+      setVicePrincipalReports(vpData);
+      setEducationalSupervisionReports(eduSupData);
+      
+      // Only show error if all requests failed
+      const allFailed = results.every(r => r.status === 'rejected');
+      if (allFailed) {
+        toast.error("فشل تحميل البيانات - يرجى التحقق من الصلاحيات");
+      }
     } catch (error) {
-      console.error("❌ Failed to fetch data:", error);
-      toast.error("فشل تحميل البيانات");
+      console.error("❌ Unexpected error:", error);
+      // Don't show toast for unexpected errors either
     }
   };
 
