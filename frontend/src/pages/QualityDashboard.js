@@ -503,9 +503,21 @@ const QualityDashboard = () => {
       pdfMake.fonts = {
         Cairo: {
           normal: 'Cairo-Regular.ttf',
-          bold: 'Cairo-Bold.ttf',
+          bold: 'Cairo-Regular.ttf',
           italics: 'Cairo-Regular.ttf',
-          bolditalics: 'Cairo-Bold.ttf'
+          bolditalics: 'Cairo-Regular.ttf'
+        },
+        Roboto: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Regular.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Regular.ttf'
+        },
+        Nillima: {
+          normal: 'Cairo-Regular.ttf',
+          bold: 'Cairo-Regular.ttf',
+          italics: 'Cairo-Regular.ttf',
+          bolditalics: 'Cairo-Regular.ttf'
         }
       };
 
