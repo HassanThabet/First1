@@ -381,11 +381,11 @@ frontend:
 
   - task: "Quality Dashboard with modal view and filtering"
     implemented: true
-    working: true
+    working: "NA"
     file: "frontend/src/pages/QualityDashboard.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
