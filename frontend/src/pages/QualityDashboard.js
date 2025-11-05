@@ -1819,7 +1819,7 @@ const QualityDashboard = () => {
                     min="1"
                     max="10"
                     value={formData.supervision_quality_rate}
-                    onChange={(e) => setFormData({ ...formData, supervision_quality_rate: e.target.value ? parseInt(e.target.value) : "" })}
+                    onChange={(e) => setFormData({ ...formData, supervision_quality_rate: e.target.value })}
                     required
                   />
                 </div>
