@@ -339,28 +339,28 @@ const QualityDashboard = () => {
           ['القسم', 'التقييم', 'الملاحظات'],
           [
             '📚 القسم الأكاديمي',
-            `${report.academic_performance_rate}/10`,
-            report.academic_notes || 'لا توجد ملاحظات'
+            `${report.academic_performance?.rate || 0}/10`,
+            report.academic_performance?.notes || 'لا توجد ملاحظات'
           ],
           [
             '👁️ قسم الإشراف',
-            `${report.supervision_quality_rate}/10`,
-            report.supervision_notes || 'لا توجد ملاحظات'
+            `${report.educational_supervision?.rate || 0}/10`,
+            report.educational_supervision?.notes || 'لا توجد ملاحظات'
           ],
           [
             '⚖️ قسم الانضباط',
-            `${report.discipline_rate}/10`,
-            report.discipline_notes || 'لا توجد ملاحظات'
+            `${report.discipline_behavior?.rate || 0}/10`,
+            report.discipline_behavior?.notes || 'لا توجد ملاحظات'
           ],
           [
             '🎨 قسم الأنشطة',
-            `${report.activities_quality_rate}/10`,
-            report.activities_notes || 'لا توجد ملاحظات'
+            `${report.activities_programs?.rate || 0}/10`,
+            report.activities_programs?.notes || 'لا توجد ملاحظات'
           ],
           [
             '💬 قسم الأخصائي الاجتماعي',
-            `${report.social_specialist_performance_rate}/10`,
-            report.social_specialist_notes || 'لا توجد ملاحظات'
+            `${report.social_specialist?.rate || 0}/10`,
+            report.social_specialist?.notes || 'لا توجد ملاحظات'
           ]
         ];
 
