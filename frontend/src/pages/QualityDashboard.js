@@ -195,16 +195,18 @@ const QualityDashboard = () => {
     setEditingQualityReport(report);
     setFormData({
       date: report.date,
-      psychological_cases: report.psychological_cases,
-      academic_cases: report.academic_cases,
-      behavioral_cases: report.behavioral_cases,
-      sessions_count: report.sessions_count,
-      families_contacted: report.families_contacted,
-      referrals_count: report.referrals_count,
-      follow_ups_count: report.follow_ups_count,
-      guidance_programs: report.guidance_programs || "",
-      challenges: report.challenges || "",
-      recommendations: report.recommendations || ""
+      academic_performance_rate: report.academic_performance_rate || 5,
+      academic_notes: report.academic_notes || "",
+      supervision_quality_rate: report.supervision_quality_rate || 5,
+      supervision_notes: report.supervision_notes || "",
+      discipline_rate: report.discipline_rate || 5,
+      discipline_notes: report.discipline_notes || "",
+      activities_quality_rate: report.activities_quality_rate || 5,
+      activities_notes: report.activities_notes || "",
+      social_specialist_performance_rate: report.social_specialist_performance_rate || 5,
+      social_specialist_notes: report.social_specialist_notes || "",
+      teaching_performance_rate: report.teaching_performance_rate || 5,
+      general_recommendations: report.general_recommendations || ""
     });
     setActiveTab("quality-create");
   };
