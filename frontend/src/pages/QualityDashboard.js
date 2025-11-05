@@ -18,14 +18,6 @@ import pdfMakeFonts from "../fonts/vfs_fonts";
 import TeacherProgressView from "../components/TeacherProgressView";
 import ActivitySupervisorsView from "../components/ActivitySupervisorsView";
 import CooperatingTeachersView from "../components/CooperatingTeachersView";
-import { 
-  createRTLTable, 
-  createStatsGrid, 
-  createSection,
-  createChartImage,
-  captureChartAsImage,
-  generatePDF
-} from "../utils/pdfTemplate";
 
 const QualityDashboard = () => {
   const { user } = useContext(AuthContext);
