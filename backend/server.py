@@ -1159,6 +1159,52 @@ async def clean_empty_quality_reports(current_user: dict = Depends(get_current_u
         "total_deleted": empty_count
     }
 
+# Clean test users and their reports
+@api_router.post("/admin/clean-test-users")
+async def clean_test_users(current_user: dict = Depends(get_current_user)):
+    if current_user["role"] not in ["admin", "chairman"]:
+        raise HTTPException(status_code=403, detail="صلاحيات المسؤول أو رئيس المجلس فقط")
+    
+    # Test user IDs to delete
+    test_user_ids = ["quality_user_001", "supervisor_001", "activities_001", "social_001"]
+    
+    deleted_users = 0
+    deleted_reports = {}
+    
+    # Collections to clean
+    report_collections = [
+        ("supervisor_reports", "تقارير المشرفين"),
+        ("vice_principal_reports", "تقارير الوكلاء"),
+        ("activities_reports", "تقارير الأنشطة"),
+        ("social_specialist_reports", "تقارير الأخصائي الاجتماعي"),
+        ("quality_reports", "تقارير الجودة"),
+        ("educational_supervision_reports", "تقارير الإشراف التربوي"),
+        ("director_reports", "تقارير المدير")
+    ]
+    
+    # Delete reports for test users
+    for collection_name, arabic_name in report_collections:
+        collection = db[collection_name]
+        
+        for user_id in test_user_ids:
+            result = await collection.delete_many({"user_id": user_id})
+            if result.deleted_count > 0:
+                if arabic_name not in deleted_reports:
+                    deleted_reports[arabic_name] = 0
+                deleted_reports[arabic_name] += result.deleted_count
+    
+    # Delete test users
+    for user_id in test_user_ids:
+        result = await db.users.delete_one({"id": user_id})
+        if result.deleted_count > 0:
+            deleted_users += 1
+    
+    return {
+        "message": f"تم حذف {deleted_users} مستخدم اختباري و تقاريرهم بنجاح",
+        "deleted_users": deleted_users,
+        "deleted_reports": deleted_reports
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
