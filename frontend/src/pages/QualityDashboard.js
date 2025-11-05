@@ -430,14 +430,14 @@ const QualityDashboard = () => {
         }
       });
 
-      // Summary statistics
+      // Summary statistics - Fixed data structure access
       const totalReports = reportsToExport.length;
-      const avgAcademic = (reportsToExport.reduce((sum, r) => sum + r.academic_performance_rate, 0) / totalReports).toFixed(1);
-      const avgSupervision = (reportsToExport.reduce((sum, r) => sum + r.supervision_quality_rate, 0) / totalReports).toFixed(1);
-      const avgDiscipline = (reportsToExport.reduce((sum, r) => sum + r.discipline_rate, 0) / totalReports).toFixed(1);
-      const avgActivities = (reportsToExport.reduce((sum, r) => sum + r.activities_quality_rate, 0) / totalReports).toFixed(1);
-      const avgSocial = (reportsToExport.reduce((sum, r) => sum + r.social_specialist_performance_rate, 0) / totalReports).toFixed(1);
-      const avgTeaching = (reportsToExport.reduce((sum, r) => sum + r.teaching_performance_rate, 0) / totalReports).toFixed(1);
+      const avgAcademic = (reportsToExport.reduce((sum, r) => sum + (parseFloat(r.academic_performance?.rate) || 0), 0) / totalReports).toFixed(1);
+      const avgSupervision = (reportsToExport.reduce((sum, r) => sum + (parseFloat(r.educational_supervision?.rate) || 0), 0) / totalReports).toFixed(1);
+      const avgDiscipline = (reportsToExport.reduce((sum, r) => sum + (parseFloat(r.discipline_behavior?.rate) || 0), 0) / totalReports).toFixed(1);
+      const avgActivities = (reportsToExport.reduce((sum, r) => sum + (parseFloat(r.activities_programs?.rate) || 0), 0) / totalReports).toFixed(1);
+      const avgSocial = (reportsToExport.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.rate) || 0), 0) / totalReports).toFixed(1);
+      const avgTeaching = (reportsToExport.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.teaching_performance_rate) || 0), 0) / totalReports).toFixed(1);
 
       content.push({
         text: '\nملخص الإحصائيات',
