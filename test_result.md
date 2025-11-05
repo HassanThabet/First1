@@ -489,11 +489,11 @@ frontend:
 
   - task: "Chairman Dashboard with modal view and filtering"
     implemented: true
-    working: true
+    working: "NA"
     file: "frontend/src/pages/ChairmanDashboard.js"
     stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
+    priority: "high"
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
