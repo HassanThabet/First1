@@ -2029,6 +2029,66 @@ const DirectorDashboard = () => {
                 </Card>
               )}
 
+              {/* Quality Reports Summary Statistics */}
+              {(reportTypeFilter === "all" || reportTypeFilter === "quality") && qualityReports.length > 0 && (() => {
+                const filteredQualityReports = filterReportsByTimeAndBranch([...qualityReports]);
+                if (filteredQualityReports.length === 0) return null;
+                
+                const avgAcademic = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.academic_performance?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+                const avgSupervision = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.educational_supervision?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+                const avgDiscipline = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.discipline_behavior?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+                const avgActivities = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.activities_programs?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+                const avgSocial = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+                const avgTeaching = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.teaching_performance_rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
+                const overallAvg = ((parseFloat(avgAcademic) + parseFloat(avgSupervision) + parseFloat(avgDiscipline) + parseFloat(avgActivities) + parseFloat(avgSocial)) / 5).toFixed(1);
+                
+                return (
+                  <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200">
+                    <CardHeader>
+                      <CardTitle className="text-xl flex items-center gap-2">
+                        🌟 ملخص إحصائيات الجودة
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                          <p className="text-sm text-gray-600 mb-1">إجمالي التقارير</p>
+                          <p className="text-3xl font-bold text-purple-600">{filteredQualityReports.length}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                          <p className="text-sm text-gray-600 mb-1">الأكاديمي</p>
+                          <p className="text-3xl font-bold text-green-600">{avgAcademic}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                          <p className="text-sm text-gray-600 mb-1">الإشراف</p>
+                          <p className="text-3xl font-bold text-blue-600">{avgSupervision}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                          <p className="text-sm text-gray-600 mb-1">الانضباط</p>
+                          <p className="text-3xl font-bold text-orange-600">{avgDiscipline}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                          <p className="text-sm text-gray-600 mb-1">الأنشطة</p>
+                          <p className="text-3xl font-bold text-pink-600">{avgActivities}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                          <p className="text-sm text-gray-600 mb-1">الأخصائي</p>
+                          <p className="text-3xl font-bold text-teal-600">{avgSocial}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm text-center">
+                          <p className="text-sm text-gray-600 mb-1">الأداء التدريسي</p>
+                          <p className="text-3xl font-bold text-indigo-600">{avgTeaching}</p>
+                        </div>
+                        <div className="bg-white p-4 rounded-lg shadow-sm text-center border-2 border-purple-300">
+                          <p className="text-sm text-gray-600 mb-1">المعدل العام</p>
+                          <p className="text-3xl font-bold text-purple-700">{overallAvg}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })()}
+
               {/* Overall Summary */}
               <Card className="bg-gradient-to-br from-blue-600 to-blue-700 text-white">
                 <CardContent className="p-6">
