@@ -208,6 +208,214 @@ const QualityDashboard = () => {
     }
   };
 
+  // Helper function to filter reports by time only
+  const filterReportsByTimeOnly = (reports) => {
+    const today = new Date();
+    
+    if (timeFilter === "daily") {
+      const todayStr = today.toISOString().split('T')[0];
+      return reports.filter(r => {
+        if (r.week_start) {
+          const weekStart = new Date(r.week_start);
+          const weekEnd = new Date(r.week_end);
+          const todayDate = new Date(todayStr);
+          return todayDate >= weekStart && todayDate <= weekEnd;
+        }
+        return r.date === todayStr;
+      });
+    } else if (timeFilter === "weekly") {
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4);
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
+        }
+        const reportDate = new Date(r.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    } else if (timeFilter === "monthly") {
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          return reportWeekStart.getMonth() === currentMonth && reportWeekStart.getFullYear() === currentYear;
+        }
+        const reportDate = new Date(r.date);
+        return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
+      });
+    } else if (timeFilter === "custom" && customStartDate && customEndDate) {
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      end.setHours(23, 59, 59, 999);
+      
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          return (reportWeekStart <= end && reportWeekEnd >= start);
+        }
+        const reportDate = new Date(r.date);
+        return reportDate >= start && reportDate <= end;
+      });
+    }
+    
+    return reports;
+  };
+
+  // Helper function to filter by time and branch
+  const filterReportsByTimeAndBranch = (reports) => {
+    let filtered = filterReportsByTimeOnly(reports);
+    
+    // Only apply branch filter if user has branch="both" and branchFilter is not "all"
+    if (user && user.branch === "both" && branchFilter !== "all") {
+      filtered = filtered.filter(r => r.branch === branchFilter);
+    }
+    
+    return filtered;
+  };
+
+  // Calculate overall statistics
+  const getOverallStatistics = () => {
+    let filteredSupervisorReports = filterReportsByTimeAndBranch([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeAndBranch([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeAndBranch([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeAndBranch([...qualityReports]);
+    let filteredVPReports = filterReportsByTimeAndBranch([...vicePrincipalReports]);
+
+    // Supervisor statistics
+    const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
+    // Get absent teachers from VP reports instead of supervisor reports
+    const totalAbsentTeachers = filteredVPReports.reduce((sum, r) => {
+      if (r.absent_teachers && Array.isArray(r.absent_teachers)) {
+        return sum + r.absent_teachers.length;
+      }
+      return sum;
+    }, 0);
+    const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
+    const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+    const totalAbsentStudents = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
+    
+    const avgDiscipline = filteredSupervisorReports.length > 0 ? 
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.student_discipline || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgCleanliness = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.classroom_cleanliness || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgAttendance = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.teacher_attendance_rate || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgBehavior = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.general_behavior || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+
+    // Activities statistics
+    const totalActivities = filteredActivitiesReports.reduce((sum, r) => sum + (r.activities?.length || 0), 0);
+    const totalActivitiesParticipants = filteredActivitiesReports.reduce((sum, r) => {
+      return sum + (r.activities || []).reduce((aSum, a) => aSum + (a.participants_count || 0), 0);
+    }, 0);
+    const avgActivitiesInteraction = filteredActivitiesReports.length > 0 ? 
+      (filteredActivitiesReports.reduce((sum, r) => {
+        const activities = r.activities || [];
+        const avgInteraction = activities.length > 0 ? 
+          activities.reduce((aSum, a) => aSum + (a.interaction_rate || 0), 0) / activities.length : 0;
+        return sum + avgInteraction;
+      }, 0) / filteredActivitiesReports.length).toFixed(1) : 0;
+
+    // Social Specialist statistics
+    const totalPsychologicalCases = filteredSocialReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademicCases = filteredSocialReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioralCases = filteredSocialReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalStudentCases = totalPsychologicalCases + totalAcademicCases + totalBehavioralCases;
+    const totalSessions = filteredSocialReports.reduce((sum, r) => sum + (r.sessions_count || 0), 0);
+    const totalFamilyContacts = filteredSocialReports.reduce((sum, r) => sum + (r.family_contacts || 0), 0);
+
+    // Quality statistics
+    const totalQualityVisits = filteredQualityReports.length;
+    const avgQualityTeachingRate = filteredQualityReports.length > 0 ?
+      (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
+
+    return {
+      totalLateTeachers,
+      totalAbsentTeachers,
+      totalCoveringTeachers,
+      totalIncidents,
+      totalAbsentStudents,
+      avgDiscipline,
+      avgCleanliness,
+      avgAttendance,
+      avgBehavior,
+      totalActivities,
+      totalActivitiesParticipants,
+      avgActivitiesInteraction,
+      totalStudentCases,
+      totalPsychologicalCases,
+      totalAcademicCases,
+      totalBehavioralCases,
+      totalSessions,
+      totalFamilyContacts,
+      totalQualityVisits,
+      avgQualityTeachingRate,
+      supervisorReportsCount: filteredSupervisorReports.length,
+      activitiesReportsCount: filteredActivitiesReports.length,
+      socialReportsCount: filteredSocialReports.length,
+      qualityReportsCount: filteredQualityReports.length,
+      totalAllReports: filteredSupervisorReports.length + filteredActivitiesReports.length + 
+                       filteredSocialReports.length + filteredQualityReports.length
+    };
+  };
+
+  // Get chart data for teachers
+  const getTeachersChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الغائبون', value: stats.totalAbsentTeachers, fill: '#ef4444' },
+      { name: 'المتأخرون', value: stats.totalLateTeachers, fill: '#f97316' },
+      { name: 'المغطون', value: stats.totalCoveringTeachers, fill: '#22c55e' }
+    ];
+  };
+
+  // Get performance chart data
+  const getPerformanceChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'انضباط الطلاب', value: parseFloat(stats.avgDiscipline) },
+      { name: 'نظافة الفصول', value: parseFloat(stats.avgCleanliness) },
+      { name: 'التزام المعلمين', value: parseFloat(stats.avgAttendance) },
+      { name: 'السلوك العام', value: parseFloat(stats.avgBehavior) }
+    ];
+  };
+
+  // Get activities chart data
+  const getActivitiesChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الأنشطة', value: stats.totalActivities },
+      { name: 'المشاركين', value: Math.floor(stats.totalActivitiesParticipants / 10) },
+      { name: 'التفاعل', value: parseFloat(stats.avgActivitiesInteraction) }
+    ];
+  };
+
+  // Get social cases chart data
+  const getSocialCasesChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'حالات نفسية', value: stats.totalPsychologicalCases, fill: '#ec4899' },
+      { name: 'حالات أكاديمية', value: stats.totalAcademicCases, fill: '#f59e0b' },
+      { name: 'حالات سلوكية', value: stats.totalBehavioralCases, fill: '#ef4444' }
+    ];
+  };
+
+  // Handle chart click to show teachers list
+  const handleChartClick = (type) => {
+    toast.info("يمكنك عرض قوائم المعلمين من خلال لوحة المدير");
+  };
+
   // Get merged reports based on period
   const getMergedReports = () => {
     let filtered = [...allReports];
