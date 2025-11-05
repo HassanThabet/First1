@@ -1,16 +1,17 @@
 <analysis>
-The AI engineer's work began by addressing a critical authorization issue causing 401 errors and empty dashboards for  and  roles. This involved modifying  to include  in relevant report endpoints. Following this, the user requested removing default '5' values from quality report fields, which necessitated extensive changes in  to clear initial state and update  and  logic. A significant challenge arose from a mismatch in data structure between frontend (flat) and backend (nested ) for quality reports, which was systematically resolved by modifying , , , and report display components in . The final outstanding issue is a  in PDF export functionality, specifically related to , which the engineer was actively investigating in  and .
+The AI engineer's trajectory began with resolving a critical authorization issue in  for  and  roles. This was followed by refining quality report fields in  to eliminate default '5' values and meticulously fixing a data structure mismatch between the frontend (flat) and backend (nested ) for quality reports. A persistent PDF export  related to  was diagnosed as an incorrect font virtual file system assignment in  and subsequently fixed. Upon user feedback, the display of detailed quality reports in  and  was enhanced to show all nested section details. A new  error then emerged during PDF export, traced to the  file only containing  while the  tries to use bold styles. The current focus is on standardizing font usage to  for all styles.
 </analysis>
 
 <product_requirements>
-The مدارس الفجر الجديد الأهلية application is a role-based school management system supporting Arabic (RTL), CRUD operations, data visualization, and Excel/PDF exports, including an Educational Supervision module. The primary goal was to enhance the Quality Dashboard and address data visibility issues across dashboards.
+The مدارس الفجر الجديد الأهلية application is a role-based school management system supporting Arabic (RTL), CRUD operations, data visualization, and Excel/PDF exports. The primary goal was to enhance the Quality Dashboard and address data visibility issues across dashboards.
 
-Key requirements addressed and implemented:
-1.  **Quality Dashboard Update**: Integrated  content into  while retaining إنشاء تقرير جودة and تقارير الجودة tabs. The الإحصائيات الإجمالية tab now displays Director's statistics.
-2.  **PDF Export Enhancement**: Added formatted PDF export for Quality reports, filterable by date (though still has a bug).
-3.  **Data Visibility & Authorization**: Resolved initial data not appearing issues by fixing 401 Unauthorized errors for  and  roles across dashboards.
-4.  **Quality Report Form Refinement**: Removed default values (5) from rating fields in the quality report creation/edit form to allow easier evaluation.
-5.  **Quality Report View/Edit Functionality**: Ensured that existing quality reports can be viewed and edited, with all saved data correctly pre-filled in the form and displayed in the modal.
+**Key requirements addressed and implemented:**
+1.  **Quality Dashboard Update**: Integrated  content into , retaining إنشاء تقرير جودة and تقارير الجودة tabs. The الإحصائيات الإجمالية tab now displays Director's statistics.
+2.  **PDF Export Enhancement**: Added formatted PDF export for Quality reports, filterable by date (still has a bug).
+3.  **Data Visibility & Authorization**: Resolved initial data not appearing by fixing 401 Unauthorized errors for  and  roles across dashboards.
+4.  **Quality Report Form Refinement**: Removed default values (5) from rating fields in the quality report creation/edit form.
+5.  **Quality Report View/Edit Functionality**: Ensured existing quality reports can be viewed and edited with all saved data correctly pre-filled and displayed.
+6.  **Detailed Quality Reports in Director/Chairman Dashboards**: User explicitly requested comprehensive quality reports in Director's and Chairman's dashboards, showing all detailed information including nested sections.
 </product_requirements>
 
 <key_technical_concepts>
@@ -33,26 +34,24 @@ The application uses a MERN-like stack: React for the frontend, FastAPI for the 
 -   :
     -   **Importance:** Contains the main logic, UI, and data handling for the Quality Dashboard, including report creation, editing, viewing, and PDF export.
     -   **Changes:**
-        -   Integrated much of  functionality, preserving Quality-specific tabs.
-        -   Replaced الإحصائيات الإجمالية tab with 's statistics.
-        -   Improved  error handling with .
-        -   Removed default  values from  hooks for report fields.
-        -   Removed  logic from  handlers for rating inputs to allow empty values.
-        -   Modified  to send nested report data (e.g., ) to match backend expectations.
-        -   Updated  to flatten nested report data from backend for pre-filling the edit form.
-        -   Adjusted  to process nested data received from the backend.
-        -   Updated the report display modal to correctly read and show nested report data (e.g., ).
-        -   Modified  to correctly read nested report data for PDF generation.
-        -   Fixed error messages for report creation/update.
-        -   Changed the submit button text based on edit/create mode.
+        -   Integrated  functionality, preserving Quality-specific tabs.
+        -   Removed default  values and  logic from  and  handlers for rating inputs.
+        -   Modified , , , and report display modal to correctly handle nested report data structures.
+        -   **Specific Fix:** Corrected the  assignment from  to  (specifically line 502 was updated to match line 760).
 -   :
     -   **Importance:** Defines API endpoints and implements role-based access control.
     -   **Changes:**
-        -   Modified several report endpoints (, , , , , ) to include  in the allowed roles list, resolving 401 errors for this role.
-        -   Updated the  Pydantic model to accept  for  instead of .
+        -   Modified several report endpoints to include  in the allowed roles list, resolving 401 errors.
+        -   Updated  Pydantic model to accept  for .
 -   :
-    -   **Importance:** Contains font definitions for PDF generation, especially for Arabic RTL support.
-    -   **Changes:** No direct changes were *completed* in the trajectory, but it was being examined due to .
+    -   **Importance:** Handles the display and logic for the Director's dashboard.
+    -   **Changes:** The quality report display modal (lines 2249-2267) was updated to show all detailed, nested report sections (academic performance, supervision, discipline, activities, social specialist) with their respective rates and notes, rather than just basic information.
+-   :
+    -   **Importance:** Handles the display and logic for the Chairman's dashboard.
+    -   **Changes:** Similar to , the quality report display modal was modified to show comprehensive details of quality reports.
+-   :
+    -   **Importance:** Contains font definitions for PDF generation, especially for Arabic RTL support using .
+    -   **Changes:** No direct changes were *completed*. Examination revealed it only contains , lacking , which is the root cause of the current font definition error during PDF export.
 </code_architecture>
 
 <pending_tasks>
@@ -60,14 +59,17 @@ The application uses a MERN-like stack: React for the frontend, FastAPI for the 
 -   Implement remember me functionality for authentication.
 -   Complete PDF export enhancement for , , and .
 -   Create a dedicated detailed page for .
--   Resolve the  issue preventing PDF export functionality on the Quality Dashboard.
+-   Resolve the  error preventing PDF export functionality on the Quality Dashboard.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was debugging a persistent issue with PDF export functionality from the Quality Dashboard. The user reported that PDF export was still failing despite previous fixes. The console logs indicated a , suggesting a problem with how  or its font virtual file system () is being initialized or accessed within . The engineer had already updated the  function to correctly read the newly structured nested report data for the PDF content itself. The current focus is on understanding why  is undefined, potentially involving issues in 's imports or 's export structure. The engineer was in the process of examining  to diagnose the root cause.
+Immediately before this summary request, the AI engineer successfully addressed two user requirements:
+1.  **PDF Export  TypeError Resolution**: The issue of  occurring during PDF export from the Quality Dashboard was diagnosed. The root cause was an inconsistent assignment of  in , specifically on line 502 where it was attempting to access a nested property () that did not exist. This was corrected by changing line 502 to directly assign  to , aligning with a correct usage already present on line 760.
+2.  **Detailed Quality Reports in Director/Chairman Dashboards**: The user requested that the Director's and Chairman's dashboards display more detailed information for quality reports, beyond the basic  and . The engineer modified the display modals in  (lines 2249-2267) and  to correctly parse and present all nested sections of the quality reports, including , , , , and , along with their respective rates and notes.
+
+After these fixes were implemented and the frontend restarted, a new error emerged upon attempting PDF export: . The engineer has investigated  and , determining that  only contains , while the PDF  attempts to use 'bold' styles, causing  to seek a non-existent font (likely defaulting to 'Nillima' or an undefined Cairo-Bold).
 </current_work>
 
 <optional_next_step>
-Investigate and resolve the  error affecting PDF export.
+Update  to configure  to use  for all font styles.
 </optional_next_step>
-
