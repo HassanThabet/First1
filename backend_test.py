@@ -2319,5 +2319,5 @@ class BackendTester:
 
 if __name__ == "__main__":
     tester = BackendTester()
-    # Run Ahmed admin test as requested
-    tester.run_ahmed_admin_test()
+    # Run quality report data structure test as requested
+    tester.run_all_tests()
