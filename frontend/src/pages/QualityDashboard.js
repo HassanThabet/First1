@@ -126,6 +126,14 @@ const QualityDashboard = () => {
       console.log("VP reports:", vpData.length);
       console.log("Educational Supervision reports:", eduSupData.length);
       
+      // Log any failed requests
+      results.forEach((result, index) => {
+        const names = ['users', 'teachers', 'supervisor', 'activities', 'social', 'quality', 'vice-principal', 'educational-supervision'];
+        if (result.status === 'rejected') {
+          console.error(`❌ Failed to fetch ${names[index]}:`, result.reason?.response?.status, result.reason?.message);
+        }
+      });
+      
       setUsers(usersData);
       setTeachers(teachersData);
       setSupervisorReports(supervisorData);
