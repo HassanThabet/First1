@@ -1955,7 +1955,7 @@ const QualityDashboard = () => {
             </Card>
 
             <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-cyan-500 to-blue-600">
-              {loading ? "جاري الإرسال..." : editingQualityReport ? "تحديث التقرير" : "إرسال التقرير"}
+              {loading ? "جاري الحفظ..." : editingQualityReport ? "تحديث التقرير" : "إنشاء تقرير جودة"}
             </Button>
 
             {editingQualityReport && (
