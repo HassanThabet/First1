@@ -131,9 +131,9 @@ backend:
 
   - task: "Supervisor Report API endpoints"
     implemented: true
-    working: true
+    working: false
     file: "backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -143,6 +143,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Supervisor Report API endpoints working correctly. Successfully tested POST /api/reports/supervisor (create), GET /api/reports/supervisor (retrieve with filtering), and PUT /api/reports/supervisor/{id} (update). All CRUD operations functional with proper authentication and authorization."
+      - working: false
+        agent: "testing"
+        comment: "❌ DATA CORRUPTION ISSUE: GET /api/reports/supervisor endpoint returning 500 Internal Server Error due to data validation errors. Database contains float values (8.5, 7.5) in integer fields (student_discipline, teacher_attendance_rate). This is a DATA INTEGRITY issue, not authorization. Pydantic model expects integers but database has floats. Authorization fix is working correctly - issue is corrupted data preventing endpoint from functioning."
 
   - task: "Activities Report API endpoints"
     implemented: true
