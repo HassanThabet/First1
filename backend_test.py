@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 import sys
 
 # Configuration
-BASE_URL = "https://alfajr-school.preview.emergentagent.com/api"
+BASE_URL = "https://school-dash-auth.preview.emergentagent.com/api"
 ADMIN_USERNAME = "مدارس الفجر الجديد الأهلية"
 ADMIN_PASSWORD = "2002002Hh"
 
