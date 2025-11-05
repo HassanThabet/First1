@@ -417,6 +417,12 @@ frontend:
       - working: true
         agent: "main"
         comment: "✅ AUTHORIZATION FIX VERIFIED - USER REPORTED ISSUE RESOLVED: Screenshot testing confirms Quality Dashboard now displays full statistics with real data (64 absent students, 3 covering teachers, 3 cooperating teachers, 2 absent teachers). All report data loading correctly after backend authorization fix."
+      - working: false
+        agent: "user"
+        comment: "USER REPORTED: PDF export from Quality Dashboard failing with error 'Font Nillima in style bold is not defined'. Despite vfs_fonts.js containing Cairo-Regular.ttf and font definitions pointing all styles to Cairo-Regular, pdfMake still tries to use bold styles with undefined font."
+      - working: "NA"
+        agent: "main"
+        comment: "FIXING: Standardizing font usage in QualityDashboard PDF export to use Cairo-Regular for all styles. Will ensure defaultStyle explicitly specifies font family and all font definitions map to Cairo-Regular.ttf to prevent pdfMake from seeking undefined bold variants."
 
   - task: "Educational Supervision Dashboard with modal view and filtering"
     implemented: false
