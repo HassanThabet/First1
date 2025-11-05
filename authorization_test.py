@@ -9,7 +9,7 @@ import json
 import sys
 
 # Configuration
-BASE_URL = "https://school-dash-auth.preview.emergentagent.com/api"
+BASE_URL = "https://quality-supervision.preview.emergentagent.com/api"
 
 # Test credentials as specified in the review request
 TEST_USERS = {
