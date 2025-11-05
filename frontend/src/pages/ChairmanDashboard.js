@@ -1218,17 +1218,25 @@ const ChairmanDashboard = () => {
           const avgTeaching = (filteredQualityReports.reduce((sum, r) => sum + (parseFloat(r.social_specialist?.teaching_performance_rate) || 0), 0) / filteredQualityReports.length).toFixed(1);
           const overallAvg = ((parseFloat(avgAcademic) + parseFloat(avgSupervision) + parseFloat(avgDiscipline) + parseFloat(avgActivities) + parseFloat(avgSocial)) / 5).toFixed(1);
           
-          const qualityStats = [
-            { label: 'إجمالي التقارير', value: filteredQualityReports.length.toString(), color: '#e9d5ff' },
-            { label: 'الأكاديمي', value: `${avgAcademic}/10`, color: '#d1fae5' },
-            { label: 'الإشراف', value: `${avgSupervision}/10`, color: '#dbeafe' },
-            { label: 'الانضباط', value: `${avgDiscipline}/10`, color: '#fed7aa' },
-            { label: 'الأنشطة', value: `${avgActivities}/10`, color: '#fce7f3' },
-            { label: 'الأخصائي', value: `${avgSocial}/10`, color: '#ccfbf1' },
-            { label: 'الأداء التدريسي', value: `${avgTeaching}/10`, color: '#e0e7ff' },
-            { label: 'المعدل العام', value: `${overallAvg}/10`, color: '#f3e8ff' }
-          ];
-          content.push(createSection('🌟 ملخص إحصائيات الجودة الشامل', createStatsGrid(qualityStats)));
+          // جدول إحصائيات الجودة
+          const qualityTable = createRTLTable(
+            [
+              { text: 'المؤشر', width: '*' },
+              { text: 'التقييم', width: 100 }
+            ],
+            [
+              ['📊 إجمالي تقارير الجودة', filteredQualityReports.length.toString()],
+              ['📚 متوسط التقييم الأكاديمي', `${avgAcademic}/10`],
+              ['👁️ متوسط تقييم الإشراف التربوي', `${avgSupervision}/10`],
+              ['⚖️ متوسط تقييم الانضباط', `${avgDiscipline}/10`],
+              ['🎨 متوسط تقييم الأنشطة', `${avgActivities}/10`],
+              ['💬 متوسط تقييم الأخصائي الاجتماعي', `${avgSocial}/10`],
+              ['👨‍🏫 متوسط الأداء التدريسي العام', `${avgTeaching}/10`],
+              [{ text: '⭐ المعدل العام', fontSize: 12, color: '#7c3aed' }, { text: `${overallAvg}/10`, fontSize: 12, color: '#7c3aed' }]
+            ],
+            { showRowNumbers: false }
+          );
+          content.push(createSection('🌟 ملخص إحصائيات الجودة الشامل', qualityTable));
         }
       }
       
