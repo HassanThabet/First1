@@ -1,0 +1,1583 @@
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
+import { API, AuthContext } from "../App";
+import DashboardLayout from "../components/DashboardLayout";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { toast } from "sonner";
+import { Eye, FileText, BarChart3, FileDown } from "lucide-react";
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import pdfMake from "@digicole/pdfmake-rtl";
+import pdfMakeFonts from "../fonts/vfs_fonts";
+import { 
+  createRTLTable, 
+  createStatsGrid, 
+  createSection,
+  createChartImage,
+  captureChartAsImage,
+  generatePDF
+} from "../utils/pdfTemplate";
+import TeacherProgressView from "../components/TeacherProgressView";
+import ActivitySupervisorsView from "../components/ActivitySupervisorsView";
+import CooperatingTeachersView from "../components/CooperatingTeachersView";
+
+const QualityDashboard = () => {
+  const { user } = useContext(AuthContext);
+  const [activeTab, setActiveTab] = useState("create");
+  const [reports, setReports] = useState([]);
+  const [allReports, setAllReports] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [editingReport, setEditingReport] = useState(null);
+
+  // Filters
+  const [viewMode, setViewMode] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
+  const [monthFilter, setMonthFilter] = useState("");
+  
+  // Statistics tab states (from DirectorDashboard)
+  const [supervisorReports, setSupervisorReports] = useState([]);
+  const [activitiesReports, setActivitiesReports] = useState([]);
+  const [socialReports, setSocialReports] = useState([]);
+  const [qualityReports, setQualityReports] = useState([]);
+  const [vicePrincipalReports, setVicePrincipalReports] = useState([]);
+  const [educationalSupervisionReports, setEducationalSupervisionReports] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [timeFilter, setTimeFilter] = useState("all");
+  const [customStartDate, setCustomStartDate] = useState("");
+  const [customEndDate, setCustomEndDate] = useState("");
+  const [reportTypeFilter, setReportTypeFilter] = useState("all");
+  const [selectedSpecificEmployee, setSelectedSpecificEmployee] = useState("all");
+  const [selectedVicePrincipal, setSelectedVicePrincipal] = useState("all");
+  const [branchFilter, setBranchFilter] = useState("all");
+  const [showDetailedReports, setShowDetailedReports] = useState(false);
+  const [showTeachersListModal, setShowTeachersListModal] = useState(false);
+  const [teachersListData, setTeachersListData] = useState({ title: "", teachers: [], type: "" });
+
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    psychological_cases: 0,
+    academic_cases: 0,
+    behavioral_cases: 0,
+    sessions_count: 0,
+    families_contacted: 0,
+    referrals_count: 0,
+    follow_ups_count: 0,
+    guidance_programs: "",
+    challenges: "",
+    recommendations: ""
+  });
+
+  useEffect(() => {
+    fetchReports();
+    fetchAllData();
+  }, []);
+
+  useEffect(() => {
+    filterReports();
+  }, [viewMode, dateFilter, monthFilter, allReports]);
+
+  const fetchReports = async () => {
+    try {
+      const res = await axios.get(`${API}/reports/quality`);
+      setAllReports(res.data);
+      setReports(res.data);
+    } catch (error) {
+      toast.error("فشل تحميل التقارير");
+    }
+  };
+
+  const fetchAllData = async () => {
+    try {
+      console.log("🔄 Fetching all data for statistics...");
+      const [usersRes, teachersRes, supervisorRes, activitiesRes, socialRes, qualityRes, vpRes, eduSupRes] = await Promise.all([
+        axios.get(`${API}/users`),
+        axios.get(`${API}/teachers`),
+        axios.get(`${API}/reports/supervisor`),
+        axios.get(`${API}/reports/activities`),
+        axios.get(`${API}/reports/social-specialist`),
+        axios.get(`${API}/reports/quality`),
+        axios.get(`${API}/reports/vice-principal`),
+        axios.get(`${API}/reports/educational-supervision`)
+      ]);
+      
+      console.log("✅ Data fetched successfully for statistics");
+      
+      setUsers(usersRes.data);
+      setTeachers(teachersRes.data);
+      setSupervisorReports(supervisorRes.data);
+      setActivitiesReports(activitiesRes.data);
+      setSocialReports(socialRes.data);
+      setQualityReports(qualityRes.data);
+      setVicePrincipalReports(vpRes.data);
+      setEducationalSupervisionReports(eduSupRes.data);
+    } catch (error) {
+      console.error("❌ Failed to fetch statistics data:", error);
+      toast.error("فشل تحميل بيانات الإحصائيات");
+    }
+  };
+
+  const filterReports = () => {
+    let filtered = [...allReports];
+
+    if (viewMode === "daily" && dateFilter) {
+      filtered = filtered.filter(r => r.date === dateFilter);
+    }
+
+    if (viewMode === "monthly" && monthFilter) {
+      const [year, month] = monthFilter.split('-');
+      filtered = filtered.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate.getFullYear() === parseInt(year) && 
+               reportDate.getMonth() === parseInt(month) - 1;
+      });
+    }
+
+    setReports(filtered);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      if (editingReport) {
+        await axios.put(`${API}/reports/quality/${editingReport.id}`, formData);
+        toast.success("تم تحديث التقرير بنجاح");
+        setEditingReport(null);
+      } else {
+        await axios.post(`${API}/reports/quality`, formData);
+        toast.success("تم إنشاء التقرير بنجاح");
+      }
+      fetchReports();
+      setActiveTab("reports");
+      setFormData({
+        date: new Date().toISOString().split('T')[0],
+        psychological_cases: 0,
+        academic_cases: 0,
+        behavioral_cases: 0,
+        sessions_count: 0,
+        families_contacted: 0,
+        referrals_count: 0,
+        follow_ups_count: 0,
+        guidance_programs: "",
+        challenges: "",
+        recommendations: ""
+      });
+    } catch (error) {
+      toast.error("فشل إنشاء التقرير");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (report) => {
+    setEditingReport(report);
+    setFormData({
+      date: report.date,
+      psychological_cases: report.psychological_cases,
+      academic_cases: report.academic_cases,
+      behavioral_cases: report.behavioral_cases,
+      sessions_count: report.sessions_count,
+      families_contacted: report.families_contacted,
+      referrals_count: report.referrals_count,
+      follow_ups_count: report.follow_ups_count,
+      guidance_programs: report.guidance_programs || "",
+      challenges: report.challenges || "",
+      recommendations: report.recommendations || ""
+    });
+    setActiveTab("create");
+  };
+
+  const handleDelete = async (reportId) => {
+    if (window.confirm("هل أنت متأكد من حذف هذا التقرير؟")) {
+      try {
+        await axios.delete(`${API}/reports/quality/${reportId}`);
+        toast.success("تم حذف التقرير بنجاح");
+        fetchReports();
+      } catch (error) {
+        toast.error("فشل حذف التقرير");
+      }
+    }
+  };
+
+  // Helper function to filter reports by time only
+  const filterReportsByTimeOnly = (reports) => {
+    const today = new Date();
+    
+    if (timeFilter === "daily") {
+      const todayStr = today.toISOString().split('T')[0];
+      return reports.filter(r => {
+        if (r.week_start) {
+          const weekStart = new Date(r.week_start);
+          const weekEnd = new Date(r.week_end);
+          const todayDate = new Date(todayStr);
+          return todayDate >= weekStart && todayDate <= weekEnd;
+        }
+        return r.date === todayStr;
+      });
+    } else if (timeFilter === "weekly") {
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4);
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
+        }
+        const reportDate = new Date(r.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    } else if (timeFilter === "monthly") {
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          return reportWeekStart.getMonth() === currentMonth && reportWeekStart.getFullYear() === currentYear;
+        }
+        const reportDate = new Date(r.date);
+        return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
+      });
+    } else if (timeFilter === "custom" && customStartDate && customEndDate) {
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      end.setHours(23, 59, 59, 999);
+      
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          return (reportWeekStart <= end && reportWeekEnd >= start);
+        }
+        const reportDate = new Date(r.date);
+        return reportDate >= start && reportDate <= end;
+      });
+    }
+    
+    return reports;
+  };
+
+  // Helper function to filter by time and branch
+  const filterReportsByTimeAndBranch = (reports) => {
+    let filtered = filterReportsByTimeOnly(reports);
+    
+    // Only apply branch filter if user has branch="both" and branchFilter is not "all"
+    if (user && user.branch === "both" && branchFilter !== "all") {
+      filtered = filtered.filter(r => r.branch === branchFilter);
+    }
+    
+    return filtered;
+  };
+
+  // Calculate overall statistics
+  const getOverallStatistics = () => {
+    let filteredSupervisorReports = filterReportsByTimeAndBranch([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeAndBranch([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeAndBranch([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeAndBranch([...qualityReports]);
+    let filteredVPReports = filterReportsByTimeAndBranch([...vicePrincipalReports]);
+
+    // Supervisor statistics
+    const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
+    // Get absent teachers from VP reports instead of supervisor reports
+    const totalAbsentTeachers = filteredVPReports.reduce((sum, r) => {
+      if (r.absent_teachers && Array.isArray(r.absent_teachers)) {
+        return sum + r.absent_teachers.length;
+      }
+      return sum;
+    }, 0);
+    const totalCoveringTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.covering_teachers?.length || 0), 0);
+    const totalIncidents = filteredSupervisorReports.reduce((sum, r) => sum + (r.incidents?.length || 0), 0);
+    const totalAbsentStudents = filteredSupervisorReports.reduce((sum, r) => sum + (r.absent_students_count || 0), 0);
+    
+    const avgDiscipline = filteredSupervisorReports.length > 0 ? 
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.student_discipline || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgCleanliness = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.classroom_cleanliness || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgAttendance = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.teacher_attendance_rate || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+    const avgBehavior = filteredSupervisorReports.length > 0 ?
+      (filteredSupervisorReports.reduce((sum, r) => sum + (r.general_behavior || 0), 0) / filteredSupervisorReports.length).toFixed(1) : 0;
+
+    // Activities statistics
+    const totalActivities = filteredActivitiesReports.reduce((sum, r) => sum + (r.activities?.length || 0), 0);
+    const totalActivitiesParticipants = filteredActivitiesReports.reduce((sum, r) => {
+      return sum + (r.activities || []).reduce((aSum, a) => aSum + (a.participants_count || 0), 0);
+    }, 0);
+    const avgActivitiesInteraction = filteredActivitiesReports.length > 0 ? 
+      (filteredActivitiesReports.reduce((sum, r) => {
+        const activities = r.activities || [];
+        const avgInteraction = activities.length > 0 ? 
+          activities.reduce((aSum, a) => aSum + (a.interaction_rate || 0), 0) / activities.length : 0;
+        return sum + avgInteraction;
+      }, 0) / filteredActivitiesReports.length).toFixed(1) : 0;
+
+    // Social Specialist statistics
+    const totalPsychologicalCases = filteredSocialReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademicCases = filteredSocialReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioralCases = filteredSocialReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalStudentCases = totalPsychologicalCases + totalAcademicCases + totalBehavioralCases;
+    const totalSessions = filteredSocialReports.reduce((sum, r) => sum + (r.sessions_count || 0), 0);
+    const totalFamilyContacts = filteredSocialReports.reduce((sum, r) => sum + (r.family_contacts || 0), 0);
+
+    // Quality statistics
+    const totalQualityVisits = filteredQualityReports.length;
+    const avgQualityTeachingRate = filteredQualityReports.length > 0 ?
+      (filteredQualityReports.reduce((sum, r) => sum + (r.teaching_performance_rate || 0), 0) / filteredQualityReports.length).toFixed(1) : 0;
+
+    return {
+      totalLateTeachers,
+      totalAbsentTeachers,
+      totalCoveringTeachers,
+      totalIncidents,
+      totalAbsentStudents,
+      avgDiscipline,
+      avgCleanliness,
+      avgAttendance,
+      avgBehavior,
+      totalActivities,
+      totalActivitiesParticipants,
+      avgActivitiesInteraction,
+      totalStudentCases,
+      totalPsychologicalCases,
+      totalAcademicCases,
+      totalBehavioralCases,
+      totalSessions,
+      totalFamilyContacts,
+      totalQualityVisits,
+      avgQualityTeachingRate,
+      supervisorReportsCount: filteredSupervisorReports.length,
+      activitiesReportsCount: filteredActivitiesReports.length,
+      socialReportsCount: filteredSocialReports.length,
+      qualityReportsCount: filteredQualityReports.length,
+      totalAllReports: filteredSupervisorReports.length + filteredActivitiesReports.length + 
+                       filteredSocialReports.length + filteredQualityReports.length
+    };
+  };
+
+  // Get chart data for teachers
+  const getTeachersChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الغائبون', value: stats.totalAbsentTeachers, fill: '#ef4444' },
+      { name: 'المتأخرون', value: stats.totalLateTeachers, fill: '#f97316' },
+      { name: 'المغطون', value: stats.totalCoveringTeachers, fill: '#22c55e' }
+    ];
+  };
+
+  // Get performance chart data
+  const getPerformanceChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'انضباط الطلاب', value: parseFloat(stats.avgDiscipline) },
+      { name: 'نظافة الفصول', value: parseFloat(stats.avgCleanliness) },
+      { name: 'التزام المعلمين', value: parseFloat(stats.avgAttendance) },
+      { name: 'السلوك العام', value: parseFloat(stats.avgBehavior) }
+    ];
+  };
+
+  // Get activities chart data
+  const getActivitiesChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'الأنشطة', value: stats.totalActivities },
+      { name: 'المشاركين', value: Math.floor(stats.totalActivitiesParticipants / 10) },
+      { name: 'التفاعل', value: parseFloat(stats.avgActivitiesInteraction) }
+    ];
+  };
+
+  // Get social cases chart data
+  const getSocialCasesChartData = () => {
+    const stats = getOverallStatistics();
+    return [
+      { name: 'حالات نفسية', value: stats.totalPsychologicalCases, fill: '#ec4899' },
+      { name: 'حالات أكاديمية', value: stats.totalAcademicCases, fill: '#f59e0b' },
+      { name: 'حالات سلوكية', value: stats.totalBehavioralCases, fill: '#ef4444' }
+    ];
+  };
+
+  // Handle chart click to show teachers list
+  const handleChartClick = (type) => {
+    toast.info("يمكنك عرض قوائم المعلمين من خلال لوحة المدير");
+  };
+
+  // Get merged reports based on period
+  const getMergedReports = () => {
+    let filtered = [...allReports];
+    const today = new Date();
+
+    if (mergedPeriod === "weekly") {
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4);
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      filtered = allReports.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    } else if (mergedPeriod === "monthly") {
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
+      filtered = allReports.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate.getMonth() === currentMonth && 
+               reportDate.getFullYear() === currentYear;
+      });
+    } else if (mergedPeriod === "custom" && mergedStartDate && mergedEndDate) {
+      const startDate = new Date(mergedStartDate);
+      const endDate = new Date(mergedEndDate);
+      endDate.setHours(23, 59, 59, 999);
+      
+      filtered = allReports.filter(r => {
+        const reportDate = new Date(r.date);
+        return reportDate >= startDate && reportDate <= endDate;
+      });
+    }
+
+    return filtered;
+  };
+
+  // Get merged statistics
+  const getMergedStatistics = () => {
+    const mergedReports = getMergedReports();
+    
+    const totalPsychological = mergedReports.reduce((sum, r) => sum + (r.psychological_cases || 0), 0);
+    const totalAcademic = mergedReports.reduce((sum, r) => sum + (r.academic_cases || 0), 0);
+    const totalBehavioral = mergedReports.reduce((sum, r) => sum + (r.behavioral_cases || 0), 0);
+    const totalCases = totalPsychological + totalAcademic + totalBehavioral;
+    
+    const totalSessions = mergedReports.reduce((sum, r) => sum + (r.sessions_count || 0), 0);
+    const totalFamilies = mergedReports.reduce((sum, r) => sum + (r.families_contacted || 0), 0);
+    const totalReferrals = mergedReports.reduce((sum, r) => sum + (r.referrals_count || 0), 0);
+    const totalFollowUps = mergedReports.reduce((sum, r) => sum + (r.follow_ups_count || 0), 0);
+    
+    return {
+      totalPsychological,
+      totalAcademic,
+      totalBehavioral,
+      totalCases,
+      totalSessions,
+      totalFamilies,
+      totalReferrals,
+      totalFollowUps,
+      totalReports: mergedReports.length
+    };
+  };
+
+  // Export to PDF - Simplified version for Arabic support
+  const exportToPDF = () => {
+    try {
+      const mergedReports = getMergedReports();
+      const stats = getMergedStatistics();
+      
+      // Ensure stats is valid
+      if (!stats || typeof stats !== 'object') {
+        console.error('Invalid stats object:', stats);
+        toast.error('خطأ في جلب الإحصائيات');
+        return;
+      }
+      
+      console.log('📊 Stats object:', stats);
+
+      // Prepare period text
+      let periodText = '';
+      if (mergedPeriod === 'weekly') {
+        periodText = 'تقرير أسبوعي';
+      } else if (mergedPeriod === 'monthly') {
+        periodText = 'تقرير شهري';
+      } else if (mergedPeriod === 'custom' && mergedStartDate && mergedEndDate) {
+        periodText = `من ${mergedStartDate} إلى ${mergedEndDate}`;
+      }
+
+      // Prepare reports data - MUST have exactly 10 columns
+      const reportsData = mergedReports.map((report, index) => {
+        const total = (report.psychological_cases || 0) + (report.academic_cases || 0) + (report.behavioral_cases || 0);
+        
+        // Safe date conversion
+        let dateStr = '-';
+        try {
+          if (report.date) {
+            dateStr = new Date(report.date).toLocaleDateString('ar-SA');
+          }
+        } catch (e) {
+          console.error('Error converting date:', e);
+        }
+        
+        const row = [
+          String(index + 1),
+          String(dateStr),
+          String(total),
+          String(report.psychological_cases || 0),
+          String(report.academic_cases || 0),
+          String(report.behavioral_cases || 0),
+          String(report.sessions_count || 0),
+          String(report.family_contacts || 0),
+          String(report.referrals_out || 0),
+          String(report.follow_ups || 0)
+        ];
+        
+        // Verify row has exactly 10 columns
+        if (row.length !== 10) {
+          console.error('Row has incorrect number of columns:', row.length, 'Expected: 10');
+          while (row.length < 10) row.push('-');
+          if (row.length > 10) row.length = 10;
+        }
+        
+        return row.map(val => String(val || '-'));
+      });
+
+      // Log data structure
+      console.log('📊 Reports data rows:', reportsData.length);
+      if (reportsData.length > 0) {
+        console.log('First row columns:', reportsData[0].length);
+        console.log('First row:', reportsData[0]);
+      }
+
+      // Verify all rows have exactly 10 columns
+      const invalidRows = reportsData.filter(row => row.length !== 10);
+      if (invalidRows.length > 0) {
+        console.error('❌ Found rows with invalid column count:', invalidRows.length);
+        invalidRows.forEach((row, idx) => {
+          console.error(`Row ${idx}: ${row.length} columns`, row);
+        });
+      }
+
+      // Define PDF document
+      const docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape', // أفقي لجداول أفضل
+        pageMargins: [40, 60, 40, 60], // هوامش متناسقة
+        defaultStyle: {
+          font: 'Cairo',
+          alignment: 'right',
+          fontSize: 10
+        },
+        content: [
+          // Header
+          {
+            text: 'مدارس الفجر الجديد الأهلية',
+            style: 'header',
+            alignment: 'center',
+            margin: [0, 0, 0, 10]
+          },
+          {
+            text: 'تقرير الجودة المدمج',
+            style: 'subheader',
+            alignment: 'center',
+            margin: [0, 0, 0, 5]
+          },
+          {
+            text: periodText,
+            alignment: 'center',
+            fontSize: 12,
+            margin: [0, 0, 0, 5]
+          },
+          {
+            text: `تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`,
+            alignment: 'center',
+            fontSize: 10,
+            margin: [0, 0, 0, 15]
+          },
+          
+          // Total Cases Box - Full width
+          {
+            table: {
+              widths: ['*'], // ملء العرض بالكامل
+              body: [
+                [
+                  { 
+                    text: `إجمالي حالات الطلاب: ${String(stats.totalCases || 0)}`, 
+                    style: 'totalCases',
+                    alignment: 'center',
+                    fillColor: '#E1BEE7',
+                    fontSize: 14,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  }
+                ]
+              ]
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15]
+          },
+
+          // Cases Distribution - Full width
+          {
+            text: 'توزيع الحالات',
+            style: 'sectionHeader',
+            alignment: 'center',
+            margin: [0, 10, 0, 10],
+            fontSize: 14,
+            bold: true,
+            color: '#9C27B0'
+          },
+          {
+            table: {
+              widths: ['*', '*', '*', '*'], // توزيع متساوي على العرض
+              body: [
+                [
+                  { 
+                    text: `نفسية\n${String(stats.totalPsychological || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E1F5FE',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `أكاديمية\n${String(stats.totalAcademic || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E1F5FE',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `سلوكية\n${String(stats.totalBehavioral || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E1F5FE',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `جلسات\n${String(stats.totalSessions || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#E1F5FE',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  }
+                ]
+              ]
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 15]
+          },
+
+          // Actions Summary - Full width
+          {
+            text: 'ملخص الإجراءات',
+            style: 'sectionHeader',
+            alignment: 'center',
+            margin: [0, 10, 0, 10],
+            fontSize: 14,
+            bold: true,
+            color: '#4CAF50'
+          },
+          {
+            table: {
+              widths: ['*', '*', '*'], // توزيع متساوي على العرض
+              body: [
+                [
+                  { 
+                    text: `التواصل مع الأسر\n${String(stats.totalFamilies || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#F1F8E9',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `التحويلات\n${String(stats.totalReferrals || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#F1F8E9',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  },
+                  { 
+                    text: `المتابعات\n${String(stats.totalFollowUps || 0)}`, 
+                    alignment: 'center', 
+                    fillColor: '#F1F8E9',
+                    fontSize: 12,
+                    bold: true,
+                    margin: [0, 10, 0, 10]
+                  }
+                ]
+              ]
+            },
+            layout: 'noBorders',
+            margin: [0, 0, 0, 20]
+          },
+
+          // Reports Details - Optimized for landscape
+          {
+            text: `تفاصيل التقارير (${stats.totalReports || 0})`,
+            style: 'sectionHeader',
+            margin: [0, 0, 0, 10],
+            fontSize: 14,
+            bold: true
+          },
+          {
+            table: {
+              headerRows: 1,
+              widths: [30, 70, 55, 55, 55, 55, 55, 55, 55, 55], // محسّنة للصفحة الأفقية
+              body: [
+                [
+                  { text: '#', style: 'tableHeader', fontSize: 9 },
+                  { text: 'التاريخ', style: 'tableHeader', fontSize: 9 },
+                  { text: 'المجموع', style: 'tableHeader', fontSize: 9 },
+                  { text: 'نفسية', style: 'tableHeader', fontSize: 9 },
+                  { text: 'أكاديمية', style: 'tableHeader', fontSize: 9 },
+                  { text: 'سلوكية', style: 'tableHeader', fontSize: 9 },
+                  { text: 'جلسات', style: 'tableHeader', fontSize: 9 },
+                  { text: 'أسر', style: 'tableHeader', fontSize: 9 },
+                  { text: 'تحويلات', style: 'tableHeader', fontSize: 9 },
+                  { text: 'متابعات', style: 'tableHeader', fontSize: 9 }
+                ],
+                ...reportsData
+              ]
+            },
+            layout: {
+              fillColor: function (rowIndex) {
+                return rowIndex === 0 ? '#9C27B0' : (rowIndex % 2 === 0 ? '#F5F5F5' : null);
+              }
+            }
+          }
+        ],
+        styles: {
+          header: {
+            fontSize: 18,
+            bold: true,
+            color: '#6A1B9A'
+          },
+          subheader: {
+            fontSize: 16,
+            bold: true,
+            color: '#6A1B9A'
+          },
+          sectionHeader: {
+            fontSize: 14,
+            bold: true,
+            color: '#6A1B9A'
+          },
+          totalCases: {
+            fontSize: 16,
+            bold: true,
+            color: '#6A1B9A'
+          },
+          tableHeader: {
+            bold: true,
+            fontSize: 9,
+            color: 'white',
+            alignment: 'center'
+          }
+        },
+        footer: function(currentPage, pageCount) {
+          return {
+            text: `صفحة ${currentPage} من ${pageCount}`,
+            alignment: 'center',
+            fontSize: 9,
+            margin: [0, 10, 0, 0]
+          };
+        }
+      };
+
+      // Generate filename
+      let filename = 'تقرير_الأخصائي_الاجتماعي';
+      if (mergedPeriod === 'weekly') filename += '_أسبوعي';
+      else if (mergedPeriod === 'monthly') filename += '_شهري';
+      else if (mergedStartDate && mergedEndDate) filename += `_${mergedStartDate}_${mergedEndDate}`;
+      filename += '.pdf';
+
+      // Create and download PDF
+      pdfMake.createPdf(docDefinition).download(filename);
+      toast.success('تم تصدير PDF بنجاح');
+    } catch (error) {
+      console.error('PDF Export Error:', error);
+      console.error('Error details:', error.message);
+      console.error('Error stack:', error.stack);
+      toast.error(`فشل تصدير PDF: ${error.message || 'خطأ غير معروف'}`);
+    }
+  };
+
+  return (
+    <DashboardLayout title="لوحة تحكم الجودة">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsTrigger value="create" className="flex items-center space-x-2 space-x-reverse">
+            <FileText className="w-4 h-4" />
+            <span>إنشاء تقرير جديد</span>
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="flex items-center space-x-2 space-x-reverse">
+            <Eye className="w-4 h-4" />
+            <span>التقارير</span>
+          </TabsTrigger>
+          <TabsTrigger value="statistics" className="flex items-center space-x-2 space-x-reverse">
+            <BarChart3 className="w-4 h-4" />
+            <span>الإحصائيات الإجمالية</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="create">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>تاريخ التقرير</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Label>اختر التاريخ</Label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  required
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>الحالات الطلابية</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>الحالات النفسية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.psychological_cases}
+                      onChange={(e) => setFormData({ ...formData, psychological_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div>
+                    <Label>الحالات الأكاديمية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.academic_cases}
+                      onChange={(e) => setFormData({ ...formData, academic_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div>
+                    <Label>الحالات السلوكية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.behavioral_cases}
+                      onChange={(e) => setFormData({ ...formData, behavioral_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                </div>
+                
+                {/* Total Cases Display */}
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border-2 border-purple-300">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-purple-800 mb-1">إجمالي عدد الحالات الطلابية</p>
+                      <p className="text-xs text-purple-600">مجموع جميع الحالات (نفسية + أكاديمية + سلوكية)</p>
+                    </div>
+                    <div className="text-4xl font-bold text-purple-700">
+                      {(formData.psychological_cases || 0) + (formData.academic_cases || 0) + (formData.behavioral_cases || 0)}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>الإجراءات المتخذة</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>عدد الجلسات</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.sessions_count}
+                    onChange={(e) => setFormData({ ...formData, sessions_count: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>التواصل مع الأسر</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.families_contacted}
+                    onChange={(e) => setFormData({ ...formData, families_contacted: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>عدد الإحالات</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.referrals_count}
+                    onChange={(e) => setFormData({ ...formData, referrals_count: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>المتابعات</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.follow_ups_count}
+                    onChange={(e) => setFormData({ ...formData, follow_ups_count: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>البرامج الإرشادية</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={formData.guidance_programs}
+                  onChange={(e) => setFormData({ ...formData, guidance_programs: e.target.value })}
+                  placeholder="وصف البرامج الإرشادية المنفذة"
+                  rows={4}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>التحديات</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={formData.challenges}
+                  onChange={(e) => setFormData({ ...formData, challenges: e.target.value })}
+                  placeholder="التحديات التي واجهتها"
+                  rows={4}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>التوصيات</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={formData.recommendations}
+                  onChange={(e) => setFormData({ ...formData, recommendations: e.target.value })}
+                  placeholder="التوصيات المقترحة"
+                  rows={4}
+                />
+              </CardContent>
+            </Card>
+
+            <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-cyan-500 to-blue-600">
+              {loading ? "جاري الإرسال..." : editingReport ? "تحديث التقرير" : "إرسال التقرير"}
+            </Button>
+
+            {editingReport && (
+              <Button
+                type="button"
+                onClick={() => {
+                  setEditingReport(null);
+                  setFormData({
+                    date: new Date().toISOString().split('T')[0],
+                    psychological_cases: 0,
+                    academic_cases: 0,
+                    behavioral_cases: 0,
+                    sessions_count: 0,
+                    families_contacted: 0,
+                    referrals_count: 0,
+                    follow_ups_count: 0,
+                    guidance_programs: "",
+                    challenges: "",
+                    recommendations: ""
+                  });
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                إلغاء التعديل
+              </Button>
+            )}
+          </form>
+        </TabsContent>
+
+        <TabsContent value="reports">
+          <div className="space-y-6">
+            {/* Filters */}
+            <Card>
+              <CardHeader>
+                <CardTitle>تصفية التقارير</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label>عرض</Label>
+                    <Select value={viewMode} onValueChange={setViewMode}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع التقارير</SelectItem>
+                        <SelectItem value="daily">يومي</SelectItem>
+                        <SelectItem value="monthly">شهري</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {viewMode === "daily" && (
+                    <div>
+                      <Label>اختر اليوم</Label>
+                      <Input
+                        type="date"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {viewMode === "monthly" && (
+                    <div>
+                      <Label>اختر الشهر</Label>
+                      <Input
+                        type="month"
+                        value={monthFilter}
+                        onChange={(e) => setMonthFilter(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setDateFilter("");
+                        setMonthFilter("");
+                        setViewMode("all");
+                      }}
+                    >
+                      إعادة تعيين
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Reports List */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-gray-800">
+                التقارير ({reports.length})
+              </h3>
+
+              <div className="grid grid-cols-1 gap-3">
+                {reports.map((report) => (
+                  <Card
+                    key={report.id}
+                    className="report-card hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => {
+                      setSelectedReport(report);
+                      setShowReportModal(true);
+                    }}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-bold text-gray-800">
+                            تقرير {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            إجمالي الحالات: {report.psychological_cases + report.academic_cases + report.behavioral_cases}
+                          </p>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedReport(report);
+                              setShowReportModal(true);
+                            }}
+                          >
+                            <Eye className="w-4 h-4 ml-1" />
+                            عرض
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(report);
+                            }}
+                          >
+                            تعديل
+                          </Button>
+
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(report.id);
+                            }}
+                          >
+                            حذف
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Report Detail Modal */}
+          <Dialog open={showReportModal} onOpenChange={setShowReportModal}>
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="text-2xl">
+                  {selectedReport && `تقرير ${new Date(selectedReport.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                </DialogTitle>
+              </DialogHeader>
+
+              {selectedReport && (
+                <div className="space-y-6 p-4">
+                  {/* Cases Statistics */}
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-800 mb-4">الحالات الطلابية</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                      <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات النفسية</div>
+                        <div className="text-3xl font-bold text-cyan-700">{selectedReport.psychological_cases}</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات الأكاديمية</div>
+                        <div className="text-3xl font-bold text-blue-700">{selectedReport.academic_cases}</div>
+                      </div>
+                      <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                        <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات السلوكية</div>
+                        <div className="text-3xl font-bold text-purple-700">{selectedReport.behavioral_cases}</div>
+                      </div>
+                    </div>
+                    
+                    {/* Total Cases */}
+                    <div className="p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-300 shadow-md">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-lg font-bold text-purple-800 mb-1">📊 إجمالي عدد الحالات الطلابية</p>
+                          <p className="text-sm text-purple-600">مجموع جميع الحالات المسجلة في التقرير</p>
+                        </div>
+                        <div className="text-5xl font-extrabold bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                          {selectedReport.psychological_cases + selectedReport.academic_cases + selectedReport.behavioral_cases}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions Taken */}
+                  <div>
+                    <h4 className="text-lg font-bold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">الإجراءات المتخذة</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div className="text-sm font-bold text-green-800">الجلسات</div>
+                        <div className="text-2xl font-bold text-green-600 mt-1">{selectedReport.sessions_count}</div>
+                      </div>
+                      <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="text-sm font-bold text-blue-800">التواصل مع الأسر</div>
+                        <div className="text-2xl font-bold text-blue-600 mt-1">{selectedReport.families_contacted}</div>
+                      </div>
+                      <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                        <div className="text-sm font-bold text-orange-800">الإحالات</div>
+                        <div className="text-2xl font-bold text-orange-600 mt-1">{selectedReport.referrals_count}</div>
+                      </div>
+                      <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <div className="text-sm font-bold text-purple-800">المتابعات</div>
+                        <div className="text-2xl font-bold text-purple-600 mt-1">{selectedReport.follow_ups_count}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="space-y-4">
+                    {selectedReport.guidance_programs && (
+                      <div className="p-4 bg-cyan-50 rounded-lg border border-cyan-200">
+                        <div className="text-sm font-bold text-cyan-800 mb-2">البرامج الإرشادية</div>
+                        <p className="text-sm text-gray-700 leading-relaxed">{selectedReport.guidance_programs}</p>
+                      </div>
+                    )}
+
+                    {selectedReport.challenges && (
+                      <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                        <div className="text-sm font-bold text-orange-800 mb-2">التحديات</div>
+                        <p className="text-sm text-gray-700 leading-relaxed">{selectedReport.challenges}</p>
+                      </div>
+                    )}
+
+                    {selectedReport.recommendations && (
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div className="text-sm font-bold text-green-800 mb-2">التوصيات</div>
+                        <p className="text-sm text-gray-700 leading-relaxed">{selectedReport.recommendations}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
+        </TabsContent>
+
+        <TabsContent value="statistics">
+          <div className="space-y-6">
+            {/* Filters */}
+            <Card>
+              <CardHeader>
+                <CardTitle>التصفية</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">نوع التقرير</label>
+                      <Select value={reportTypeFilter} onValueChange={(value) => {
+                        setReportTypeFilter(value);
+                        setSelectedSpecificEmployee("all");
+                        setSelectedVicePrincipal("all");
+                      }}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر نوع التقرير" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">جميع التقارير</SelectItem>
+                          <SelectItem value="vice_principal">الوكلاء</SelectItem>
+                          <SelectItem value="supervisor">المشرفين</SelectItem>
+                          <SelectItem value="activities">الأنشطة</SelectItem>
+                          <SelectItem value="social">الأخصائي الاجتماعي</SelectItem>
+                          <SelectItem value="quality">الجودة</SelectItem>
+                          <SelectItem value="educational_supervision">الإشراف التربوي</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium mb-2">الفترة الزمنية</label>
+                      <Select value={timeFilter} onValueChange={setTimeFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر الفترة الزمنية" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">جميع الفترات</SelectItem>
+                          <SelectItem value="daily">اليوم</SelectItem>
+                          <SelectItem value="weekly">هذا الأسبوع</SelectItem>
+                          <SelectItem value="monthly">هذا الشهر</SelectItem>
+                          <SelectItem value="custom">فترة مخصصة</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    {/* Branch filter - only for users with branch="both" */}
+                    {user && user.branch === "both" && (
+                      <div>
+                        <label className="block text-sm font-medium mb-2">الفرع</label>
+                        <Select value={branchFilter} onValueChange={setBranchFilter}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر الفرع" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">جميع الفروع</SelectItem>
+                            <SelectItem value="boys">البنين</SelectItem>
+                            <SelectItem value="girls">البنات</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+
+                  {timeFilter === "custom" && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">من تاريخ</label>
+                        <Input 
+                          type="date" 
+                          value={customStartDate}
+                          onChange={(e) => setCustomStartDate(e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">إلى تاريخ</label>
+                        <Input 
+                          type="date" 
+                          value={customEndDate}
+                          onChange={(e) => setCustomEndDate(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Overall Statistics */}
+            {(() => {
+              const stats = getOverallStatistics();
+              return (
+                <>
+                  {/* Supervisor Statistics */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
+                    <>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Card className="bg-gradient-to-br from-red-50 to-red-100 border-l-4 border-red-500">
+                          <CardContent className="p-6">
+                            <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون الغائبون</div>
+                            <div className="text-4xl font-bold text-red-700">{stats.totalAbsentTeachers}</div>
+                            <p className="text-xs text-gray-600 mt-2">معلم</p>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-l-4 border-orange-500">
+                          <CardContent className="p-6">
+                            <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المتأخرون</div>
+                            <div className="text-4xl font-bold text-orange-700">{stats.totalLateTeachers}</div>
+                            <p className="text-xs text-gray-600 mt-2">معلم</p>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-l-4 border-green-500">
+                          <CardContent className="p-6">
+                            <div className="text-sm text-gray-700 mb-1 font-semibold">المعلمون المغطون</div>
+                            <div className="text-4xl font-bold text-green-700">{stats.totalCoveringTeachers}</div>
+                            <p className="text-xs text-gray-600 mt-2">معلم</p>
+                          </CardContent>
+                        </Card>
+
+                        <Card className="bg-gradient-to-br from-pink-50 to-pink-100 border-l-4 border-pink-500">
+                          <CardContent className="p-6">
+                            <div className="text-sm text-gray-700 mb-1 font-semibold">الطلاب الغائبون</div>
+                            <div className="text-4xl font-bold text-pink-700">{stats.totalAbsentStudents}</div>
+                            <p className="text-xs text-gray-600 mt-2">طالب</p>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* Charts */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Teachers Chart */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>توزيع حالات المعلمين</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <PieChart>
+                                <Pie
+                                  data={getTeachersChartData()}
+                                  cx="50%"
+                                  cy="50%"
+                                  labelLine={false}
+                                  label={(entry) => `${entry.name}: ${entry.value}`}
+                                  outerRadius={80}
+                                  fill="#8884d8"
+                                  dataKey="value"
+                                >
+                                  {getTeachersChartData().map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                                  ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                              </PieChart>
+                            </ResponsiveContainer>
+                          </CardContent>
+                        </Card>
+
+                        {/* Performance Chart */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle>مؤشرات الأداء العام</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <ResponsiveContainer width="100%" height={250}>
+                              <BarChart data={getPerformanceChartData()}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis dataKey="name" />
+                                <YAxis domain={[0, 10]} />
+                                <Tooltip />
+                                <Legend />
+                                <Bar dataKey="value" fill="#3b82f6" />
+                              </BarChart>
+                            </ResponsiveContainer>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Activities Statistics */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "activities") && stats.activitiesReportsCount > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>إحصائيات الأنشطة</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <div className="text-sm font-bold text-blue-800">إجمالي الأنشطة</div>
+                            <div className="text-3xl font-bold text-blue-600 mt-2">{stats.totalActivities}</div>
+                          </div>
+                          <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                            <div className="text-sm font-bold text-purple-800">إجمالي المشاركين</div>
+                            <div className="text-3xl font-bold text-purple-600 mt-2">{stats.totalActivitiesParticipants}</div>
+                          </div>
+                          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                            <div className="text-sm font-bold text-green-800">متوسط التفاعل</div>
+                            <div className="text-3xl font-bold text-green-600 mt-2">{stats.avgActivitiesInteraction}/10</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Social Specialist Statistics */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "social") && stats.socialReportsCount > 0 && (
+                    <>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>إحصائيات الأخصائي الاجتماعي</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="p-4 bg-pink-50 rounded-lg border border-pink-200">
+                              <div className="text-sm font-bold text-pink-800">حالات نفسية</div>
+                              <div className="text-3xl font-bold text-pink-600 mt-2">{stats.totalPsychologicalCases}</div>
+                            </div>
+                            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                              <div className="text-sm font-bold text-yellow-800">حالات أكاديمية</div>
+                              <div className="text-3xl font-bold text-yellow-600 mt-2">{stats.totalAcademicCases}</div>
+                            </div>
+                            <div className="p-4 bg-red-50 rounded-lg border border-red-200">
+                              <div className="text-sm font-bold text-red-800">حالات سلوكية</div>
+                              <div className="text-3xl font-bold text-red-600 mt-2">{stats.totalBehavioralCases}</div>
+                            </div>
+                            <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+                              <div className="text-sm font-bold text-purple-800">إجمالي الحالات</div>
+                              <div className="text-3xl font-bold text-purple-600 mt-2">{stats.totalStudentCases}</div>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Social Cases Chart */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>توزيع حالات الطلاب</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ResponsiveContainer width="100%" height={250}>
+                            <PieChart>
+                              <Pie
+                                data={getSocialCasesChartData()}
+                                cx="50%"
+                                cy="50%"
+                                labelLine={false}
+                                label={(entry) => `${entry.name}: ${entry.value}`}
+                                outerRadius={80}
+                                fill="#8884d8"
+                                dataKey="value"
+                              >
+                                {getSocialCasesChartData().map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                                ))}
+                              </Pie>
+                              <Tooltip />
+                              <Legend />
+                            </PieChart>
+                          </ResponsiveContainer>
+                        </CardContent>
+                      </Card>
+                    </>
+                  )}
+
+                  {/* Quality Statistics */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "quality") && stats.qualityReportsCount > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>إحصائيات الجودة</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <div className="text-sm font-bold text-blue-800">إجمالي الزيارات</div>
+                            <div className="text-3xl font-bold text-blue-600 mt-2">{stats.totalQualityVisits}</div>
+                          </div>
+                          <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                            <div className="text-sm font-bold text-green-800">متوسط الأداء التدريسي</div>
+                            <div className="text-3xl font-bold text-green-600 mt-2">{stats.avgQualityTeachingRate}/10</div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Teacher Progress View */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>تقييم تحسن المعلمين</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <TeacherProgressView branch={user.branch} compact={true} />
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Activity Supervisors View */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>المعلمون المشرفون على الأنشطة</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ActivitySupervisorsView compact={true} />
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Cooperating Teachers View */}
+                  {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>المعلمون المتعاونون في الأنشطة</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <CooperatingTeachersView compact={true} />
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
+              );
+            })()}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </DashboardLayout>
+  );
+};
+
+export default QualityDashboard;
