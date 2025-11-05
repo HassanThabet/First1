@@ -19,13 +19,11 @@ import {
   captureChartAsImage,
   generatePDF
 } from "../utils/pdfTemplate";
-import DirectorReportForm from "./DirectorReportForm";
-import DirectorReportsList from "./DirectorReportsList";
 import TeacherProgressView from "../components/TeacherProgressView";
 import ActivitySupervisorsView from "../components/ActivitySupervisorsView";
 import CooperatingTeachersView from "../components/CooperatingTeachersView";
 
-const DirectorDashboard = () => {
+const QualityDashboard = () => {
   const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("dashboard");
   
