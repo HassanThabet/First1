@@ -812,8 +812,8 @@ async def get_social_specialist_reports(user_id: Optional[str] = None, branch: O
     
     if current_user["role"] == "social_specialist":
         query["user_id"] = current_user["id"]
-    elif current_user["role"] in ["director", "quality"]:
-        # Directors with "both" branch can see all reports, otherwise filter by branch
+    elif current_user["role"] in ["chairman", "director", "quality"]:
+        # Chairman/Directors with "both" branch can see all reports, otherwise filter by branch
         if current_user["branch"] != "both":
             query["branch"] = current_user["branch"]
     
