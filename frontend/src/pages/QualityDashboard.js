@@ -65,17 +65,17 @@ const QualityDashboard = () => {
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
-    academic_performance_rate: 5,
+    academic_performance_rate: "",
     academic_notes: "",
-    supervision_quality_rate: 5,
+    supervision_quality_rate: "",
     supervision_notes: "",
-    discipline_rate: 5,
+    discipline_rate: "",
     discipline_notes: "",
-    activities_quality_rate: 5,
+    activities_quality_rate: "",
     activities_notes: "",
-    social_specialist_performance_rate: 5,
+    social_specialist_performance_rate: "",
     social_specialist_notes: "",
-    teaching_performance_rate: 5,
+    teaching_performance_rate: "",
     general_recommendations: ""
   });
 
