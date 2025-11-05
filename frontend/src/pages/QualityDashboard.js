@@ -1528,7 +1528,7 @@ const QualityDashboard = () => {
                 width: '33%',
                 stack: [
                   { text: 'معلمون محسّنون', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
-                  { text: teacherProgress.filter(t => t.trend === 'up').length.toString(), fontSize: 20, bold: true, color: '#16a34a' }
+                  { text: teacherProgress.filter(t => t.trend === 'up').length.toString(), fontSize: 20, color: '#16a34a' }
                 ],
                 alignment: 'center'
               },
@@ -1536,7 +1536,7 @@ const QualityDashboard = () => {
                 width: '34%',
                 stack: [
                   { text: 'معلمون مستقرون', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
-                  { text: teacherProgress.filter(t => t.trend === 'stable').length.toString(), fontSize: 20, bold: true, color: '#ca8a04' }
+                  { text: teacherProgress.filter(t => t.trend === 'stable').length.toString(), fontSize: 20, color: '#ca8a04' }
                 ],
                 alignment: 'center'
               },
@@ -1544,7 +1544,7 @@ const QualityDashboard = () => {
                 width: '33%',
                 stack: [
                   { text: 'يحتاجون دعم', fontSize: 10, color: '#666', margin: [0, 0, 0, 5] },
-                  { text: teacherProgress.filter(t => t.trend === 'down').length.toString(), fontSize: 20, bold: true, color: '#dc2626' }
+                  { text: teacherProgress.filter(t => t.trend === 'down').length.toString(), fontSize: 20, color: '#dc2626' }
                 ],
                 alignment: 'center'
               }
