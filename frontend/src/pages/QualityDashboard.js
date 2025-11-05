@@ -482,13 +482,13 @@ const QualityDashboard = () => {
         styles: {
           header: {
             fontSize: 18,
-            bold: true,
-            color: '#1976D2'
+            color: '#1976D2',
+            font: 'Cairo'
           },
           sectionHeader: {
             fontSize: 14,
-            bold: true,
-            color: '#333'
+            color: '#333',
+            font: 'Cairo'
           }
         },
         defaultStyle: {
@@ -499,6 +499,7 @@ const QualityDashboard = () => {
         pageMargins: [40, 60, 40, 60]
       };
 
+      // Set up fonts - Initialize vfs and fonts BEFORE creating PDF
       pdfMake.vfs = pdfMakeFonts;
       pdfMake.fonts = {
         Cairo: {
