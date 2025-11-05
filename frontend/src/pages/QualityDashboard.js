@@ -65,16 +65,18 @@ const QualityDashboard = () => {
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
-    psychological_cases: 0,
-    academic_cases: 0,
-    behavioral_cases: 0,
-    sessions_count: 0,
-    families_contacted: 0,
-    referrals_count: 0,
-    follow_ups_count: 0,
-    guidance_programs: "",
-    challenges: "",
-    recommendations: ""
+    academic_performance_rate: 5,
+    academic_notes: "",
+    supervision_quality_rate: 5,
+    supervision_notes: "",
+    discipline_rate: 5,
+    discipline_notes: "",
+    activities_quality_rate: 5,
+    activities_notes: "",
+    social_specialist_performance_rate: 5,
+    social_specialist_notes: "",
+    teaching_performance_rate: 5,
+    general_recommendations: ""
   });
 
   useEffect(() => {
