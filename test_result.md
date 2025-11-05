@@ -179,9 +179,9 @@ backend:
 
   - task: "Quality Report API endpoints"
     implemented: true
-    working: true
+    working: false
     file: "backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -191,6 +191,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Quality Report API endpoints working correctly. Created test user, successfully tested POST /api/reports/quality (create) and GET /api/reports/quality (retrieve). All operations functional with proper authentication and data validation."
+      - working: false
+        agent: "testing"
+        comment: "❌ DATA STRUCTURE MISMATCH IDENTIFIED: Frontend QualityDashboard sends flat structure (academic_performance_rate: 9, academic_notes: 'text') but backend QualityReport model expects nested dict structure (academic_performance: {rate: '9', notes: 'text'}). TESTING RESULTS: 1) ✅ Login as quality_user/123456 successful, 2) ✅ GET /api/reports/quality returns 4 existing reports with nested dict structure, 3) ✅ POST with flat structure creates report but data is lost (stored as empty dicts {}), 4) ✅ POST with nested structure works correctly and preserves all data. ROOT CAUSE: Frontend sends flat fields but backend expects nested dicts, causing rating values to be saved as 0 instead of actual numbers. SOLUTION: Frontend must restructure data before sending to match backend model expectations."
 
   - task: "Vice-Principal Report API endpoints"
     implemented: true
