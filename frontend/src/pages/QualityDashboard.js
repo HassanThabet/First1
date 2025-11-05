@@ -826,9 +826,9 @@ const QualityDashboard = () => {
             <Eye className="w-4 h-4" />
             <span>التقارير</span>
           </TabsTrigger>
-          <TabsTrigger value="merged" className="flex items-center space-x-2 space-x-reverse">
+          <TabsTrigger value="statistics" className="flex items-center space-x-2 space-x-reverse">
             <BarChart3 className="w-4 h-4" />
-            <span>التقارير المدمجة</span>
+            <span>الإحصائيات الإجمالية</span>
           </TabsTrigger>
         </TabsList>
 
