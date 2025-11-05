@@ -1075,6 +1075,53 @@ async def get_teacher_evaluations(branch: Optional[str] = None, current_user: di
     
     return teacher_data
 
+# Clean orphaned reports - Delete reports with non-existent user_ids
+@api_router.post("/admin/clean-orphaned-reports")
+async def clean_orphaned_reports(current_user: dict = Depends(get_current_user)):
+    if current_user["role"] != "admin":
+        raise HTTPException(status_code=403, detail="صلاحيات المسؤول فقط")
+    
+    # Get all valid user IDs
+    all_users = await db.users.find().to_list(length=None)
+    valid_user_ids = {user["id"] for user in all_users}
+    
+    deleted_counts = {}
+    
+    # Collections to check
+    collections = [
+        ("supervisor_reports", "تقارير المشرفين"),
+        ("vice_principal_reports", "تقارير الوكلاء"),
+        ("activities_reports", "تقارير الأنشطة"),
+        ("social_specialist_reports", "تقارير الأخصائي الاجتماعي"),
+        ("quality_reports", "تقارير الجودة"),
+        ("educational_supervision_reports", "تقارير الإشراف التربوي"),
+        ("director_reports", "تقارير المدير")
+    ]
+    
+    total_deleted = 0
+    
+    for collection_name, arabic_name in collections:
+        collection = db[collection_name]
+        
+        # Find reports with user_id not in valid_user_ids
+        orphaned_reports = await collection.find({"user_id": {"$exists": True}}).to_list(length=None)
+        
+        orphaned_count = 0
+        for report in orphaned_reports:
+            if report.get("user_id") not in valid_user_ids:
+                await collection.delete_one({"id": report["id"]})
+                orphaned_count += 1
+        
+        if orphaned_count > 0:
+            deleted_counts[arabic_name] = orphaned_count
+            total_deleted += orphaned_count
+    
+    return {
+        "message": f"تم حذف {total_deleted} تقرير يتيم بنجاح",
+        "details": deleted_counts,
+        "total_deleted": total_deleted
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
