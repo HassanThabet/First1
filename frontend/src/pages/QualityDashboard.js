@@ -1419,12 +1419,32 @@ const QualityDashboard = () => {
   };
 
   return (
-    <DashboardLayout title="لوحة تحكم المدير - مدارس الفجر الجديد الأهلية">
+    <DashboardLayout title="لوحة تحكم الجودة - مدارس الفجر الجديد الأهلية">
       <div className="space-y-6">
         {/* Tabs Navigation */}
         <Card>
           <CardContent className="p-0">
             <div className="flex border-b">
+              <button
+                onClick={() => setActiveTab("quality-create")}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                  activeTab === "quality-create"
+                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                ✍️ إنشاء تقرير جودة
+              </button>
+              <button
+                onClick={() => setActiveTab("quality-reports")}
+                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                  activeTab === "quality-reports"
+                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                📄 تقارير الجودة
+              </button>
               <button
                 onClick={() => setActiveTab("dashboard")}
                 className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
@@ -1433,27 +1453,7 @@ const QualityDashboard = () => {
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
-                📊 لوحة التحكم
-              </button>
-              <button
-                onClick={() => setActiveTab("create-report")}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-                  activeTab === "create-report"
-                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
-              >
-                ✍️ إنشاء تقرير
-              </button>
-              <button
-                onClick={() => setActiveTab("my-reports")}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
-                  activeTab === "my-reports"
-                    ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
-              >
-                📄 تقاريري
+                📊 الإحصائيات الإجمالية
               </button>
               <button
                 onClick={() => setActiveTab("teacher-progress")}
@@ -1470,12 +1470,408 @@ const QualityDashboard = () => {
         </Card>
 
         {/* Tab Content */}
-        {activeTab === "create-report" && (
-          <DirectorReportForm onReportCreated={() => setActiveTab("my-reports")} />
+        {activeTab === "quality-create" && (
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>تاريخ التقرير</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Label>اختر التاريخ</Label>
+                <Input
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  required
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>الحالات الطلابية</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>الحالات النفسية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.psychological_cases}
+                      onChange={(e) => setFormData({ ...formData, psychological_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div>
+                    <Label>الحالات الأكاديمية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.academic_cases}
+                      onChange={(e) => setFormData({ ...formData, academic_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div>
+                    <Label>الحالات السلوكية</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.behavioral_cases}
+                      onChange={(e) => setFormData({ ...formData, behavioral_cases: parseInt(e.target.value) || 0 })}
+                    />
+                  </div>
+                </div>
+                
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border-2 border-purple-300">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-purple-800 mb-1">إجمالي عدد الحالات الطلابية</p>
+                      <p className="text-xs text-purple-600">مجموع جميع الحالات (نفسية + أكاديمية + سلوكية)</p>
+                    </div>
+                    <div className="text-4xl font-bold text-purple-700">
+                      {(formData.psychological_cases || 0) + (formData.academic_cases || 0) + (formData.behavioral_cases || 0)}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>الإجراءات المتخذة</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label>عدد الجلسات</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.sessions_count}
+                    onChange={(e) => setFormData({ ...formData, sessions_count: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>التواصل مع الأسر</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.families_contacted}
+                    onChange={(e) => setFormData({ ...formData, families_contacted: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>عدد الإحالات</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.referrals_count}
+                    onChange={(e) => setFormData({ ...formData, referrals_count: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <Label>المتابعات</Label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.follow_ups_count}
+                    onChange={(e) => setFormData({ ...formData, follow_ups_count: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>البرامج الإرشادية</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={formData.guidance_programs}
+                  onChange={(e) => setFormData({ ...formData, guidance_programs: e.target.value })}
+                  placeholder="وصف البرامج الإرشادية المنفذة"
+                  rows={4}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>التحديات</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={formData.challenges}
+                  onChange={(e) => setFormData({ ...formData, challenges: e.target.value })}
+                  placeholder="التحديات التي واجهتها"
+                  rows={4}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>التوصيات</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={formData.recommendations}
+                  onChange={(e) => setFormData({ ...formData, recommendations: e.target.value })}
+                  placeholder="التوصيات المقترحة"
+                  rows={4}
+                />
+              </CardContent>
+            </Card>
+
+            <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-cyan-500 to-blue-600">
+              {loading ? "جاري الإرسال..." : editingQualityReport ? "تحديث التقرير" : "إرسال التقرير"}
+            </Button>
+
+            {editingQualityReport && (
+              <Button
+                type="button"
+                onClick={() => {
+                  setEditingQualityReport(null);
+                  setFormData({
+                    date: new Date().toISOString().split('T')[0],
+                    psychological_cases: 0,
+                    academic_cases: 0,
+                    behavioral_cases: 0,
+                    sessions_count: 0,
+                    families_contacted: 0,
+                    referrals_count: 0,
+                    follow_ups_count: 0,
+                    guidance_programs: "",
+                    challenges: "",
+                    recommendations: ""
+                  });
+                }}
+                variant="outline"
+                className="w-full"
+              >
+                إلغاء التعديل
+              </Button>
+            )}
+          </form>
         )}
 
-        {activeTab === "my-reports" && (
-          <DirectorReportsList />
+        {activeTab === "quality-reports" && (
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>تصفية التقارير</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <Label>عرض</Label>
+                    <Select value={viewMode} onValueChange={setViewMode}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع التقارير</SelectItem>
+                        <SelectItem value="daily">يومي</SelectItem>
+                        <SelectItem value="monthly">شهري</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {viewMode === "daily" && (
+                    <div>
+                      <Label>اختر اليوم</Label>
+                      <Input
+                        type="date"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {viewMode === "monthly" && (
+                    <div>
+                      <Label>اختر الشهر</Label>
+                      <Input
+                        type="month"
+                        value={monthFilter}
+                        onChange={(e) => setMonthFilter(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex items-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setDateFilter("");
+                        setMonthFilter("");
+                        setViewMode("all");
+                      }}
+                    >
+                      إعادة تعيين
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-gray-800">
+                التقارير ({qualityReportsOwn.length})
+              </h3>
+
+              <div className="grid grid-cols-1 gap-3">
+                {qualityReportsOwn.map((report) => (
+                  <Card
+                    key={report.id}
+                    className="report-card hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => {
+                      setSelectedQualityReport(report);
+                      setShowQualityReportModal(true);
+                    }}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-bold text-gray-800">
+                            تقرير {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                          </h4>
+                          <p className="text-sm text-gray-500">
+                            إجمالي الحالات: {report.psychological_cases + report.academic_cases + report.behavioral_cases}
+                          </p>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedQualityReport(report);
+                              setShowQualityReportModal(true);
+                            }}
+                          >
+                            <Eye className="w-4 h-4 ml-1" />
+                            عرض
+                          </Button>
+
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEdit(report);
+                            }}
+                          >
+                            تعديل
+                          </Button>
+
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(report.id);
+                            }}
+                          >
+                            حذف
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            <Dialog open={showQualityReportModal} onOpenChange={setShowQualityReportModal}>
+              <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="text-2xl">
+                    {selectedQualityReport && `تقرير ${new Date(selectedQualityReport.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`}
+                  </DialogTitle>
+                </DialogHeader>
+
+                {selectedQualityReport && (
+                  <div className="space-y-6 p-4">
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-800 mb-4">الحالات الطلابية</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="stat-card bg-gradient-to-br from-cyan-50 to-cyan-100 border-l-4 border-cyan-500">
+                          <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات النفسية</div>
+                          <div className="text-3xl font-bold text-cyan-700">{selectedQualityReport.psychological_cases}</div>
+                        </div>
+                        <div className="stat-card bg-gradient-to-br from-blue-50 to-blue-100 border-l-4 border-blue-500">
+                          <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات الأكاديمية</div>
+                          <div className="text-3xl font-bold text-blue-700">{selectedQualityReport.academic_cases}</div>
+                        </div>
+                        <div className="stat-card bg-gradient-to-br from-purple-50 to-purple-100 border-l-4 border-purple-500">
+                          <div className="text-sm text-gray-700 mb-1 font-semibold">الحالات السلوكية</div>
+                          <div className="text-3xl font-bold text-purple-700">{selectedQualityReport.behavioral_cases}</div>
+                        </div>
+                      </div>
+                      
+                      <div className="p-5 bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 rounded-xl border-2 border-purple-300 shadow-md">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-lg font-bold text-purple-800 mb-1">📊 إجمالي عدد الحالات الطلابية</p>
+                            <p className="text-sm text-purple-600">مجموع جميع الحالات المسجلة في التقرير</p>
+                          </div>
+                          <div className="text-5xl font-extrabold bg-gradient-to-br from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                            {selectedQualityReport.psychological_cases + selectedQualityReport.academic_cases + selectedQualityReport.behavioral_cases}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h4 className="text-lg font-bold text-gray-800 mb-4 border-b-2 border-gray-200 pb-2">الإجراءات المتخذة</h4>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                          <div className="text-sm font-bold text-green-800">الجلسات</div>
+                          <div className="text-2xl font-bold text-green-600 mt-1">{selectedQualityReport.sessions_count}</div>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          <div className="text-sm font-bold text-blue-800">التواصل مع الأسر</div>
+                          <div className="text-2xl font-bold text-blue-600 mt-1">{selectedQualityReport.families_contacted}</div>
+                        </div>
+                        <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                          <div className="text-sm font-bold text-orange-800">الإحالات</div>
+                          <div className="text-2xl font-bold text-orange-600 mt-1">{selectedQualityReport.referrals_count}</div>
+                        </div>
+                        <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                          <div className="text-sm font-bold text-purple-800">المتابعات</div>
+                          <div className="text-2xl font-bold text-purple-600 mt-1">{selectedQualityReport.follow_ups_count}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      {selectedQualityReport.guidance_programs && (
+                        <div className="p-4 bg-cyan-50 rounded-lg border border-cyan-200">
+                          <div className="text-sm font-bold text-cyan-800 mb-2">البرامج الإرشادية</div>
+                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.guidance_programs}</p>
+                        </div>
+                      )}
+
+                      {selectedQualityReport.challenges && (
+                        <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                          <div className="text-sm font-bold text-orange-800 mb-2">التحديات</div>
+                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.challenges}</p>
+                        </div>
+                      )}
+
+                      {selectedQualityReport.recommendations && (
+                        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                          <div className="text-sm font-bold text-green-800 mb-2">التوصيات</div>
+                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.recommendations}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
+          </div>
         )}
 
         {activeTab === "teacher-progress" && (
