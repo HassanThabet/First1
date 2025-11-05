@@ -213,7 +213,11 @@ const QualityDashboard = () => {
         general_recommendations: ""
       });
     } catch (error) {
-      toast.error("فشل إنشاء التقرير");
+      if (editingQualityReport) {
+        toast.error("فشل تحديث التقرير");
+      } else {
+        toast.error("فشل إنشاء التقرير");
+      }
     } finally {
       setLoading(false);
     }
