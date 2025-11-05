@@ -2256,12 +2256,12 @@ const QualityDashboard = () => {
                       <CardContent className="pt-4">
                         <div className="flex items-center justify-between mb-3">
                           <span className="font-semibold">التقييم:</span>
-                          <span className="text-2xl font-bold text-pink-600">{selectedQualityReport.social_specialist_performance_rate}/10</span>
+                          <span className="text-2xl font-bold text-pink-600">{selectedQualityReport.social_specialist?.rate || 0}/10</span>
                         </div>
-                        {selectedQualityReport.social_specialist_notes && (
+                        {selectedQualityReport.social_specialist?.notes && (
                           <div className="p-3 bg-pink-50 rounded">
                             <div className="text-xs font-semibold text-pink-800 mb-1">الملاحظات:</div>
-                            <p className="text-sm text-gray-700">{selectedQualityReport.social_specialist_notes}</p>
+                            <p className="text-sm text-gray-700">{selectedQualityReport.social_specialist.notes}</p>
                           </div>
                         )}
                       </CardContent>
@@ -2277,19 +2277,19 @@ const QualityDashboard = () => {
                       <CardContent className="pt-4">
                         <div className="flex items-center justify-between">
                           <span className="font-semibold">معدل الأداء:</span>
-                          <span className="text-2xl font-bold text-cyan-600">{selectedQualityReport.teaching_performance_rate}/10</span>
+                          <span className="text-2xl font-bold text-cyan-600">{selectedQualityReport.social_specialist?.teaching_performance_rate || 0}/10</span>
                         </div>
                       </CardContent>
                     </Card>
 
                     {/* التوصيات العامة */}
-                    {selectedQualityReport.general_recommendations && (
+                    {selectedQualityReport.social_specialist?.general_recommendations && (
                       <Card>
                         <CardHeader>
                           <CardTitle className="text-lg">التوصيات العامة</CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.general_recommendations}</p>
+                          <p className="text-sm text-gray-700 leading-relaxed">{selectedQualityReport.social_specialist.general_recommendations}</p>
                         </CardContent>
                       </Card>
                     )}
