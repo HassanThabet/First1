@@ -2813,10 +2813,10 @@ const QualityDashboard = () => {
                     
                     {/* Absent Teachers Detailed Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "supervisor" || reportTypeFilter === "vice_principal") && (
-                      <div id="director-absent-teachers-chart">
+                      <div id="director-absent-teachers-chart" key={`absent-chart-${activeTab}`}>
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">تفاصيل غياب المعلمين (عدد الأيام)</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                          <BarChart data={getAggregatedAbsentTeachers().slice(0, 10)}>
+                          <BarChart data={getAggregatedAbsentTeachers().slice(0, 10)} key={`bar-absent-${reportTypeFilter}-${timeFilter}`}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
                             <YAxis label={{ value: 'عدد أيام الغياب', angle: -90, position: 'insideLeft' }} />
