@@ -1872,12 +1872,12 @@ const QualityDashboard = () => {
 
             {/* قسم الانضباط */}
             <Card className="border-l-4 border-orange-500">
-              <CardHeader className="bg-orange-50">
-                <CardTitle className="flex items-center gap-2">
-                  ⚖️ قسم الانضباط
+              <CardHeader className="bg-orange-50 p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  ⚖️ قسم الانضباط والسلوك
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 pt-4">
+              <CardContent className="space-y-3 sm:space-y-4 pt-4 p-4 sm:p-6">
                 <div>
                   <Label>تقييم الانضباط (من 1 إلى 10)</Label>
                   <Input
