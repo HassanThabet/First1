@@ -1738,49 +1738,53 @@ const QualityDashboard = () => {
   return (
     <DashboardLayout title="لوحة تحكم الجودة - مدارس الفجر الجديد الأهلية">
       <div className="space-y-6">
-        {/* Tabs Navigation */}
+        {/* Tabs Navigation - Mobile Responsive */}
         <Card>
           <CardContent className="p-0">
-            <div className="flex border-b">
+            <div className="flex flex-col sm:flex-row border-b overflow-x-auto">
               <button
                 onClick={() => setActiveTab("quality-create")}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 text-center text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                   activeTab === "quality-create"
                     ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
-                ✍️ إنشاء تقرير جودة
+                <span className="hidden sm:inline">✍️ إنشاء تقرير جودة</span>
+                <span className="sm:hidden">✍️ إنشاء</span>
               </button>
               <button
                 onClick={() => setActiveTab("quality-reports")}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 text-center text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                   activeTab === "quality-reports"
                     ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
-                📄 تقارير الجودة
+                <span className="hidden sm:inline">📄 تقارير الجودة</span>
+                <span className="sm:hidden">📄 التقارير</span>
               </button>
               <button
                 onClick={() => setActiveTab("dashboard")}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 text-center text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                   activeTab === "dashboard"
                     ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
-                📊 الإحصائيات الإجمالية
+                <span className="hidden sm:inline">📊 الإحصائيات الإجمالية</span>
+                <span className="sm:hidden">📊 الإحصائيات</span>
               </button>
               <button
                 onClick={() => setActiveTab("teacher-progress")}
-                className={`flex-1 px-6 py-4 text-center font-medium transition-colors ${
+                className={`flex-1 px-3 sm:px-6 py-3 sm:py-4 text-center text-sm sm:text-base font-medium transition-colors whitespace-nowrap ${
                   activeTab === "teacher-progress"
                     ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
               >
-                📈 تقييم تحسن المعلمين
+                <span className="hidden sm:inline">📈 تقييم تحسن المعلمين</span>
+                <span className="sm:hidden">📈 المعلمين</span>
               </button>
             </div>
           </CardContent>
