@@ -2757,10 +2757,10 @@ const QualityDashboard = () => {
                   <div className="space-y-6">
                     {/* Teachers Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
-                      <div id="director-teachers-chart">
+                      <div id="director-teachers-chart" key={`teachers-chart-${activeTab}`}>
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات المعلمين (انقر للتفاصيل)</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                          <PieChart>
+                          <PieChart key={`pie-teachers-${reportTypeFilter}-${timeFilter}`}>
                             <Pie
                               data={getTeachersChartData()}
                               cx="50%"
