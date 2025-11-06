@@ -3374,16 +3374,17 @@ const QualityDashboard = () => {
             </DialogHeader>
             
             <div className="space-y-4" dir="rtl">
-              <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
-                <span className="font-semibold text-blue-800">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-3 p-3 sm:p-4 bg-blue-50 rounded-lg">
+                <span className="font-semibold text-blue-800 text-sm sm:text-base text-center sm:text-right">
                   إجمالي عدد المعلمين: {teachersListData.teachers.length}
                 </span>
                 <Button 
                   onClick={exportTeachersListToPDF}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto"
                   size="sm"
                 >
-                  📄 تصدير إلى PDF
+                  <span className="hidden sm:inline">📄 تصدير إلى PDF</span>
+                  <span className="sm:hidden">📄 تصدير PDF</span>
                 </Button>
               </div>
               
