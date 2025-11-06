@@ -1934,12 +1934,12 @@ const QualityDashboard = () => {
 
             {/* قسم الأخصائي الاجتماعي */}
             <Card className="border-l-4 border-pink-500">
-              <CardHeader className="bg-pink-50">
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="bg-pink-50 p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   💬 قسم الأخصائي الاجتماعي
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 pt-4">
+              <CardContent className="space-y-3 sm:space-y-4 pt-4 p-4 sm:p-6">
                 <div>
                   <Label>تقييم أداء الأخصائي الاجتماعي (من 1 إلى 10)</Label>
                   <Input
