@@ -2796,10 +2796,10 @@ const QualityDashboard = () => {
                     
                     {/* Performance Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "supervisor") && (
-                      <div id="director-performance-chart">
+                      <div id="director-performance-chart" key={`performance-chart-${activeTab}`}>
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">متوسط الأداء العام</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                          <BarChart data={getPerformanceChartData()}>
+                          <BarChart data={getPerformanceChartData()} key={`bar-performance-${reportTypeFilter}-${timeFilter}`}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="name" />
                             <YAxis domain={[0, 10]} />
