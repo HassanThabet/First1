@@ -2857,10 +2857,10 @@ const QualityDashboard = () => {
                     
                     {/* Activities Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "activities") && (
-                      <div id="director-activities-chart">
+                      <div id="director-activities-chart" key={`activities-chart-${activeTab}`}>
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">إحصائيات الأنشطة (انقر على "المشاركين" للتفاصيل)</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                          <BarChart data={getActivitiesChartData()} onClick={(e) => {
+                          <BarChart data={getActivitiesChartData()} key={`bar-activities-${reportTypeFilter}-${timeFilter}`} onClick={(e) => {
                             if (e && e.activeLabel === 'المشاركين') {
                               handleChartClick('activity');
                             }
