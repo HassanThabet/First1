@@ -1792,12 +1792,12 @@ const QualityDashboard = () => {
 
         {/* Tab Content */}
         {activeTab === "quality-create" && (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle>تاريخ التقرير</CardTitle>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">تاريخ التقرير</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 <Label>اختر التاريخ</Label>
                 <Input
                   type="date"
