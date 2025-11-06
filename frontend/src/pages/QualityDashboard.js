@@ -2106,20 +2106,20 @@ const QualityDashboard = () => {
             {/* Summary Statistics Card */}
             {qualityReportsOwn.length > 0 && (
               <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-2">
+                <CardHeader className="p-4 sm:p-6">
+                  <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
                     📊 ملخص الإحصائيات
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-                      <p className="text-sm text-gray-600 mb-1">إجمالي التقارير</p>
-                      <p className="text-3xl font-bold text-blue-600">{qualityReportsOwn.length}</p>
+                <CardContent className="p-4 sm:p-6">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4">
+                    <div className="bg-white p-2 sm:p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">إجمالي التقارير</p>
+                      <p className="text-xl sm:text-3xl font-bold text-blue-600">{qualityReportsOwn.length}</p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-sm text-center">
-                      <p className="text-sm text-gray-600 mb-1">متوسط التقييم الأكاديمي</p>
-                      <p className="text-3xl font-bold text-green-600">
+                    <div className="bg-white p-2 sm:p-4 rounded-lg shadow-sm text-center">
+                      <p className="text-xs sm:text-sm text-gray-600 mb-1">متوسط التقييم الأكاديمي</p>
+                      <p className="text-xl sm:text-3xl font-bold text-green-600">
                         {(qualityReportsOwn.reduce((sum, r) => sum + (parseFloat(r.academic_performance?.rate) || 0), 0) / qualityReportsOwn.length).toFixed(1)}
                       </p>
                     </div>
