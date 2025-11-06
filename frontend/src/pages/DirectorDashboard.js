@@ -2272,13 +2272,41 @@ const DirectorDashboard = () => {
                     <h4 className="font-semibold text-purple-800">الأنشطة:</h4>
                     {selectedReport.activities.map((activity, idx) => (
                       <div key={idx} className="p-4 bg-purple-50 rounded-lg">
-                        <h5 className="font-semibold text-purple-900 mb-2">{activity.activity_name}</h5>
+                        <h5 className="font-semibold text-purple-900 mb-2">{activity.name || activity.activity_name}</h5>
                         <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div><span className="font-medium">التاريخ:</span> {activity.date}</div>
+                          <div><span className="font-medium">النوع:</span> {activity.type}</div>
+                          <div><span className="font-medium">المجموعة المستهدفة:</span> {activity.target_group}</div>
                           <div><span className="font-medium">عدد المشاركين:</span> {activity.participants_count}</div>
                           <div><span className="font-medium">معدل التفاعل:</span> {activity.interaction_rate}/10</div>
-                          {activity.supervising_teachers && activity.supervising_teachers.length > 0 && (
+                          {activity.supervisors && activity.supervisors.length > 0 && (
                             <div className="col-span-2">
-                              <span className="font-medium">المعلمون المشرفون:</span> {activity.supervising_teachers.join(', ')}
+                              <span className="font-medium">المشرفون:</span> {activity.supervisors.join(', ')}
+                            </div>
+                          )}
+                          {activity.cooperating_teachers && activity.cooperating_teachers.length > 0 && (
+                            <div className="col-span-2">
+                              <span className="font-medium">المعلمون المتعاونون:</span> {activity.cooperating_teachers.join(', ')}
+                            </div>
+                          )}
+                          {activity.admin_cooperation && (
+                            <div className="col-span-2">
+                              <span className="font-medium">تعاون الإدارة:</span> {activity.admin_cooperation}
+                            </div>
+                          )}
+                          {activity.educational_impact && (
+                            <div className="col-span-2">
+                              <span className="font-medium">الأثر التعليمي:</span> {activity.educational_impact}
+                            </div>
+                          )}
+                          {activity.problems && (
+                            <div className="col-span-2">
+                              <span className="font-medium">المشاكل:</span> {activity.problems}
+                            </div>
+                          )}
+                          {activity.recommendations && (
+                            <div className="col-span-2">
+                              <span className="font-medium">التوصيات:</span> {activity.recommendations}
                             </div>
                           )}
                         </div>
