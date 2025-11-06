@@ -1903,12 +1903,12 @@ const QualityDashboard = () => {
 
             {/* قسم الأنشطة */}
             <Card className="border-l-4 border-purple-500">
-              <CardHeader className="bg-purple-50">
-                <CardTitle className="flex items-center gap-2">
+              <CardHeader className="bg-purple-50 p-4 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                   🎨 قسم الأنشطة
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4 pt-4">
+              <CardContent className="space-y-3 sm:space-y-4 pt-4 p-4 sm:p-6">
                 <div>
                   <Label>تقييم جودة الأنشطة (من 1 إلى 10)</Label>
                   <Input
