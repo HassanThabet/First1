@@ -2893,10 +2893,10 @@ const QualityDashboard = () => {
                     
                     {/* Social Cases Chart */}
                     {(reportTypeFilter === "all" || reportTypeFilter === "social") && (
-                      <div id="director-social-chart">
+                      <div id="director-social-chart" key={`social-chart-${activeTab}`}>
                         <h3 className="text-lg font-semibold mb-4 text-gray-700">توزيع حالات الأخصائي الاجتماعي</h3>
                         <ResponsiveContainer width="100%" height={300}>
-                          <PieChart>
+                          <PieChart key={`pie-social-${reportTypeFilter}-${timeFilter}`}>
                             <Pie
                               data={getSocialCasesChartData()}
                               cx="50%"
