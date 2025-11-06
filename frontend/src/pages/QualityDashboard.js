@@ -2091,10 +2091,11 @@ const QualityDashboard = () => {
                     </Button>
                     <Button
                       onClick={exportQualityReportsToPDF}
-                      className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700"
+                      className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-sm sm:text-base px-3 sm:px-4"
                     >
-                      <FileDown className="w-4 h-4 ml-2" />
-                      تصدير PDF
+                      <FileDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
+                      <span className="hidden sm:inline">تصدير PDF</span>
+                      <span className="sm:hidden">PDF</span>
                     </Button>
                   </div>
                 </div>
