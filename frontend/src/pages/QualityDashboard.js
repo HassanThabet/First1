@@ -2176,7 +2176,7 @@ const QualityDashboard = () => {
                 التقارير ({qualityReportsOwn.length})
               </h3>
 
-              <div className="grid grid-cols-1 gap-3">
+              <div className="grid grid-cols-1 gap-2 sm:gap-3">
                 {qualityReportsOwn.map((report) => (
                   <Card
                     key={report.id}
@@ -2186,34 +2186,36 @@ const QualityDashboard = () => {
                       setShowQualityReportModal(true);
                     }}
                   >
-                    <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-bold text-gray-800">
-                            تقرير {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div className="flex-1 w-full sm:w-auto">
+                          <h4 className="font-bold text-sm sm:text-base text-gray-800">
+                            تقرير {new Date(report.date).toLocaleDateString("ar-SA", { year: 'numeric', month: 'long', day: 'numeric' })}
                           </h4>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-xs sm:text-sm text-gray-500">
                             معدل الأداء التدريسي: {report.social_specialist?.teaching_performance_rate || 0}/10
                           </p>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                           <Button
                             variant="outline"
                             size="sm"
+                            className="flex-1 sm:flex-none text-xs sm:text-sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedQualityReport(report);
                               setShowQualityReportModal(true);
                             }}
                           >
-                            <Eye className="w-4 h-4 ml-1" />
+                            <Eye className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                             عرض
                           </Button>
 
                           <Button
                             variant="outline"
                             size="sm"
+                            className="flex-1 sm:flex-none text-xs sm:text-sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleEdit(report);
@@ -2225,6 +2227,7 @@ const QualityDashboard = () => {
                           <Button
                             variant="destructive"
                             size="sm"
+                            className="flex-1 sm:flex-none text-xs sm:text-sm"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(report.id);
