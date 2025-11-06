@@ -1737,7 +1737,7 @@ const QualityDashboard = () => {
 
   return (
     <DashboardLayout title="لوحة تحكم الجودة - مدارس الفجر الجديد الأهلية">
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
         {/* Tabs Navigation - Mobile Responsive */}
         <Card>
           <CardContent className="p-0">
