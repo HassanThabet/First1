@@ -2520,17 +2520,19 @@ const QualityDashboard = () => {
             </div>
             
             {/* Action Buttons */}
-            <div className="flex justify-between items-center mt-4 pt-4 border-t">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 mt-4 pt-4 border-t">
               <Button 
                 onClick={exportToPDF}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto text-sm sm:text-base"
               >
-                📄 تصدير التقرير إلى PDF
+                <span className="hidden sm:inline">📄 تصدير التقرير إلى PDF</span>
+                <span className="sm:hidden">📄 تصدير PDF</span>
               </Button>
               
               <Button 
                 onClick={() => setShowDetailedReports(!showDetailedReports)}
                 variant="outline"
+                className="w-full sm:w-auto text-sm sm:text-base"
                 className="border-blue-600 text-blue-600 hover:bg-blue-50"
               >
                 {showDetailedReports ? "إخفاء التقارير التفصيلية" : "عرض التقارير التفصيلية"}
