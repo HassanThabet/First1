@@ -2078,7 +2078,7 @@ const QualityDashboard = () => {
                     </div>
                   )}
 
-                  <div className="flex items-end gap-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-end gap-2">
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -2086,12 +2086,13 @@ const QualityDashboard = () => {
                         setMonthFilter("");
                         setViewMode("all");
                       }}
+                      className="w-full sm:w-auto text-sm sm:text-base"
                     >
                       إعادة تعيين
                     </Button>
                     <Button
                       onClick={exportQualityReportsToPDF}
-                      className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-sm sm:text-base px-3 sm:px-4"
+                      className="bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-sm sm:text-base px-3 sm:px-4 w-full sm:w-auto"
                     >
                       <FileDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
                       <span className="hidden sm:inline">تصدير PDF</span>
