@@ -8,7 +8,7 @@ import requests
 import json
 
 # Configuration
-BASE_URL = "https://quality-school-dash.preview.emergentagent.com/api"
+BASE_URL = "https://eduportal-200.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_USERS = {

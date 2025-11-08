@@ -1,25 +1,42 @@
 <analysis>
-The AI engineer's trajectory began with resolving a critical authorization issue in  for  and  roles. This was followed by refining quality report fields in  to eliminate default '5' values and meticulously fixing a data structure mismatch between the frontend (flat) and backend (nested ) for quality reports. A persistent PDF export  related to  was diagnosed as an incorrect font virtual file system assignment in  and subsequently fixed. Upon user feedback, the display of detailed quality reports in  and  was enhanced to show all nested section details. A new  error then emerged during PDF export, traced to the  file only containing  while the  tries to use bold styles. The current focus is on standardizing font usage to  for all styles.
+The AI engineer's work primarily focused on iteratively refining and fixing the مدارس الفجر الجديد الأهلية application based on continuous user feedback. The trajectory began by resolving a PDF font rendering issue by standardizing font usage and removing explicit bold styles. Subsequently, the engineer enhanced dashboard functionalities by integrating summary statistics, fixing report counts, and improving PDF exports for various roles. A significant portion of the work involved improving mobile responsiveness and resolving React reconciliation errors () in different dashboards (, ). The engineer also addressed data visibility inconsistencies, such as activities not appearing in detailed reports and branch filters not being applied correctly to report views. Throughout, the approach involved detailed file examination, targeted code modifications, and backend endpoint creation for data cleaning. The work concluded with successfully verifying the dashboard functionality after addressing a compilation error, indicating a stable application state.
 </analysis>
 
 <product_requirements>
-The مدارس الفجر الجديد الأهلية application is a role-based school management system supporting Arabic (RTL), CRUD operations, data visualization, and Excel/PDF exports. The primary goal was to enhance the Quality Dashboard and address data visibility issues across dashboards.
+The مدارس الفجر الجديد الأهلية application is a role-based school management system supporting Arabic (RTL), CRUD operations, data visualization, and Excel/PDF exports. The primary goal was to enhance the Quality Dashboard and address data visibility issues across dashboards, with a focus on user experience and data accuracy.
 
 **Key requirements addressed and implemented:**
-1.  **Quality Dashboard Update**: Integrated  content into , retaining إنشاء تقرير جودة and تقارير الجودة tabs. The الإحصائيات الإجمالية tab now displays Director's statistics.
-2.  **PDF Export Enhancement**: Added formatted PDF export for Quality reports, filterable by date (still has a bug).
-3.  **Data Visibility & Authorization**: Resolved initial data not appearing by fixing 401 Unauthorized errors for  and  roles across dashboards.
-4.  **Quality Report Form Refinement**: Removed default values (5) from rating fields in the quality report creation/edit form.
-5.  **Quality Report View/Edit Functionality**: Ensured existing quality reports can be viewed and edited with all saved data correctly pre-filled and displayed.
-6.  **Detailed Quality Reports in Director/Chairman Dashboards**: User explicitly requested comprehensive quality reports in Director's and Chairman's dashboards, showing all detailed information including nested sections.
+1.  **Quality Dashboard Update**: Integrated  content into , retaining إنشاء تقرير جودة and تقارير الجودة tabs. الإحصائيات الإجمالية displays Director's statistics.
+2.  **PDF Export Enhancement**:
+    *   Added formatted PDF export for Quality reports (initially had a font bug, then fixed).
+    *   Add quality summary to Director/Chairman PDF exports, formatted as a table.
+    *   Ensure PDF export buttons are responsive on mobile.
+3.  **Data Visibility & Authorization**:
+    *   Resolved initial data not appearing by fixing 401 Unauthorized errors for  and  roles.
+    *   Ensure detailed quality reports in Director's and Chairman's dashboards show all nested section details.
+    *   Ensure activities added are visible in detailed reports for Director, Chairman, and Quality dashboards.
+    *   Ensure Activity Supervisors and Cooperating Teachers are filtered by date in Director, Chairman, and Quality dashboards.
+    *   Ensure detailed report views (modals) respect the branch filter (boys/girls).
+    *   Display student absence count in Supervisor detailed reports (Director, Chairman, Quality dashboards).
+4.  **Quality Report Form Refinement**: Removed default values (5) from rating fields. Ensured existing reports can be viewed/edited correctly.
+5.  **Data Consistency**:
+    *   PDF summary statistics for quality reports should not be empty and should include correct data.
+    *   Quality summary statistics should be integrated into the تقارير الجودة tab in .
+    *   Quality summary statistics should be integrated into Director and Chairman dashboards.
+    *   Correct inaccurate quality report counts in Chairman dashboard by deleting empty/orphan reports.
+6.  **User Experience & Stability**:
+    *   Resolve React  errors during tab navigation on mobile in Quality Dashboard.
+    *   Resolve React  errors when selecting subjects for late teachers in Supervisor Dashboard.
+    *   Improve overall mobile responsiveness across all tabs and components in Quality Dashboard.
 </product_requirements>
 
 <key_technical_concepts>
 -   **MERN-like Stack**: React (Frontend), FastAPI (Backend), MongoDB (Database).
--   **RTL Support**:  with  fonts for Arabic PDF.
+-   **RTL Support**:  with  fonts for Arabic PDF generation.
 -   **PDF Generation**:  for dynamic PDF reports.
 -   **Error Handling**:  for resilient API calls.
 -   **Role-Based Access Control**: Backend endpoints use roles for authorization.
+-   **React Component Lifecycle**: Use of  props and  for component reconciliation.
 </key_technical_concepts>
 
 <code_architecture>
@@ -32,26 +49,62 @@ The application uses a MERN-like stack: React for the frontend, FastAPI for the 
 **Key Files and Their Importance/Changes:**
 
 -   :
-    -   **Importance:** Contains the main logic, UI, and data handling for the Quality Dashboard, including report creation, editing, viewing, and PDF export.
+    -   **Importance:** Central hub for Quality reports, including creation, editing, viewing, and PDF export. Also contains the Director's statistics tab and functionality for Teacher Progress and Activity Supervisors.
     -   **Changes:**
-        -   Integrated  functionality, preserving Quality-specific tabs.
-        -   Removed default  values and  logic from  and  handlers for rating inputs.
-        -   Modified , , , and report display modal to correctly handle nested report data structures.
-        -   **Specific Fix:** Corrected the  assignment from  to  (specifically line 502 was updated to match line 760).
+        -   **PDF Font Fix (Chat 41, 47, 51, 57, 59):** Removed  from  styles and content in  and  functions to prevent Font Nillima is not defined error, standardizing on .
+        -   **PDF Data Fix (Chat 76):** Corrected data access for nested fields (e.g., ) in  to ensure PDF summary statistics are not empty.
+        -   **Quality Summary Integration (Chat 92):** Added a summary statistics card to the تقارير الجودة tab (lines 2050-2100 approximately).
+        -   **Mobile Responsiveness & React  Fix (Chat 259, 267, 269, 273, 275, 286, 290, 292, 296, 305, 309, 311, 315, 317, 319, 323, 327, 329):** Implemented comprehensive responsive design using TailwindCSS classes (e.g., , , ) for main containers, cards, forms, buttons, and tables. Added dynamic  props to charts and other list items to prevent React  errors when switching tabs.
+        -   **Activity Details Display (Chat 367):** Corrected the display logic for activity details from  to  in the quality report detailed view.
+        -   **Date Filtering for Components (Chat 392):** Passed  and  props to  and  components to ensure they respect the date filter.
+        -   **Student Absences Display (Chat 442):** Added display for  in Supervisor detailed reports.
+        -   **Branch Filter Fix (Chat 475):** Replaced  with  in the  function.
+        -   **Compilation Error Fix (Chat 494):** Removed a duplicate declaration of  (around line 995).
+
 -   :
-    -   **Importance:** Defines API endpoints and implements role-based access control.
+    -   **Importance:** Defines API endpoints, implements role-based access control, and handles data interaction with MongoDB.
     -   **Changes:**
-        -   Modified several report endpoints to include  in the allowed roles list, resolving 401 errors.
-        -   Updated  Pydantic model to accept  for .
+        -   **Orphaned Report Deletion (Chat 140):** Added a new endpoint  that allows  role to delete reports associated with non-existent users.
+        -   **Empty Quality Report Deletion (Chat 211):** Added a new endpoint  for  to remove quality reports with no content.
+        -   **Test User and Report Deletion (Chat 240):** Added  to remove specific test users ( and others) and their associated quality reports.
+
 -   :
     -   **Importance:** Handles the display and logic for the Director's dashboard.
-    -   **Changes:** The quality report display modal (lines 2249-2267) was updated to show all detailed, nested report sections (academic performance, supervision, discipline, activities, social specialist) with their respective rates and notes, rather than just basic information.
+    -   **Changes:**
+        -   **Quality Summary Integration (Chat 115):** Added a quality summary statistics card (around lines 1980-2045).
+        -   **PDF Quality Summary (Chat 175, 186):** Integrated quality summary details into the  function, later formatted as a table.
+        -   **Activity Details Display (Chat 354):** Corrected the display logic for activity details from  to .
+        -   **Date Filtering for Components (Chat 384):** Passed  and  props to  and  components.
+        -   **Student Absences Display (Chat 428):** Added display for  in Supervisor detailed reports.
+        -   **Branch Filter Fix (Chat 457, 461):** Replaced  with  in the  function for various report types.
+
 -   :
     -   **Importance:** Handles the display and logic for the Chairman's dashboard.
-    -   **Changes:** Similar to , the quality report display modal was modified to show comprehensive details of quality reports.
+    -   **Changes:**
+        -   **Quality Summary Integration (Chat 119):** Added a quality summary statistics card.
+        -   **PDF Quality Summary (Chat 179, 188):** Integrated quality summary details into the  function, later formatted as a table.
+        -   **Activity Details Display (Chat 358):** Corrected the display logic for activity details from  to .
+        -   **Date Filtering for Components (Chat 388):** Passed  and  props to  and  components.
+        -   **Student Absences Display (Chat 434):** Added display for  in Supervisor detailed reports.
+        -   **Branch Filter Fix (Chat 469):** Replaced  with  in the  function for various report types.
+        -   **Compilation Error Fix (Chat 488):** Removed a duplicate declaration of  (around line 556).
+
+-   :
+    -   **Importance:** Manages the Supervisor's specific tasks and report views.
+    -   **Changes:**
+        -   **React  Fix (Chat 403, 407, 411, 415):** Added unique  props to  iterations for , , and  to resolve React reconciliation errors when interacting with select elements.
+
+-   :
+    -   **Importance:** Component for displaying activity supervisors.
+    -   **Changes (Chat 378):** Modified to accept  and  props and apply filtering to displayed data.
+
+-   :
+    -   **Importance:** Component for displaying cooperating teachers.
+    -   **Changes (Chat 382):** Modified to accept  and  props and apply filtering to displayed data.
+
 -   :
     -   **Importance:** Contains font definitions for PDF generation, especially for Arabic RTL support using .
-    -   **Changes:** No direct changes were *completed*. Examination revealed it only contains , lacking , which is the root cause of the current font definition error during PDF export.
+    -   **Changes:** No direct changes were *completed*. Examination confirmed it only contains , which was the root cause of the initial PDF font definition error before  was modified.
 </code_architecture>
 
 <pending_tasks>
@@ -59,17 +112,16 @@ The application uses a MERN-like stack: React for the frontend, FastAPI for the 
 -   Implement remember me functionality for authentication.
 -   Complete PDF export enhancement for , , and .
 -   Create a dedicated detailed page for .
--   Resolve the  error preventing PDF export functionality on the Quality Dashboard.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer successfully addressed two user requirements:
-1.  **PDF Export  TypeError Resolution**: The issue of  occurring during PDF export from the Quality Dashboard was diagnosed. The root cause was an inconsistent assignment of  in , specifically on line 502 where it was attempting to access a nested property () that did not exist. This was corrected by changing line 502 to directly assign  to , aligning with a correct usage already present on line 760.
-2.  **Detailed Quality Reports in Director/Chairman Dashboards**: The user requested that the Director's and Chairman's dashboards display more detailed information for quality reports, beyond the basic  and . The engineer modified the display modals in  (lines 2249-2267) and  to correctly parse and present all nested sections of the quality reports, including , , , , and , along with their respective rates and notes.
+Immediately before this summary request, the AI engineer addressed a critical compilation error () that arose after previous changes. This error occurred in both  and  because a  command intended to replace function *calls* also inadvertently replaced a function *definition*, leading to duplicate declarations.
 
-After these fixes were implemented and the frontend restarted, a new error emerged upon attempting PDF export: . The engineer has investigated  and , determining that  only contains , while the PDF  attempts to use 'bold' styles, causing  to seek a non-existent font (likely defaulting to 'Nillima' or an undefined Cairo-Bold).
+The engineer successfully resolved this by identifying and removing the redundant function declarations of  in both  (Chat 488) and  (Chat 494).
+
+Following this fix, the user reported that the Director, Chairman, and Quality dashboards were not working. The engineer investigated the issue by checking supervisor services (all running), compilation status (successful), and performing a visual inspection via screenshot of the Director Dashboard. The screenshot and subsequent console checks confirmed that the Director dashboard was functioning correctly, displaying updated statistics, and had no errors in the browser console. The previous issues regarding  errors, mobile responsiveness, filter application, and data display have been addressed and validated for the Director Dashboard. The remaining task is to verify Chairman and Quality dashboards.
 </current_work>
 
 <optional_next_step>
-Update  to configure  to use  for all font styles.
+Verify the functionality of the Chairman and Quality dashboards.
 </optional_next_step>
