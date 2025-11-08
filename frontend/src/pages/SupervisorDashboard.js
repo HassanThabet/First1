@@ -215,7 +215,7 @@ const SupervisorDashboard = () => {
         general_notes: "",
         incidents: [],
         covering_teachers: [],
-        absent_students_count: 0
+        absent_students_count: ""
       });
     } catch (error) {
       toast.error(error.response?.data?.detail || "فشل إنشاء التقرير");
