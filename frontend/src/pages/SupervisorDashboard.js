@@ -49,7 +49,7 @@ const SupervisorDashboard = () => {
     general_notes: "",
     incidents: [],
     covering_teachers: [],
-    absent_students_count: 0
+    absent_students_count: ""
   });
   
   const [editingReport, setEditingReport] = useState(null);
