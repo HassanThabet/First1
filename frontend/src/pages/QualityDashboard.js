@@ -715,7 +715,7 @@ const QualityDashboard = () => {
     console.log("🏢 branchFilter:", branchFilter);
     console.log("👤 user.branch:", user?.branch);
     
-    let filtered = filterReportsByTimeOnly(reports);
+    let filtered = filterReportsByTimeAndBranch(reports);
     console.log("✅ After time filter:", filtered.length, "reports");
     
     // Only apply branch filter if user has branch="both" and branchFilter is not "all"
@@ -992,7 +992,7 @@ const QualityDashboard = () => {
   };
 
   // Helper function to filter reports by time only
-  const filterReportsByTimeOnly = (reports) => {
+  const filterReportsByTimeAndBranch = (reports) => {
     const today = new Date();
     
     if (timeFilter === "daily") {
@@ -1060,7 +1060,7 @@ const QualityDashboard = () => {
     let allReports = [];
     
     if (reportTypeFilter === "all" || reportTypeFilter === "vice_principal") {
-      const filtered = filterReportsByTimeOnly([...vicePrincipalReports]);
+      const filtered = filterReportsByTimeAndBranch([...vicePrincipalReports]);
       const vpsFiltered = selectedVicePrincipal === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedVicePrincipal);
@@ -1076,7 +1076,7 @@ const QualityDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "supervisor") {
-      const filtered = filterReportsByTimeOnly([...supervisorReports]);
+      const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
       const supFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
@@ -1092,7 +1092,7 @@ const QualityDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
-      const filtered = filterReportsByTimeOnly([...activitiesReports]);
+      const filtered = filterReportsByTimeAndBranch([...activitiesReports]);
       const actFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
@@ -1108,7 +1108,7 @@ const QualityDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "social") {
-      const filtered = filterReportsByTimeOnly([...socialReports]);
+      const filtered = filterReportsByTimeAndBranch([...socialReports]);
       const socFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
@@ -1124,7 +1124,7 @@ const QualityDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
-      const filtered = filterReportsByTimeOnly([...qualityReports]);
+      const filtered = filterReportsByTimeAndBranch([...qualityReports]);
       const qualFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
@@ -1140,7 +1140,7 @@ const QualityDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") {
-      const filtered = filterReportsByTimeOnly([...educationalSupervisionReports]);
+      const filtered = filterReportsByTimeAndBranch([...educationalSupervisionReports]);
       const eduSupFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
@@ -1658,10 +1658,10 @@ const QualityDashboard = () => {
 
   // Calculate overall statistics
   const getOverallStatistics_OLD = () => {
-    let filteredSupervisorReports = filterReportsByTimeOnly([...supervisorReports]);
-    let filteredActivitiesReports = filterReportsByTimeOnly([...activitiesReports]);
-    let filteredSocialReports = filterReportsByTimeOnly([...socialReports]);
-    let filteredQualityReports = filterReportsByTimeOnly([...qualityReports]);
+    let filteredSupervisorReports = filterReportsByTimeAndBranch([...supervisorReports]);
+    let filteredActivitiesReports = filterReportsByTimeAndBranch([...activitiesReports]);
+    let filteredSocialReports = filterReportsByTimeAndBranch([...socialReports]);
+    let filteredQualityReports = filterReportsByTimeAndBranch([...qualityReports]);
 
     // Supervisor statistics
     const totalLateTeachers = filteredSupervisorReports.reduce((sum, r) => sum + (r.late_teachers?.length || 0), 0);
