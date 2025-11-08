@@ -1945,7 +1945,12 @@ const DirectorDashboard = () => {
                     <CardTitle className="text-xl">🎯 المعلمون المشرفون على الأنشطة</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <ActivitySupervisorsView compact={true} />
+                    <ActivitySupervisorsView 
+                      compact={true} 
+                      timeFilter={timeFilter}
+                      customStartDate={customStartDate}
+                      customEndDate={customEndDate}
+                    />
                   </CardContent>
                 </Card>
               )}
@@ -1957,7 +1962,12 @@ const DirectorDashboard = () => {
                     <CardTitle className="text-xl">🤝 المعلمون المتعاونون في الأنشطة</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CooperatingTeachersView compact={true} />
+                    <CooperatingTeachersView 
+                      compact={true}
+                      timeFilter={timeFilter}
+                      customStartDate={customStartDate}
+                      customEndDate={customEndDate}
+                    />
                   </CardContent>
                 </Card>
               )}
