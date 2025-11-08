@@ -186,14 +186,20 @@ const SupervisorDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Prepare data: convert empty absent_students_count to 0
+      const submitData = {
+        ...formData,
+        absent_students_count: formData.absent_students_count === "" ? 0 : parseInt(formData.absent_students_count) || 0
+      };
+      
       if (editingReport) {
         // Update existing report
-        await axios.put(`${API}/reports/supervisor/${editingReport.id}`, formData);
+        await axios.put(`${API}/reports/supervisor/${editingReport.id}`, submitData);
         toast.success("تم تحديث التقرير بنجاح");
         setEditingReport(null);
       } else {
         // Create new report
-        await axios.post(`${API}/reports/supervisor`, formData);
+        await axios.post(`${API}/reports/supervisor`, submitData);
         toast.success("تم إنشاء التقرير بنجاح");
       }
       fetchData();
