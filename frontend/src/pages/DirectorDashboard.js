@@ -654,7 +654,7 @@ const DirectorDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "activities") {
-      const filtered = filterReportsByTimeOnly([...activitiesReports]);
+      const filtered = filterReportsByTimeAndBranch([...activitiesReports]);
       const actFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
@@ -670,7 +670,7 @@ const DirectorDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "social") {
-      const filtered = filterReportsByTimeOnly([...socialReports]);
+      const filtered = filterReportsByTimeAndBranch([...socialReports]);
       const socFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
@@ -686,7 +686,7 @@ const DirectorDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "quality") {
-      const filtered = filterReportsByTimeOnly([...qualityReports]);
+      const filtered = filterReportsByTimeAndBranch([...qualityReports]);
       const qualFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
@@ -702,7 +702,7 @@ const DirectorDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "educational_supervision") {
-      const filtered = filterReportsByTimeOnly([...educationalSupervisionReports]);
+      const filtered = filterReportsByTimeAndBranch([...educationalSupervisionReports]);
       const eduSupFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
