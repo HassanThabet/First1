@@ -618,9 +618,12 @@ const SupervisorDashboard = () => {
               <CardContent>
                 <Input
                   type="number"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   min="0"
+                  placeholder="أدخل عدد الطلاب الغائبين"
                   value={formData.absent_students_count}
-                  onChange={(e) => setFormData({ ...formData, absent_students_count: parseInt(e.target.value) || 0 })}
+                  onChange={(e) => setFormData({ ...formData, absent_students_count: e.target.value === "" ? "" : parseInt(e.target.value) || "" })}
                   data-testid="absent-students-input"
                 />
               </CardContent>
