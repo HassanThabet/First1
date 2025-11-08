@@ -377,14 +377,18 @@ const SupervisorDashboard = () => {
                 <div>
                   <Label className="mb-2 block">المعلمون المتأخرون</Label>
                   {formData.late_teachers.map((lt, index) => (
-                    <div key={index} className="flex gap-2 mb-2">
-                      <Select value={lt.subject} onValueChange={(value) => updateLateTeacher(index, "subject", value)}>
+                    <div key={`late-teacher-${index}-${lt.teacher}-${lt.subject}`} className="flex gap-2 mb-2">
+                      <Select 
+                        value={lt.subject} 
+                        onValueChange={(value) => updateLateTeacher(index, "subject", value)}
+                        key={`subject-select-${index}`}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="اختر المادة" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent key={`subject-content-${index}`}>
                           {subjects.map(subject => (
-                            <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
+                            <SelectItem key={`subject-${subject.id}-${index}`} value={subject.name}>{subject.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
