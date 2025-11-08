@@ -564,28 +564,37 @@ const SupervisorDashboard = () => {
               </CardHeader>
               <CardContent>
                 {formData.covering_teachers.map((ct, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <Select value={ct.subject} onValueChange={(value) => updateCoveringTeacher(index, "subject", value)}>
+                  <div key={`covering-teacher-${index}-${ct.teacher}-${ct.subject}`} className="flex gap-2 mb-2">
+                    <Select 
+                      value={ct.subject} 
+                      onValueChange={(value) => updateCoveringTeacher(index, "subject", value)}
+                      key={`cover-subject-select-${index}`}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="اختر المادة" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent key={`cover-subject-content-${index}`}>
                         {subjects.map(subject => (
-                          <SelectItem key={subject.id} value={subject.name}>{subject.name}</SelectItem>
+                          <SelectItem key={`cover-subject-${subject.id}-${index}`} value={subject.name}>{subject.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    <Select value={ct.teacher} onValueChange={(value) => updateCoveringTeacher(index, "teacher", value)}>
+                    <Select 
+                      value={ct.teacher} 
+                      onValueChange={(value) => updateCoveringTeacher(index, "teacher", value)}
+                      key={`cover-teacher-select-${index}`}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="اختر المعلم" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent key={`cover-teacher-content-${index}`}>
                         {teachers.filter(t => t.subject === ct.subject).map(teacher => (
-                          <SelectItem key={teacher.id} value={teacher.name}>{teacher.name}</SelectItem>
+                          <SelectItem key={`cover-teacher-${teacher.id}-${index}`} value={teacher.name}>{teacher.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                     <Input
+                      key={`cover-period-input-${index}`}
                       placeholder="رقم الحصة"
                       value={ct.period}
                       onChange={(e) => updateCoveringTeacher(index, "period", e.target.value)}
