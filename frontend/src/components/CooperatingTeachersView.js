@@ -4,13 +4,13 @@ import { API } from '../App';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { toast } from 'sonner';
 
-const CooperatingTeachersView = ({ compact = false }) => {
+const CooperatingTeachersView = ({ compact = false, timeFilter = 'all', customStartDate = '', customEndDate = '' }) => {
   const [cooperatingData, setCooperatingData] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchCooperatingTeachers();
-  }, []);
+  }, [timeFilter, customStartDate, customEndDate]);
 
   const fetchCooperatingTeachers = async () => {
     try {
@@ -22,8 +22,38 @@ const CooperatingTeachersView = ({ compact = false }) => {
         axios.get(`${API}/teachers`)
       ]);
 
-      const activities = activitiesRes.data;
+      let activities = activitiesRes.data;
       const teachers = teachersRes.data;
+
+      // Apply time filter
+      if (timeFilter !== 'all') {
+        activities = activities.filter(report => {
+          if (!report.activities || report.activities.length === 0) return false;
+          
+          // Get the earliest activity date in the report
+          const activityDates = report.activities.map(a => new Date(a.date)).filter(d => !isNaN(d));
+          if (activityDates.length === 0) return false;
+          
+          const reportDate = activityDates[0];
+          const now = new Date();
+          
+          if (timeFilter === 'today') {
+            return reportDate.toDateString() === now.toDateString();
+          } else if (timeFilter === 'week') {
+            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            return reportDate >= weekAgo && reportDate <= now;
+          } else if (timeFilter === 'month') {
+            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+            return reportDate >= monthAgo && reportDate <= now;
+          } else if (timeFilter === 'custom' && customStartDate && customEndDate) {
+            const start = new Date(customStartDate);
+            const end = new Date(customEndDate);
+            return reportDate >= start && reportDate <= end;
+          }
+          
+          return true;
+        });
+      }
 
       // Create a map to count activities per cooperating teacher
       const cooperatingMap = new Map();
