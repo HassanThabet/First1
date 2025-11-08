@@ -392,17 +392,22 @@ const SupervisorDashboard = () => {
                           ))}
                         </SelectContent>
                       </Select>
-                      <Select value={lt.teacher} onValueChange={(value) => updateLateTeacher(index, "teacher", value)}>
+                      <Select 
+                        value={lt.teacher} 
+                        onValueChange={(value) => updateLateTeacher(index, "teacher", value)}
+                        key={`teacher-select-${index}`}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="اختر المعلم" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent key={`teacher-content-${index}`}>
                           {teachers.filter(t => t.subject === lt.subject).map(teacher => (
-                            <SelectItem key={teacher.id} value={teacher.name}>{teacher.name}</SelectItem>
+                            <SelectItem key={`teacher-${teacher.id}-${index}`} value={teacher.name}>{teacher.name}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                       <Input
+                        key={`period-input-${index}`}
                         placeholder="رقم الحصة"
                         value={lt.period}
                         onChange={(e) => updateLateTeacher(index, "period", e.target.value)}
