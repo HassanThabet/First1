@@ -530,7 +530,7 @@ const SupervisorDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {formData.incidents.map((incident, index) => (
-                  <div key={index} className="border p-4 rounded-lg space-y-3">
+                  <div key={`incident-${index}-${incident.description?.substring(0,10)}`} className="border p-4 rounded-lg space-y-3">
                     <div className="flex justify-between items-center">
                       <Label>الحادثة أو المخالفة {index + 1}</Label>
                       <Button type="button" variant="destructive" size="sm" onClick={() => removeIncident(index)}>
@@ -538,11 +538,13 @@ const SupervisorDashboard = () => {
                       </Button>
                     </div>
                     <Textarea
+                      key={`incident-desc-${index}`}
                       placeholder="وصف الحادثة أو المخالفة"
                       value={incident.description}
                       onChange={(e) => updateIncident(index, "description", e.target.value)}
                     />
                     <Textarea
+                      key={`incident-action-${index}`}
                       placeholder="الإجراء المتخذ"
                       value={incident.action}
                       onChange={(e) => updateIncident(index, "action", e.target.value)}
