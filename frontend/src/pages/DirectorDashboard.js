@@ -622,7 +622,7 @@ const DirectorDashboard = () => {
     let allReports = [];
     
     if (reportTypeFilter === "all" || reportTypeFilter === "vice_principal") {
-      const filtered = filterReportsByTimeOnly([...vicePrincipalReports]);
+      const filtered = filterReportsByTimeAndBranch([...vicePrincipalReports]);
       const vpsFiltered = selectedVicePrincipal === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedVicePrincipal);
@@ -638,7 +638,7 @@ const DirectorDashboard = () => {
     }
     
     if (reportTypeFilter === "all" || reportTypeFilter === "supervisor") {
-      const filtered = filterReportsByTimeOnly([...supervisorReports]);
+      const filtered = filterReportsByTimeAndBranch([...supervisorReports]);
       const supFiltered = selectedSpecificEmployee === "all" 
         ? filtered 
         : filtered.filter(r => r.user_id === selectedSpecificEmployee);
