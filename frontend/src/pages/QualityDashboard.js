@@ -708,6 +708,69 @@ const QualityDashboard = () => {
       .sort((a, b) => b.count - a.count);
   };
 
+  const filterReportsByTimeOnly = (reports) => {
+    const today = new Date();
+    
+    if (timeFilter === "daily") {
+      const todayStr = today.toISOString().split('T')[0];
+      return reports.filter(r => {
+        if (r.week_start) {
+          const weekStart = new Date(r.week_start);
+          const weekEnd = new Date(r.week_end);
+          const todayDate = new Date(todayStr);
+          return todayDate >= weekStart && todayDate <= weekEnd;
+        }
+        return r.date === todayStr;
+      });
+    } else if (timeFilter === "weekly") {
+      const currentDay = today.getDay();
+      const daysFromSaturday = currentDay === 6 ? 0 : currentDay + 1;
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - daysFromSaturday);
+      weekStart.setHours(0, 0, 0, 0);
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 4);
+      weekEnd.setHours(23, 59, 59, 999);
+      
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
+        }
+        const reportDate = new Date(r.date);
+        return reportDate >= weekStart && reportDate <= weekEnd;
+      });
+    } else if (timeFilter === "monthly") {
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          return reportWeekStart.getMonth() === currentMonth && reportWeekStart.getFullYear() === currentYear;
+        }
+        const reportDate = new Date(r.date);
+        return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
+      });
+    } else if (timeFilter === "custom" && customStartDate && customEndDate) {
+      const start = new Date(customStartDate);
+      const end = new Date(customEndDate);
+      end.setHours(23, 59, 59, 999);
+      
+      return reports.filter(r => {
+        if (r.week_start) {
+          const reportWeekStart = new Date(r.week_start);
+          const reportWeekEnd = new Date(r.week_end);
+          return (reportWeekStart <= end && reportWeekEnd >= start);
+        }
+        const reportDate = new Date(r.date);
+        return reportDate >= start && reportDate <= end;
+      });
+    }
+    
+    return reports;
+  };
+
   // Helper function to filter by time and branch
   const filterReportsByTimeAndBranch = (reports) => {
     console.log("🔍 filterReportsByTimeAndBranch called with", reports.length, "reports");
@@ -715,7 +778,7 @@ const QualityDashboard = () => {
     console.log("🏢 branchFilter:", branchFilter);
     console.log("👤 user.branch:", user?.branch);
     
-    let filtered = filterReportsByTimeAndBranch(reports);
+    let filtered = filterReportsByTimeOnly(reports);
     console.log("✅ After time filter:", filtered.length, "reports");
     
     // Only apply branch filter if user has branch="both" and branchFilter is not "all"
