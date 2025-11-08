@@ -660,7 +660,7 @@ const SupervisorDashboard = () => {
                     incidents: [],
                     absent_teachers: [],
                     covering_teachers: [],
-                    absent_students_count: 0
+                    absent_students_count: ""
                   });
                 }}
                 variant="outline"
