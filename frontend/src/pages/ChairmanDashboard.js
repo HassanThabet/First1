@@ -2229,6 +2229,16 @@ const ChairmanDashboard = () => {
                       </div>
                     )}
                     
+                    {selectedReport.absent_students_count !== undefined && selectedReport.absent_students_count !== null && (
+                      <div className="p-4 bg-red-50 rounded-lg border-l-4 border-red-500">
+                        <h4 className="font-semibold text-red-800 mb-2">الطلاب الغائبون:</h4>
+                        <div className="flex items-center gap-3">
+                          <span className="text-4xl font-bold text-red-600">{selectedReport.absent_students_count}</span>
+                          <span className="text-sm text-gray-600">طالب/طالبة غائب</span>
+                        </div>
+                      </div>
+                    )}
+                    
                     {selectedReport.student_movement && (
                       <div className="p-4 bg-blue-50 rounded-lg">
                         <h4 className="font-semibold text-blue-800 mb-2">حركة الطلاب:</h4>
