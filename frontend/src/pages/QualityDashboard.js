@@ -3025,7 +3025,7 @@ const QualityDashboard = () => {
                               
                               return (
                                 <Card 
-                                  key={index} 
+                                  key={report.id || `${report.type}-${report.userName}-${index}`} 
                                   className={`bg-gradient-to-br ${bgColor} border-r-4 cursor-pointer hover:shadow-lg transition-shadow`}
                                   onClick={(e) => {
                                     e.stopPropagation();
