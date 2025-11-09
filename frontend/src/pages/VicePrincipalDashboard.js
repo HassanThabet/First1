@@ -843,7 +843,7 @@ const VicePrincipalDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {formData.suggestions.map((suggestion, index) => (
-                  <div key={index} className="flex gap-2">
+                  <div key={`suggestion-${index}-${suggestion.substring(0, 20)}`} className="flex gap-2">
                     <Textarea
                       placeholder="أضف اقتراح"
                       value={suggestion}
