@@ -867,7 +867,7 @@ const VicePrincipalDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {formData.absent_teachers.map((at, index) => (
-                  <div key={index} className="flex gap-2 items-center">
+                  <div key={`absent-teacher-${index}-${at.teacher}`} className="flex gap-2 items-center">
                     <Select value={at.teacher} onValueChange={(value) => updateAbsentTeacher(index, "teacher", value)}>
                       <SelectTrigger className="flex-1">
                         <SelectValue placeholder="اختر المعلم" />
