@@ -1034,7 +1034,7 @@ const SupervisorDashboard = () => {
                             </div>
                             <div className="flex flex-wrap gap-2">
                               {selectedReport.student_movement_classes.map((cls, i) => (
-                                <span key={i} className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full">
+                                <span key={`movement-class-${cls}`} className="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full">
                                   {cls}
                                 </span>
                               ))}
