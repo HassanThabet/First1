@@ -2648,7 +2648,7 @@ const ChairmanDashboard = () => {
                     </thead>
                     <tbody>
                       {teachersListData.teachers.map((teacher, index) => (
-                        <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <tr key={`teacher-${teacher.name}-${index}`} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                           <td className="border border-gray-300 px-4 py-2 text-center">{index + 1}</td>
                           <td className="border border-gray-300 px-4 py-2 text-center font-semibold">
                             {teacher.name}
