@@ -1904,7 +1904,7 @@ const ChairmanDashboard = () => {
                               dataKey="value"
                             >
                               {getSocialCasesChartData().map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                <Cell key={`social-cell-${entry.name}-${entry.value}`} fill={entry.fill} />
                               ))}
                             </Pie>
                             <Tooltip />
