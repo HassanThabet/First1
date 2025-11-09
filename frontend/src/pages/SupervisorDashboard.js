@@ -974,7 +974,7 @@ const SupervisorDashboard = () => {
                               </div>
                               <ul className="text-sm text-gray-700 space-y-1">
                                 {selectedReport.late_teachers.map((lt, i) => (
-                                  <li key={i} className="flex items-start">
+                                  <li key={`late-${lt.teacher}-${lt.subject}-${lt.period}`} className="flex items-start">
                                     <span className="text-orange-600 ml-2">•</span>
                                     <span><strong>{lt.teacher}</strong> - {lt.subject} - حصة {lt.period}</span>
                                   </li>
