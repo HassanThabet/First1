@@ -1171,7 +1171,7 @@ const ActivitiesDashboard = () => {
               {selectedReport && (
                 <div className="space-y-6 p-4">
                   {selectedReport.activities.map((activity, index) => (
-                    <Card key={index} className="border-2 border-cyan-200">
+                    <Card key={`activity-view-${index}-${activity.name}`} className="border-2 border-cyan-200">
                       <CardHeader className="bg-gradient-to-r from-cyan-50 to-blue-50">
                         <CardTitle className="text-lg">
                           {index + 1}. {activity.name}
