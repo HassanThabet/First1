@@ -785,7 +785,7 @@ const ActivitiesDashboard = () => {
         <TabsContent value="create">
           <form onSubmit={handleSubmit} className="space-y-6">
             {activities.map((activity, index) => (
-              <Card key={index}>
+              <Card key={`activity-form-${index}-${activity.name || ''}`}>
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle>نشاط {index + 1}</CardTitle>
