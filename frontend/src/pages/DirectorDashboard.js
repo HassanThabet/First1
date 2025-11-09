@@ -2301,12 +2301,20 @@ const DirectorDashboard = () => {
                           <div><span className="font-medium">معدل التفاعل:</span> {activity.interaction_rate}/10</div>
                           {activity.supervisors && activity.supervisors.length > 0 && (
                             <div className="col-span-2">
-                              <span className="font-medium">المشرفون:</span> {activity.supervisors.join(', ')}
+                              <span className="font-medium">المشرفون:</span> {activity.supervisors.map(item => {
+                                // If it's a teacher ID, find the teacher name
+                                const teacher = teachers.find(t => t.id === item);
+                                return teacher ? teacher.name : item;
+                              }).join(', ')}
                             </div>
                           )}
                           {activity.cooperating_teachers && activity.cooperating_teachers.length > 0 && (
                             <div className="col-span-2">
-                              <span className="font-medium">المعلمون المتعاونون:</span> {activity.cooperating_teachers.join(', ')}
+                              <span className="font-medium">المعلمون المتعاونون:</span> {activity.cooperating_teachers.map(item => {
+                                // If it's a teacher ID, find the teacher name
+                                const teacher = teachers.find(t => t.id === item);
+                                return teacher ? teacher.name : item;
+                              }).join(', ')}
                             </div>
                           )}
                           {activity.admin_cooperation && (
