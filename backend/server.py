@@ -195,17 +195,30 @@ def verify_password(password: str, hashed) -> bool:
 def generate_token() -> str:
     return secrets.token_urlsafe(32)
 
-async def get_current_user(token: Optional[str] = Cookie(None)):
-    if not token:
+async def get_current_user(
+    token: Optional[str] = Cookie(None),
+    authorization: Optional[str] = Header(None)
+):
+    # Try to get token from cookie first, then from Authorization header
+    auth_token = token
+    
+    if not auth_token and authorization:
+        # Extract token from "Bearer <token>" format
+        if authorization.startswith("Bearer "):
+            auth_token = authorization[7:]
+        else:
+            auth_token = authorization
+    
+    if not auth_token:
         raise HTTPException(status_code=401, detail="غير مصرح")
     
-    session = await db.sessions.find_one({"token": token})
+    session = await db.sessions.find_one({"token": auth_token})
     if not session:
         raise HTTPException(status_code=401, detail="جلسة غير صالحة")
     
     expires_at = datetime.fromisoformat(session["expires_at"])
     if expires_at < datetime.now(timezone.utc):
-        await db.sessions.delete_one({"token": token})
+        await db.sessions.delete_one({"token": auth_token})
         raise HTTPException(status_code=401, detail="انتهت صلاحية الجلسة")
     
     user = await db.users.find_one({"id": session["user_id"]}, {"_id": 0, "password": 0})
