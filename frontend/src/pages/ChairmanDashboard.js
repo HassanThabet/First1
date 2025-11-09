@@ -2522,7 +2522,7 @@ const ChairmanDashboard = () => {
                         <h4 className="font-semibold text-amber-800 mb-2">المعلمون المزارون:</h4>
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.visited_teachers.map((teacher, idx) => (
-                            <li key={idx} className="text-sm">{teacher}</li>
+                            <li key={`visited-${selectedReport.id}-${idx}-${teacher}`} className="text-sm">{teacher}</li>
                           ))}
                         </ul>
                       </div>
