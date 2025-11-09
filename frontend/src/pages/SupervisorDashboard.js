@@ -383,58 +383,60 @@ const SupervisorDashboard = () => {
                 <div>
                   <Label className="mb-2 block">المعلمون المتأخرون</Label>
                   {formData.late_teachers.map((lt, index) => (
-                    <div key={`late-teacher-${index}-${lt.teacher}-${lt.subject}`} className="grid grid-cols-1 md:grid-cols-4 gap-2 mb-3 p-3 bg-gray-50 rounded-lg">
-                      <div>
-                        <Label className="text-xs mb-1 block">المادة</Label>
-                        <Select 
-                          value={lt.subject} 
-                          onValueChange={(value) => updateLateTeacher(index, "subject", value)}
-                          key={`subject-select-${index}`}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر المادة" />
-                          </SelectTrigger>
-                          <SelectContent key={`subject-content-${index}`}>
-                            {subjects.map(subject => (
-                              <SelectItem key={`subject-${subject.id}-${index}`} value={subject.name}>{subject.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label className="text-xs mb-1 block">المعلم</Label>
-                        <Select 
-                          value={lt.teacher} 
-                          onValueChange={(value) => updateLateTeacher(index, "teacher", value)}
-                          key={`teacher-select-${index}`}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="اختر المعلم" />
-                          </SelectTrigger>
-                          <SelectContent key={`teacher-content-${index}`}>
-                            {teachers.filter(t => t.subject === lt.subject).map(teacher => (
-                              <SelectItem key={`teacher-${teacher.id}-${lt.subject}`} value={teacher.name}>{teacher.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label className="text-xs mb-1 block">رقم الحصة</Label>
-                        <Input
-                          key={`period-input-${index}`}
-                          type="number"
-                          min="1"
-                          max="10"
-                          placeholder="رقم الحصة"
-                          className="text-center font-bold text-lg"
-                          value={lt.period}
-                          onChange={(e) => updateLateTeacher(index, "period", e.target.value)}
-                        />
-                      </div>
-                      <div className="flex items-end">
-                        <Button type="button" variant="destructive" size="icon" onClick={() => removeLateTeacher(index)} className="w-full">
-                          <X className="w-4 h-4" />
-                        </Button>
+                    <div key={`late-teacher-${index}-${lt.teacher}-${lt.subject}`} className="mb-3 p-3 bg-gray-50 rounded-lg">
+                      <div className="flex flex-col md:flex-row gap-2">
+                        <div className="flex-1 min-w-0">
+                          <Label className="text-xs mb-1 block">المادة</Label>
+                          <Select 
+                            value={lt.subject} 
+                            onValueChange={(value) => updateLateTeacher(index, "subject", value)}
+                            key={`subject-select-${index}`}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="اختر المادة" />
+                            </SelectTrigger>
+                            <SelectContent key={`subject-content-${index}`}>
+                              {subjects.map(subject => (
+                                <SelectItem key={`subject-${subject.id}-${index}`} value={subject.name}>{subject.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Label className="text-xs mb-1 block">المعلم</Label>
+                          <Select 
+                            value={lt.teacher} 
+                            onValueChange={(value) => updateLateTeacher(index, "teacher", value)}
+                            key={`teacher-select-${index}`}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="اختر المعلم" />
+                            </SelectTrigger>
+                            <SelectContent key={`teacher-content-${index}`}>
+                              {teachers.filter(t => t.subject === lt.subject).map(teacher => (
+                                <SelectItem key={`teacher-${teacher.id}-${lt.subject}`} value={teacher.name}>{teacher.name}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="w-full md:w-32 flex-shrink-0">
+                          <Label className="text-xs mb-1 block">رقم الحصة</Label>
+                          <Input
+                            key={`period-input-${index}`}
+                            type="number"
+                            min="1"
+                            max="10"
+                            placeholder="الحصة"
+                            className="text-center font-bold text-lg w-full"
+                            value={lt.period}
+                            onChange={(e) => updateLateTeacher(index, "period", e.target.value)}
+                          />
+                        </div>
+                        <div className="w-full md:w-12 flex items-end flex-shrink-0">
+                          <Button type="button" variant="destructive" size="icon" onClick={() => removeLateTeacher(index)} className="w-full">
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   ))}
