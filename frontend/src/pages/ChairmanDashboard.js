@@ -2191,7 +2191,7 @@ const ChairmanDashboard = () => {
                         <h4 className="font-semibold text-orange-800 mb-2">المعلمون المتأخرون:</h4>
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.late_teachers.map((lt, idx) => (
-                            <li key={idx} className="text-sm">
+                            <li key={`late-${selectedReport.id}-${idx}-${typeof lt === 'object' ? lt.teacher : lt}`} className="text-sm">
                               {typeof lt === 'object' ? `${lt.teacher || ''} - ${lt.subject || ''} - ${lt.minutes_late || 0} دقيقة` : lt}
                             </li>
                           ))}
