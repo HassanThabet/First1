@@ -383,65 +383,44 @@ const SupervisorDashboard = () => {
                 <div>
                   <Label className="mb-2 block">المعلمون المتأخرون</Label>
                   {formData.late_teachers.map((lt, index) => (
-                    <div key={`late-teacher-${index}-${lt.teacher}-${lt.subject}`} className="mb-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="space-y-2">
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <Label className="text-xs mb-1 block">المادة</Label>
-                            <Select 
-                              value={lt.subject} 
-                              onValueChange={(value) => updateLateTeacher(index, "subject", value)}
-                              key={`subject-select-${index}`}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="اختر المادة" />
-                              </SelectTrigger>
-                              <SelectContent key={`subject-content-${index}`}>
-                                {subjects.map(subject => (
-                                  <SelectItem key={`subject-${subject.id}-${index}`} value={subject.name}>{subject.name}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <div>
-                            <Label className="text-xs mb-1 block">المعلم</Label>
-                            <Select 
-                              value={lt.teacher} 
-                              onValueChange={(value) => updateLateTeacher(index, "teacher", value)}
-                              key={`teacher-select-${index}`}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="اختر المعلم" />
-                              </SelectTrigger>
-                              <SelectContent key={`teacher-content-${index}`}>
-                                {teachers.filter(t => t.subject === lt.subject).map(teacher => (
-                                  <SelectItem key={`teacher-${teacher.id}-${lt.subject}`} value={teacher.name}>{teacher.name}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        </div>
-                        <div className="flex gap-2">
-                          <div className="flex-1">
-                            <Label className="text-xs mb-1 block">رقم الحصة</Label>
-                            <Input
-                              key={`period-input-${index}`}
-                              type="number"
-                              min="1"
-                              max="10"
-                              placeholder="رقم الحصة"
-                              className="text-center font-bold text-xl"
-                              value={lt.period}
-                              onChange={(e) => updateLateTeacher(index, "period", e.target.value)}
-                            />
-                          </div>
-                          <div className="flex items-end">
-                            <Button type="button" variant="destructive" size="icon" onClick={() => removeLateTeacher(index)}>
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
+                    <div key={`late-teacher-${index}-${lt.teacher}-${lt.subject}`} className="flex gap-2 mb-2">
+                      <Select 
+                        value={lt.subject} 
+                        onValueChange={(value) => updateLateTeacher(index, "subject", value)}
+                        key={`subject-select-${index}`}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر المادة" />
+                        </SelectTrigger>
+                        <SelectContent key={`subject-content-${index}`}>
+                          {subjects.map(subject => (
+                            <SelectItem key={`subject-${subject.id}-${index}`} value={subject.name}>{subject.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Select 
+                        value={lt.teacher} 
+                        onValueChange={(value) => updateLateTeacher(index, "teacher", value)}
+                        key={`teacher-select-${index}`}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="اختر المعلم" />
+                        </SelectTrigger>
+                        <SelectContent key={`teacher-content-${index}`}>
+                          {teachers.filter(t => t.subject === lt.subject).map(teacher => (
+                            <SelectItem key={`teacher-${teacher.id}-${lt.subject}`} value={teacher.name}>{teacher.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        key={`period-input-${index}`}
+                        placeholder="رقم الحصة"
+                        value={lt.period}
+                        onChange={(e) => updateLateTeacher(index, "period", e.target.value)}
+                      />
+                      <Button type="button" variant="destructive" size="icon" onClick={() => removeLateTeacher(index)}>
+                        <X className="w-4 h-4" />
+                      </Button>
                     </div>
                   ))}
                   <Button type="button" variant="outline" onClick={addLateTeacher} className="w-full">
