@@ -812,7 +812,7 @@ const VicePrincipalDashboard = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {formData.problems.map((problem, index) => (
-                  <div key={index} className="border p-4 rounded-lg space-y-3">
+                  <div key={`problem-${index}-${problem.description || ''}`} className="border p-4 rounded-lg space-y-3">
                     <div className="flex justify-between items-center">
                       <h4 className="font-semibold">مشكلة {index + 1}</h4>
                       <Button type="button" variant="destructive" size="sm" onClick={() => removeProblem(index)}>
