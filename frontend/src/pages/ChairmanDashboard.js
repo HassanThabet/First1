@@ -2292,7 +2292,7 @@ const ChairmanDashboard = () => {
                   <div className="space-y-4">
                     <h4 className="font-semibold text-purple-800">الأنشطة:</h4>
                     {selectedReport.activities.map((activity, idx) => (
-                      <div key={idx} className="p-4 bg-purple-50 rounded-lg">
+                      <div key={`activity-${selectedReport.id}-${activity.name}-${idx}`} className="p-4 bg-purple-50 rounded-lg">
                         <h5 className="font-semibold text-purple-900 mb-2">{activity.name || activity.activity_name}</h5>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           <div><span className="font-medium">التاريخ:</span> {activity.date}</div>
