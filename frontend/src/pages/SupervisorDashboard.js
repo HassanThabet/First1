@@ -468,7 +468,7 @@ const SupervisorDashboard = () => {
                   </Select>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {formData.student_movement_classes.map((cls, index) => (
-                      <div key={index} className="bg-cyan-100 px-3 py-1 rounded-full flex items-center space-x-2 space-x-reverse">
+                      <div key={`class-${cls}-${index}`} className="bg-cyan-100 px-3 py-1 rounded-full flex items-center space-x-2 space-x-reverse">
                         <span className="text-sm">{cls}</span>
                         <button
                           type="button"
