@@ -2564,7 +2564,7 @@ const ChairmanDashboard = () => {
                         <h4 className="font-semibold text-blue-800 mb-2">المقترحات:</h4>
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.suggestions.map((suggestion, idx) => (
-                            <li key={idx} className="text-sm">
+                            <li key={`suggestion-${selectedReport.id}-${idx}-${typeof suggestion === 'object' ? suggestion.description : suggestion}`} className="text-sm">
                               {typeof suggestion === 'object' ? suggestion.description : suggestion}
                             </li>
                           ))}
