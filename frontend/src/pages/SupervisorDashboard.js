@@ -991,7 +991,7 @@ const SupervisorDashboard = () => {
                               </div>
                               <ul className="text-sm text-gray-700 space-y-1">
                                 {selectedReport.covering_teachers.map((ct, i) => (
-                                  <li key={i} className="flex items-start">
+                                  <li key={`cover-${ct.teacher}-${ct.subject}-${ct.period}`} className="flex items-start">
                                     <span className="text-green-600 ml-2">•</span>
                                     <span><strong>{ct.teacher}</strong> - {ct.subject} - حصة {ct.period}</span>
                                   </li>
