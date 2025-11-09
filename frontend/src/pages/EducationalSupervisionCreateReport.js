@@ -160,7 +160,7 @@ const EducationalSupervisionCreateReport = ({ onReportCreated }) => {
 
             {/* Teacher Evaluations */}
             {teacherEvaluations.map((evaluation, index) => (
-              <Card key={index} className="relative border-2 border-blue-200">
+              <Card key={`evaluation-${index}-${evaluation.teacher_name || ''}`} className="relative border-2 border-blue-200">
                 <CardHeader className="bg-blue-50">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-lg">تقييم المعلم #{index + 1}</CardTitle>
