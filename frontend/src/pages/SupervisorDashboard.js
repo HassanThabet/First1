@@ -595,7 +595,7 @@ const SupervisorDashboard = () => {
                       </SelectTrigger>
                       <SelectContent key={`cover-teacher-content-${index}`}>
                         {teachers.filter(t => t.subject === ct.subject).map(teacher => (
-                          <SelectItem key={`cover-teacher-${teacher.id}-${index}`} value={teacher.name}>{teacher.name}</SelectItem>
+                          <SelectItem key={`cover-teacher-${teacher.id}-${ct.subject}`} value={teacher.name}>{teacher.name}</SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
