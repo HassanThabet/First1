@@ -2015,7 +2015,7 @@ const ChairmanDashboard = () => {
                               
                               return (
                                 <Card 
-                                  key={index} 
+                                  key={`${report.type}-${report.user_id}-${report.date || report.week_start || index}`}
                                   className={`bg-gradient-to-br ${bgColor} border-r-4 cursor-pointer hover:shadow-lg transition-shadow`}
                                   onClick={(e) => {
                                     e.stopPropagation();
