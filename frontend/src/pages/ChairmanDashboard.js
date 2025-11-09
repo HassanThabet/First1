@@ -1775,7 +1775,7 @@ const ChairmanDashboard = () => {
                               style={{ cursor: 'pointer' }}
                             >
                               {getTeachersChartData().map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.fill} />
+                                <Cell key={`teachers-cell-${entry.name}-${entry.value}`} fill={entry.fill} />
                               ))}
                             </Pie>
                             <Tooltip />
