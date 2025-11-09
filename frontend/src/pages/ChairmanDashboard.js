@@ -2217,7 +2217,7 @@ const ChairmanDashboard = () => {
                         <h4 className="font-semibold text-yellow-800 mb-2">الحوادث:</h4>
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.incidents.map((inc, idx) => (
-                            <li key={idx} className="text-sm">
+                            <li key={`incident-${selectedReport.id}-${idx}-${typeof inc === 'object' ? inc.description : inc}`} className="text-sm">
                               {typeof inc === 'object' && inc !== null ? 
                                 (inc.description || inc.action || JSON.stringify(inc)) : 
                                 inc
