@@ -8,7 +8,7 @@ import requests
 import json
 
 # Configuration
-BASE_URL = "https://alfajr-school-2.preview.emergentagent.com/api"
+BASE_URL = "https://myproject-4.preview.emergentagent.com/api"
 
 # Test credentials
 TEST_USERS = {

@@ -9,7 +9,7 @@ import json
 import sys
 
 # Configuration
-BASE_URL = "https://alfajr-school-2.preview.emergentagent.com/api"
+BASE_URL = "https://myproject-4.preview.emergentagent.com/api"
 
 # Test credentials as specified in the review request
 TEST_USERS = {
