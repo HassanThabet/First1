@@ -19,6 +19,7 @@ const VicePrincipalDashboard = () => {
   const { user } = useContext(AuthContext);
   const [activeTab, setActiveTab] = useState("create");
   const [supervisorReports, setSupervisorReports] = useState([]);
+  const [allSupervisorReports, setAllSupervisorReports] = useState([]);
   const [myReports, setMyReports] = useState([]);
   const [users, setUsers] = useState([]);
   const [teachers, setTeachers] = useState([]);
@@ -29,6 +30,10 @@ const VicePrincipalDashboard = () => {
   const [showSupervisorModal, setShowSupervisorModal] = useState(false);
   const [showMyReportModal, setShowMyReportModal] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  
+  // Supervisor Reports Filters
+  const [supervisorDateFilter, setSupervisorDateFilter] = useState("");
+  const [supervisorNameFilter, setSupervisorNameFilter] = useState("all");
   
   // Export filters
   const [exportStartDate, setExportStartDate] = useState("");
