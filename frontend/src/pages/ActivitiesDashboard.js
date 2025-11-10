@@ -1147,6 +1147,11 @@ const ActivitiesDashboard = () => {
                           <h4 className="font-bold text-gray-800">
                             تقرير الأنشطة - {report.activities.length} نشاط
                           </h4>
+                          {report.report_date && (
+                            <p className="text-sm font-semibold text-blue-600 mb-1">
+                              📅 تاريخ التقرير: {new Date(report.report_date).toLocaleDateString("ar-SA")}
+                            </p>
+                          )}
                           <p className="text-sm text-gray-500">
                             تم الإنشاء: {new Date(report.created_at).toLocaleString("ar-SA")}
                           </p>
