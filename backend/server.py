@@ -1223,10 +1223,17 @@ async def clean_test_users(current_user: dict = Depends(get_current_user)):
 # Include the router in the main app
 app.include_router(api_router)
 
+# Get CORS origins from environment variable
+cors_origins_env = os.environ.get('CORS_ORIGINS', '*')
+if cors_origins_env == '*':
+    cors_origins = ["*"]
+else:
+    cors_origins = [origin.strip() for origin in cors_origins_env.split(',')]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["http://localhost:3000", "https://edu-supervision.preview.emergentagent.com"],
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
