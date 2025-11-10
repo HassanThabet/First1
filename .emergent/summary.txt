@@ -1,127 +1,97 @@
 <analysis>
-The AI engineer's work primarily focused on iteratively refining and fixing the مدارس الفجر الجديد الأهلية application based on continuous user feedback. The trajectory began by resolving a PDF font rendering issue by standardizing font usage and removing explicit bold styles. Subsequently, the engineer enhanced dashboard functionalities by integrating summary statistics, fixing report counts, and improving PDF exports for various roles. A significant portion of the work involved improving mobile responsiveness and resolving React reconciliation errors () in different dashboards (, ). The engineer also addressed data visibility inconsistencies, such as activities not appearing in detailed reports and branch filters not being applied correctly to report views. Throughout, the approach involved detailed file examination, targeted code modifications, and backend endpoint creation for data cleaning. The work concluded with successfully verifying the dashboard functionality after addressing a compilation error, indicating a stable application state.
+The trajectory documents an intensive, iterative development and debugging process for the مدارس الفجر الجديد الأهلية school management application. The work began with fixing critical bugs like  reconciliation errors (caused by Google Translate, fixed with ) and authentication issues. The development then shifted to a highly interactive feature enhancement cycle driven by direct user feedback, often accompanied by screenshots.
+
+Key feature work included: implementing a collapsible details view for teacher evaluations, adding a report date to activity reports, and enhancing UI/UX across multiple dashboards (, , ) by improving form inputs and redesigning layouts to reduce clutter. Backend logic was updated to support these frontend changes, including adding new fields to data models (), enriching API responses with user data (e.g., ), and implementing critical business logic like cascading deletes for user reports.
+
+The final and current phase of the trajectory is focused on resolving a critical deployment issue. The user's live deployment is not updating with the latest code from GitHub. The root cause was identified as the initial deployment being created from a local preview environment, breaking the link to the GitHub repository. The AI is currently guiding the user through the process of creating a new, correctly configured deployment linked to their GitHub repository to get the latest features live.
 </analysis>
 
 <product_requirements>
-The مدارس الفجر الجديد الأهلية application is a role-based school management system supporting Arabic (RTL), CRUD operations, data visualization, and Excel/PDF exports. The primary goal was to enhance the Quality Dashboard and address data visibility issues across dashboards, with a focus on user experience and data accuracy.
+The مدارس الفجر الجديد الأهلية application is a comprehensive, role-based school management system designed for Arabic-speaking users (RTL support). It features distinct dashboards for various roles, including Chairman, Director, Quality Supervisor, Educational Supervisor, Vice Principal, and Social Specialist.
 
-**Key requirements addressed and implemented:**
-1.  **Quality Dashboard Update**: Integrated  content into , retaining إنشاء تقرير جودة and تقارير الجودة tabs. الإحصائيات الإجمالية displays Director's statistics.
-2.  **PDF Export Enhancement**:
-    *   Added formatted PDF export for Quality reports (initially had a font bug, then fixed).
-    *   Add quality summary to Director/Chairman PDF exports, formatted as a table.
-    *   Ensure PDF export buttons are responsive on mobile.
-3.  **Data Visibility & Authorization**:
-    *   Resolved initial data not appearing by fixing 401 Unauthorized errors for  and  roles.
-    *   Ensure detailed quality reports in Director's and Chairman's dashboards show all nested section details.
-    *   Ensure activities added are visible in detailed reports for Director, Chairman, and Quality dashboards.
-    *   Ensure Activity Supervisors and Cooperating Teachers are filtered by date in Director, Chairman, and Quality dashboards.
-    *   Ensure detailed report views (modals) respect the branch filter (boys/girls).
-    *   Display student absence count in Supervisor detailed reports (Director, Chairman, Quality dashboards).
-4.  **Quality Report Form Refinement**: Removed default values (5) from rating fields. Ensured existing reports can be viewed/edited correctly.
-5.  **Data Consistency**:
-    *   PDF summary statistics for quality reports should not be empty and should include correct data.
-    *   Quality summary statistics should be integrated into the تقارير الجودة tab in .
-    *   Quality summary statistics should be integrated into Director and Chairman dashboards.
-    *   Correct inaccurate quality report counts in Chairman dashboard by deleting empty/orphan reports.
-6.  **User Experience & Stability**:
-    *   Resolve React  errors during tab navigation on mobile in Quality Dashboard.
-    *   Resolve React  errors when selecting subjects for late teachers in Supervisor Dashboard.
-    *   Improve overall mobile responsiveness across all tabs and components in Quality Dashboard.
+The core requirements implemented during this trajectory were focused on enhancing data visibility, improving user experience, and ensuring data integrity. Key features and fixes include:
+1.  **Enhanced Reporting:** Added a toggle button to show/hide detailed teacher evaluation reports, preventing cluttered UIs. Enhanced PDF exports to include these full details.
+2.  **UI/UX Improvements:** Fixed crowded layouts in the Vice Principal and Supervisor dashboards, improved form input fields by removing default  values, and added numeric keyboards for mobile users.
+3.  **Data Accuracy and Richness:** Added a dedicated Report Date field to activity reports. Ensured supervisor names are displayed on teacher evaluations. Corrected data display to show Period (الحصة) instead of Minutes for late teachers.
+4.  **Data Integrity:** Implemented a cascading delete feature, ensuring that when a user is deleted from the admin panel, all associated reports are also removed. Created a script to clean up any old or orphan reports.
+5.  **Filtering and Sorting:** Added date and supervisor name filters to the Vice Principal's dashboard. Sorted teacher evaluation reports from newest to oldest.
+6.  **Deployment:** The final requirement is to ensure all developed features are correctly deployed to the live production environment.
 </product_requirements>
 
 <key_technical_concepts>
--   **MERN-like Stack**: React (Frontend), FastAPI (Backend), MongoDB (Database).
--   **RTL Support**:  with  fonts for Arabic PDF generation.
--   **PDF Generation**:  for dynamic PDF reports.
--   **Error Handling**:  for resilient API calls.
--   **Role-Based Access Control**: Backend endpoints use roles for authorization.
--   **React Component Lifecycle**: Use of  props and  for component reconciliation.
+- **Stack:** MERN-like (React, FastAPI, MongoDB).
+- **Frontend:** React, Tailwind CSS, and a component library resembling Shadcn UI (, , ). State management is done with  and .
+- **Backend:** Python's FastAPI framework with Pydantic for data modeling.
+- **Authentication:** JWT-based token authentication.
+- **Database:** MongoDB for data persistence.
+- **DevOps:** Git for version control, with a deployment workflow involving saving to GitHub and deploying on the Emergent platform.
+- **Internationalization:** RTL support, including  for Arabic PDF generation.
 </key_technical_concepts>
 
 <code_architecture>
-The application uses a MERN-like stack: React for the frontend, FastAPI for the backend, and MongoDB for the database.
+The application follows a standard client-server architecture with a React frontend and a FastAPI backend.
 
 **Directory Structure:**
 
 
-
-**Key Files and Their Importance/Changes:**
-
--   :
-    -   **Importance:** Central hub for Quality reports, including creation, editing, viewing, and PDF export. Also contains the Director's statistics tab and functionality for Teacher Progress and Activity Supervisors.
+-   ****
+    -   **Importance:** This is the core of the backend, defining all API endpoints, data models (Pydantic), and business logic.
     -   **Changes:**
-        -   **PDF Font Fix (Chat 41, 47, 51, 57, 59):** Removed  from  styles and content in  and  functions to prevent Font Nillima is not defined error, standardizing on .
-        -   **PDF Data Fix (Chat 76):** Corrected data access for nested fields (e.g., ) in  to ensure PDF summary statistics are not empty.
-        -   **Quality Summary Integration (Chat 92):** Added a summary statistics card to the تقارير الجودة tab (lines 2050-2100 approximately).
-        -   **Mobile Responsiveness & React  Fix (Chat 259, 267, 269, 273, 275, 286, 290, 292, 296, 305, 309, 311, 315, 317, 319, 323, 327, 329):** Implemented comprehensive responsive design using TailwindCSS classes (e.g., , , ) for main containers, cards, forms, buttons, and tables. Added dynamic  props to charts and other list items to prevent React  errors when switching tabs.
-        -   **Activity Details Display (Chat 367):** Corrected the display logic for activity details from  to  in the quality report detailed view.
-        -   **Date Filtering for Components (Chat 392):** Passed  and  props to  and  components to ensure they respect the date filter.
-        -   **Student Absences Display (Chat 442):** Added display for  in Supervisor detailed reports.
-        -   **Branch Filter Fix (Chat 475):** Replaced  with  in the  function.
-        -   **Compilation Error Fix (Chat 494):** Removed a duplicate declaration of  (around line 995).
+        -   Added  to all report-fetching endpoints to fix Unknown user issues.
+        -   Modified the  DELETE endpoint to implement cascade deletion of all related reports.
+        -   Added a  field to the  model.
+        -   Moved the hardcoded admin password to environment variables for security.
+        -   Configured CORS to use environment variables instead of a wildcard .
 
--   :
-    -   **Importance:** Defines API endpoints, implements role-based access control, and handles data interaction with MongoDB.
+-   ****
+    -   **Importance:** A reusable component for displaying teacher evaluation progress, used across multiple dashboards.
     -   **Changes:**
-        -   **Orphaned Report Deletion (Chat 140):** Added a new endpoint  that allows  role to delete reports associated with non-existent users.
-        -   **Empty Quality Report Deletion (Chat 211):** Added a new endpoint  for  to remove quality reports with no content.
-        -   **Test User and Report Deletion (Chat 240):** Added  to remove specific test users ( and others) and their associated quality reports.
+        -   Added state () and a toggle function () to show/hide detailed reports.
+        -   Modified the UI to display the  with each evaluation.
+        -   Updated the report sorting logic to display reports from newest to oldest.
+        -   Changed the First Evaluation label to Previous Evaluation for clarity.
+        -   Enhanced the  function to include all detailed evaluation data.
 
--   :
-    -   **Importance:** Handles the display and logic for the Director's dashboard.
+-   **, , **
+    -   **Importance:** These are the primary high-level dashboards for management roles.
     -   **Changes:**
-        -   **Quality Summary Integration (Chat 115):** Added a quality summary statistics card (around lines 1980-2045).
-        -   **PDF Quality Summary (Chat 175, 186):** Integrated quality summary details into the  function, later formatted as a table.
-        -   **Activity Details Display (Chat 354):** Corrected the display logic for activity details from  to .
-        -   **Date Filtering for Components (Chat 384):** Passed  and  props to  and  components.
-        -   **Student Absences Display (Chat 428):** Added display for  in Supervisor detailed reports.
-        -   **Branch Filter Fix (Chat 457, 461):** Replaced  with  in the  function for various report types.
+        -   Updated report detail modals to correctly display the  for activity reports.
+        -   Modified logic to display Period () instead of Minutes () for late teachers.
+        -   Added detailed views for Social Specialist reports within the modals.
+        -   Updated date filtering logic () to correctly handle the new  field for activity reports.
 
--   :
-    -   **Importance:** Handles the display and logic for the Chairman's dashboard.
+-   ****
+    -   **Importance:** Dashboard for the Vice Principal.
     -   **Changes:**
-        -   **Quality Summary Integration (Chat 119):** Added a quality summary statistics card.
-        -   **PDF Quality Summary (Chat 179, 188):** Integrated quality summary details into the  function, later formatted as a table.
-        -   **Activity Details Display (Chat 358):** Corrected the display logic for activity details from  to .
-        -   **Date Filtering for Components (Chat 388):** Passed  and  props to  and  components.
-        -   **Student Absences Display (Chat 434):** Added display for  in Supervisor detailed reports.
-        -   **Branch Filter Fix (Chat 469):** Replaced  with  in the  function for various report types.
-        -   **Compilation Error Fix (Chat 488):** Removed a duplicate declaration of  (around line 556).
+        -   Added date and supervisor name filters to the supervisor reports tab.
+        -   Redesigned the report card layout to be less cluttered.
+        -   Made the main navigation tabs responsive () to prevent crowding on smaller screens.
 
--   :
-    -   **Importance:** Manages the Supervisor's specific tasks and report views.
+-   ****
+    -   **Importance:** Interface for creating and viewing activity reports.
     -   **Changes:**
-        -   **React  Fix (Chat 403, 407, 411, 415):** Added unique  props to  iterations for , , and  to resolve React reconciliation errors when interacting with select elements.
+        -   Added a new Report Date () input field to the report creation form.
+        -   Modified input fields for  and  to have no default value (), a placeholder, and .
+        -   Updated  to correctly parse these fields as numbers.
 
--   :
-    -   **Importance:** Component for displaying activity supervisors.
-    -   **Changes (Chat 378):** Modified to accept  and  props and apply filtering to displayed data.
-
--   :
-    -   **Importance:** Component for displaying cooperating teachers.
-    -   **Changes (Chat 382):** Modified to accept  and  props and apply filtering to displayed data.
-
--   :
-    -   **Importance:** Contains font definitions for PDF generation, especially for Arabic RTL support using .
-    -   **Changes:** No direct changes were *completed*. Examination confirmed it only contains , which was the root cause of the initial PDF font definition error before  was modified.
+-   ****
+    -   **Importance:** A one-off script created to solve a user-reported problem of dead reports.
+    -   **Changes:** Created this new script to iterate through all report collections, find reports associated with non-existent users, and delete them to maintain data integrity.
 </code_architecture>
 
 <pending_tasks>
--   Implement automatic archiving of old reports.
--   Implement remember me functionality for authentication.
--   Complete PDF export enhancement for , , and .
--   Create a dedicated detailed page for .
+-   Resolve the current deployment issue to ensure the latest code from the  branch is live. The user needs guidance on how to create a new deployment properly linked to their GitHub repository.
+-   The original list of pending tasks (automatic archiving, remember me functionality, etc.) remains unaddressed as the focus shifted to iterative UI/UX fixes and the critical deployment blocker.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer addressed a critical compilation error () that arose after previous changes. This error occurred in both  and  because a  command intended to replace function *calls* also inadvertently replaced a function *definition*, leading to duplicate declarations.
+The AI engineer is actively troubleshooting a critical deployment issue with the user. The user has successfully saved all recent code changes to the  branch of their First1 GitHub repository. However, when they use the Re-Deploy button on their existing live deployment, none of the new changes appear.
 
-The engineer successfully resolved this by identifying and removing the redundant function declarations of  in both  (Chat 488) and  (Chat 494).
+The AI diagnosed the root cause: the live deployment environment was created from a local preview state and is not connected to the GitHub repository. Consequently, Re-Deploy is just re-publishing the same old, disconnected codebase. All the recent feature enhancements—such as cascade delete, UI fixes for the Vice Principal and Social Specialist dashboards, and corrected data displays—exist in the preview environment and on GitHub, but not in the live deployment.
 
-Following this fix, the user reported that the Director, Chairman, and Quality dashboards were not working. The engineer investigated the issue by checking supervisor services (all running), compilation status (successful), and performing a visual inspection via screenshot of the Director Dashboard. The screenshot and subsequent console checks confirmed that the Director dashboard was functioning correctly, displaying updated statistics, and had no errors in the browser console. The previous issues regarding  errors, mobile responsiveness, filter application, and data display have been addressed and validated for the Director Dashboard. The remaining task is to verify Chairman and Quality dashboards.
+The current focus is guiding the user through the correct process of creating a **new** deployment that is properly linked to their GitHub repository. The user has reached the New Deployment screen but is confused as there is no explicit option to select GitHub as the source. The AI's last action was to advise the user to cancel the current deployment attempt and look for a Deploy from GitHub or Connect GitHub Repository option on the main Deployments page, indicating that the user's account might need to be linked to GitHub first before a source can be selected.
 </current_work>
 
 <optional_next_step>
-Verify the functionality of the Chairman and Quality dashboards.
+Guide the user to find the Deploy from GitHub or Connect Repository option in their Emergent dashboard. If it doesn't exist, instruct them on how to link their Emergent account to their GitHub account first, which is a prerequisite for creating a repository-linked deployment.
 </optional_next_step>

@@ -12,7 +12,7 @@ import sys
 import time
 
 # Configuration
-BASE_URL = "https://edu-supervision.preview.emergentagent.com/api"
+BASE_URL = "https://alfajr-school-2.preview.emergentagent.com/api"
 ADMIN_USERNAME = "مدارس الفجر الجديد الأهلية"
 ADMIN_PASSWORD = "2002002Hh"
 
