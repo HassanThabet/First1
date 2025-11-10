@@ -89,25 +89,37 @@ const SocialSpecialistDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Convert empty strings to numbers
+      const processedData = {
+        ...formData,
+        psychological_cases: parseInt(formData.psychological_cases) || 0,
+        academic_cases: parseInt(formData.academic_cases) || 0,
+        behavioral_cases: parseInt(formData.behavioral_cases) || 0,
+        sessions_count: parseInt(formData.sessions_count) || 0,
+        families_contacted: parseInt(formData.families_contacted) || 0,
+        referrals_count: parseInt(formData.referrals_count) || 0,
+        follow_ups_count: parseInt(formData.follow_ups_count) || 0
+      };
+
       if (editingReport) {
-        await axios.put(`${API}/reports/social-specialist/${editingReport.id}`, formData);
+        await axios.put(`${API}/reports/social-specialist/${editingReport.id}`, processedData);
         toast.success("تم تحديث التقرير بنجاح");
         setEditingReport(null);
       } else {
-        await axios.post(`${API}/reports/social-specialist`, formData);
+        await axios.post(`${API}/reports/social-specialist`, processedData);
         toast.success("تم إنشاء التقرير بنجاح");
       }
       fetchReports();
       setActiveTab("reports");
       setFormData({
         date: new Date().toISOString().split('T')[0],
-        psychological_cases: 0,
-        academic_cases: 0,
-        behavioral_cases: 0,
-        sessions_count: 0,
-        families_contacted: 0,
-        referrals_count: 0,
-        follow_ups_count: 0,
+        psychological_cases: "",
+        academic_cases: "",
+        behavioral_cases: "",
+        sessions_count: "",
+        families_contacted: "",
+        referrals_count: "",
+        follow_ups_count: "",
         guidance_programs: "",
         challenges: "",
         recommendations: ""
