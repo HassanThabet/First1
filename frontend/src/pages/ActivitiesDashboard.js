@@ -739,14 +739,15 @@ const ActivitiesDashboard = () => {
 
   const handleEdit = (report) => {
     setEditingReport(report);
+    setReportDate(report.report_date || "");
     setActivities(report.activities || [{
       name: "",
       date: "",
       target_group: "",
       type: "",
       supervisors: [],
-      participants_count: 0,
-      interaction_rate: 0,
+      participants_count: "",
+      interaction_rate: "",
       cooperating_teachers: [],
       admin_cooperation: "",
       educational_impact: "",
