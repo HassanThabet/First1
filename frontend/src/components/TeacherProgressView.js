@@ -114,13 +114,53 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
   };
 
   useEffect(() => {
-    if (selectedTeacher === "all") {
-      setTeacherProgress(allTeacherProgress);
-    } else {
-      const filtered = allTeacherProgress.filter(t => t.teacher_id === selectedTeacher);
-      setTeacherProgress(filtered);
+    let filtered = allTeacherProgress;
+    
+    // Filter by supervisor if selected
+    if (selectedSupervisor !== "all") {
+      filtered = filtered.filter(t => {
+        return t.evaluations.some(eval_item => eval_item.supervisor_name === selectedSupervisor);
+      }).map(t => ({
+        ...t,
+        evaluations: t.evaluations.filter(eval_item => eval_item.supervisor_name === selectedSupervisor)
+      }));
+      
+      // Recalculate progress based on filtered evaluations
+      filtered = filtered.map(teacher => {
+        const sortedEvals = [...teacher.evaluations].sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        let improvement = 0;
+        let trend = "stable";
+        let previousAverage = 0;
+        if (sortedEvals.length > 1) {
+          const first = sortedEvals[0].average;
+          const last = sortedEvals[sortedEvals.length - 1].average;
+          previousAverage = sortedEvals.length > 1 ? sortedEvals[sortedEvals.length - 2].average : first;
+          improvement = ((last - first) / first * 100).toFixed(1);
+          
+          if (improvement > 5) trend = "up";
+          else if (improvement < -5) trend = "down";
+        }
+        
+        return {
+          ...teacher,
+          improvement: parseFloat(improvement),
+          trend,
+          evaluationCount: teacher.evaluations.length,
+          currentAverage: sortedEvals[sortedEvals.length - 1]?.average.toFixed(1) || 0,
+          firstAverage: sortedEvals[0]?.average.toFixed(1) || 0,
+          previousAverage: previousAverage.toFixed(1)
+        };
+      });
     }
-  }, [selectedTeacher, allTeacherProgress]);
+    
+    // Filter by teacher if selected
+    if (selectedTeacher !== "all") {
+      filtered = filtered.filter(t => t.teacher_id === selectedTeacher);
+    }
+    
+    setTeacherProgress(filtered);
+  }, [selectedTeacher, selectedSupervisor, allTeacherProgress]);
 
   const exportToPDF = (teacher = null) => {
     if (pdfMakeFonts) {
