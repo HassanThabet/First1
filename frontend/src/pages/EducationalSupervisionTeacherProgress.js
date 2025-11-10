@@ -18,6 +18,7 @@ const EducationalSupervisionTeacherProgress = () => {
   const [allTeacherProgress, setAllTeacherProgress] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTeacher, setSelectedTeacher] = useState("all");
+  const [expandedTeachers, setExpandedTeachers] = useState({});
 
   useEffect(() => {
     fetchReportsAndCalculateProgress();
