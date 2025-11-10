@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Backend API Testing Script for School Management System
-Tests authentication, activities reports, social specialist reports, and teachers endpoints
+Backend API Health Check for School Management System
+Comprehensive testing of all critical endpoints for deployment readiness
 """
 
 import requests
@@ -9,6 +9,7 @@ import json
 import uuid
 from datetime import datetime, timezone
 import sys
+import time
 
 # Configuration
 BASE_URL = "https://edu-supervision.preview.emergentagent.com/api"
