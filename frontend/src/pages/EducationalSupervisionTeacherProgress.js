@@ -256,39 +256,117 @@ const EducationalSupervisionTeacherProgress = () => {
           margin: [0, 0, 0, 20]
         },
         {
-          text: 'التقييم النوعي (آخر تقرير)',
+          text: 'التقييمات التفصيلية',
           style: 'sectionHeader',
           margin: [0, 15, 0, 10]
-        },
-        {
-          columns: [
-            {
-              width: '50%',
-              stack: [
-                { text: 'نقاط القوة', fontSize: 12, bold: true, color: '#16a34a', margin: [0, 0, 0, 5] },
-                { 
-                  text: teacher.evaluations[teacher.evaluations.length - 1]?.strengths || 'لا يوجد', 
-                  fontSize: 10,
-                  background: '#f0fdf4',
-                  margin: [5, 5, 5, 5]
-                }
+        }
+      ].concat(
+        teacher.evaluations.map((eval_item, evalIdx) => [
+          {
+            text: `التقييم #${evalIdx + 1} - ${formatDate(eval_item.date)}`,
+            fontSize: 11,
+            bold: true,
+            color: '#2563eb',
+            margin: [0, 10, 0, 5]
+          },
+          {
+            table: {
+              widths: ['*', '*', '*', '*'],
+              body: [
+                [
+                  { text: 'التخطيط', bold: true, fillColor: '#dbeafe', alignment: 'center' },
+                  { text: 'الأداء', bold: true, fillColor: '#dcfce7', alignment: 'center' },
+                  { text: 'إدارة الوقت', bold: true, fillColor: '#f3e8ff', alignment: 'center' },
+                  { text: 'تحقيق الأهداف', bold: true, fillColor: '#fed7aa', alignment: 'center' }
+                ],
+                [
+                  { text: `${eval_item.planning}/10`, alignment: 'center', fontSize: 12, bold: true },
+                  { text: `${eval_item.performance}/10`, alignment: 'center', fontSize: 12, bold: true },
+                  { text: `${eval_item.time_management}/10`, alignment: 'center', fontSize: 12, bold: true },
+                  { text: `${eval_item.goal_achievement}/10`, alignment: 'center', fontSize: 12, bold: true }
+                ]
               ]
             },
-            {
-              width: '50%',
-              stack: [
-                { text: 'نقاط التطوير', fontSize: 12, bold: true, color: '#ea580c', margin: [0, 0, 0, 5] },
-                { 
-                  text: teacher.evaluations[teacher.evaluations.length - 1]?.needs_support || 'لا يوجد', 
-                  fontSize: 10,
-                  background: '#fff7ed',
-                  margin: [5, 5, 5, 5]
-                }
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#e5e7eb',
+              vLineColor: () => '#e5e7eb'
+            },
+            margin: [0, 0, 0, 5]
+          },
+          {
+            table: {
+              widths: ['*'],
+              body: [
+                [{ text: 'المعدل', bold: true, fillColor: '#cffafe', alignment: 'center' }],
+                [{ text: `${eval_item.average.toFixed(1)}/10`, alignment: 'center', fontSize: 14, bold: true, color: '#0891b2' }]
               ]
-            }
-          ]
-        }
-      ],
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#e5e7eb',
+              vLineColor: () => '#e5e7eb'
+            },
+            margin: [0, 0, 0, 5]
+          },
+          {
+            table: {
+              widths: ['*'],
+              body: [
+                [{ text: 'استخدام استراتيجيات تعليمية', bold: true, fillColor: '#fef3c7', alignment: 'center' }],
+                [{ 
+                  text: eval_item.uses_strategies ? 'نعم ✓' : 'لا ✗', 
+                  alignment: 'center', 
+                  fontSize: 11, 
+                  bold: true,
+                  color: eval_item.uses_strategies ? '#16a34a' : '#dc2626'
+                }]
+              ]
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#e5e7eb',
+              vLineColor: () => '#e5e7eb'
+            },
+            margin: [0, 0, 0, 5]
+          },
+          eval_item.strengths ? {
+            table: {
+              widths: ['*'],
+              body: [
+                [{ text: '💪 نقاط القوة', bold: true, fillColor: '#dcfce7', alignment: 'right' }],
+                [{ text: eval_item.strengths || '-', alignment: 'right', fontSize: 10 }]
+              ]
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#e5e7eb',
+              vLineColor: () => '#e5e7eb'
+            },
+            margin: [0, 0, 0, 5]
+          } : null,
+          eval_item.needs_support ? {
+            table: {
+              widths: ['*'],
+              body: [
+                [{ text: '🎯 نقاط تحتاج دعم', bold: true, fillColor: '#fecaca', alignment: 'right' }],
+                [{ text: eval_item.needs_support || '-', alignment: 'right', fontSize: 10 }]
+              ]
+            },
+            layout: {
+              hLineWidth: () => 1,
+              vLineWidth: () => 1,
+              hLineColor: () => '#e5e7eb',
+              vLineColor: () => '#e5e7eb'
+            },
+            margin: [0, 0, 0, 10]
+          } : null
+        ]).flat().filter(item => item !== null)
+      ),
       styles: {
         header: {
           fontSize: 18,
