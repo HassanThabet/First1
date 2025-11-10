@@ -233,10 +233,11 @@ async def get_current_user(
 async def create_admin():
     admin = await db.users.find_one({"username": "مدارس الفجر الجديد الأهلية"})
     if not admin:
+        admin_password = os.environ.get('ADMIN_PASSWORD', '2002002Hh')
         admin_data = {
             "id": str(uuid.uuid4()),
             "username": "مدارس الفجر الجديد الأهلية",
-            "password": hash_password("2002002Hh"),
+            "password": hash_password(admin_password),
             "role": "admin",
             "branch": "both",
             "created_at": datetime.now(timezone.utc).isoformat()
