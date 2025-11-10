@@ -1133,22 +1133,74 @@ const VicePrincipalDashboard = () => {
 
         <TabsContent value="supervisor-reports">
           <div className="space-y-4">
-            <div className="flex items-center justify-between mb-4">
+            {/* Header with Title and Export Buttons */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <h3 className="text-xl font-bold text-gray-800">
                 تقارير المشرفين ({supervisorReports.length})
               </h3>
               <div className="flex gap-2">
-                <Button onClick={exportToPDF} variant="outline" className="text-red-600 border-red-300 hover:bg-red-50">
+                <Button onClick={exportToPDF} variant="outline" size="sm" className="text-red-600 border-red-300 hover:bg-red-50">
                   <FileDown className="w-4 h-4 ml-2" />
                   PDF
                 </Button>
-                <Button onClick={exportToExcel} variant="outline">
+                <Button onClick={exportToExcel} variant="outline" size="sm">
                   <FileDown className="w-4 h-4 ml-2" />
                   Excel
                 </Button>
               </div>
             </div>
 
+            {/* Filters */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">🔍 تصفية التقارير</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label>التاريخ</Label>
+                    <Input
+                      type="date"
+                      value={supervisorDateFilter}
+                      onChange={(e) => setSupervisorDateFilter(e.target.value)}
+                      placeholder="اختر التاريخ"
+                    />
+                  </div>
+                  <div>
+                    <Label>المشرف</Label>
+                    <Select value={supervisorNameFilter} onValueChange={setSupervisorNameFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="جميع المشرفين" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">جميع المشرفين</SelectItem>
+                        {users
+                          .filter(u => u.role === "supervisor" && u.assigned_to === user.id && u.branch === user.branch)
+                          .map((supervisor) => (
+                            <SelectItem key={supervisor.id} value={supervisor.id}>
+                              {supervisor.username}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSupervisorDateFilter("");
+                        setSupervisorNameFilter("all");
+                      }}
+                      className="w-full"
+                    >
+                      إعادة تعيين
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Reports List - Compact Design */}
             <div className="grid grid-cols-1 gap-3">
               {supervisorReports.map((report) => (
                 <Card 
