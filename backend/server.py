@@ -392,8 +392,47 @@ async def delete_user(user_id: str, current_user: dict = Depends(get_current_use
     if current_user["role"] != "admin":
         raise HTTPException(status_code=403, detail="غير مصرح")
     
+    # Cascade delete: Delete all reports for this user
+    deleted_counts = {}
+    
+    # Delete supervisor reports
+    result = await db.supervisor_reports.delete_many({"user_id": user_id})
+    deleted_counts["supervisor_reports"] = result.deleted_count
+    
+    # Delete vice principal reports
+    result = await db.vice_principal_reports.delete_many({"user_id": user_id})
+    deleted_counts["vice_principal_reports"] = result.deleted_count
+    
+    # Delete activities reports
+    result = await db.activities_reports.delete_many({"user_id": user_id})
+    deleted_counts["activities_reports"] = result.deleted_count
+    
+    # Delete educational supervision reports
+    result = await db.educational_supervision_reports.delete_many({"user_id": user_id})
+    deleted_counts["educational_supervision_reports"] = result.deleted_count
+    
+    # Delete social specialist reports
+    result = await db.social_specialist_reports.delete_many({"user_id": user_id})
+    deleted_counts["social_specialist_reports"] = result.deleted_count
+    
+    # Delete quality reports
+    result = await db.quality_reports.delete_many({"user_id": user_id})
+    deleted_counts["quality_reports"] = result.deleted_count
+    
+    # Delete director reports
+    result = await db.director_reports.delete_many({"user_id": user_id})
+    deleted_counts["director_reports"] = result.deleted_count
+    
+    # Delete the user
     await db.users.delete_one({"id": user_id})
-    return {"message": "تم حذف المستخدم بنجاح"}
+    
+    total_reports_deleted = sum(deleted_counts.values())
+    
+    return {
+        "message": f"تم حذف المستخدم و {total_reports_deleted} تقرير بنجاح",
+        "deleted_reports": deleted_counts,
+        "total_reports_deleted": total_reports_deleted
+    }
 
 # Teachers Management
 @api_router.post("/teachers", response_model=Teacher)
