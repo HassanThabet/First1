@@ -564,7 +564,7 @@ async def create_supervisor_report(report_data: dict, current_user: dict = Depen
     report_obj = SupervisorReport(**report_data)
     return report_obj
 
-@api_router.get("/reports/supervisor", response_model=List[SupervisorReport])
+@api_router.get("/reports/supervisor")
 async def get_supervisor_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     query = {}
     
@@ -585,6 +585,12 @@ async def get_supervisor_reports(user_id: Optional[str] = None, branch: Optional
         query["branch"] = branch
     
     reports = await db.supervisor_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Add user name to each report
+    for report in reports:
+        user = await db.users.find_one({"id": report["user_id"]}, {"_id": 0, "username": 1, "full_name": 1})
+        report["user_name"] = (user.get("full_name") or user.get("username")) if user else "مستخدم محذوف"
+    
     return reports
 
 @api_router.get("/reports/supervisor/{report_id}", response_model=SupervisorReport)
