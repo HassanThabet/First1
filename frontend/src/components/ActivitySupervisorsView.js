@@ -30,11 +30,18 @@ const ActivitySupervisorsView = ({ compact = false, timeFilter = 'all', customSt
         activities = activities.filter(report => {
           if (!report.activities || report.activities.length === 0) return false;
           
-          // Get the earliest activity date in the report
-          const activityDates = report.activities.map(a => new Date(a.date)).filter(d => !isNaN(d));
-          if (activityDates.length === 0) return false;
+          // Use report_date if available, otherwise use the earliest activity date
+          let reportDate;
+          if (report.report_date) {
+            reportDate = new Date(report.report_date);
+          } else {
+            const activityDates = report.activities.map(a => new Date(a.date)).filter(d => !isNaN(d));
+            if (activityDates.length === 0) return false;
+            reportDate = activityDates[0];
+          }
           
-          const reportDate = activityDates[0];
+          if (isNaN(reportDate.getTime())) return false;
+          
           const now = new Date();
           
           if (timeFilter === 'today') {
