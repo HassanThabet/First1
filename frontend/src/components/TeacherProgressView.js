@@ -17,6 +17,8 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
   const [allTeacherProgress, setAllTeacherProgress] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTeacher, setSelectedTeacher] = useState("all");
+  const [selectedSupervisor, setSelectedSupervisor] = useState("all");
+  const [supervisors, setSupervisors] = useState([]);
   const [expandedTeachers, setExpandedTeachers] = useState({});
 
   useEffect(() => {
