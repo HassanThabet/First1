@@ -61,28 +61,34 @@ const EducationalSupervisionTeacherProgress = () => {
       
       // Calculate progress for each teacher
       const progressData = Object.values(teacherMap).map(teacher => {
-        // Sort evaluations by date
-        teacher.evaluations.sort((a, b) => new Date(a.date) - new Date(b.date));
+        // Sort evaluations from oldest to newest first for calculations
+        const sortedEvals = [...teacher.evaluations].sort((a, b) => new Date(a.date) - new Date(b.date));
         
         // Calculate improvement
         let improvement = 0;
         let trend = "stable";
-        if (teacher.evaluations.length > 1) {
-          const first = teacher.evaluations[0].average;
-          const last = teacher.evaluations[teacher.evaluations.length - 1].average;
+        let previousAverage = 0;
+        if (sortedEvals.length > 1) {
+          const first = sortedEvals[0].average;
+          const last = sortedEvals[sortedEvals.length - 1].average;
+          previousAverage = sortedEvals.length > 1 ? sortedEvals[sortedEvals.length - 2].average : first;
           improvement = ((last - first) / first * 100).toFixed(1);
           
           if (improvement > 5) trend = "up";
           else if (improvement < -5) trend = "down";
         }
         
+        // Now reverse the order for display (newest to oldest)
+        teacher.evaluations = sortedEvals.reverse();
+        
         return {
           ...teacher,
           improvement: parseFloat(improvement),
           trend,
           evaluationCount: teacher.evaluations.length,
-          currentAverage: teacher.evaluations[teacher.evaluations.length - 1]?.average.toFixed(1) || 0,
-          firstAverage: teacher.evaluations[0]?.average.toFixed(1) || 0
+          currentAverage: sortedEvals[0]?.average.toFixed(1) || 0,
+          firstAverage: sortedEvals[sortedEvals.length - 1]?.average.toFixed(1) || 0,
+          previousAverage: previousAverage.toFixed(1)
         };
       });
       
