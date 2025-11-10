@@ -1205,42 +1205,43 @@ const VicePrincipalDashboard = () => {
               {supervisorReports.map((report) => (
                 <Card 
                   key={report.id}
-                  className="report-card hover:shadow-lg transition-shadow cursor-pointer"
+                  className="report-card hover:shadow-md transition-all cursor-pointer border-l-4 border-blue-500"
                   onClick={() => {
                     setSelectedSupervisorReport(report);
                     setShowSupervisorModal(true);
                   }}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
+                  <CardContent className="p-3">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      {/* Info Section */}
                       <div className="flex-1">
-                        <h4 className="font-bold text-gray-800">
-                          تقرير {new Date(report.date).toLocaleDateString("ar-SA", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                        </h4>
-                        <p className="text-sm text-gray-500">
-                          تم الإنشاء: {new Date(report.created_at).toLocaleString("ar-SA")}
-                        </p>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">
+                            {getUserName(report.user_id)}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            {new Date(report.date).toLocaleDateString("ar-SA")}
+                          </span>
+                        </div>
+                        
+                        {/* Quick Stats - Compact */}
+                        <div className="flex flex-wrap gap-2">
+                          <span className="text-xs px-2 py-1 bg-cyan-50 text-cyan-700 rounded">
+                            انضباط: {report.student_discipline}/10
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-blue-50 text-blue-700 rounded">
+                            نظافة: {report.classroom_cleanliness}/10
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-purple-50 text-purple-700 rounded">
+                            التزام: {report.teacher_attendance_rate}/10
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-green-50 text-green-700 rounded">
+                            سلوك: {report.general_behavior}/10
+                          </span>
+                        </div>
                       </div>
                       
-                      <div className="hidden md:flex items-center gap-3">
-                        <div className="text-center">
-                          <div className="text-xs text-gray-600">الانضباط</div>
-                          <div className="text-lg font-bold text-cyan-600">{report.student_discipline}/10</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-gray-600">النظافة</div>
-                          <div className="text-lg font-bold text-blue-600">{report.classroom_cleanliness}/10</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-gray-600">الالتزام</div>
-                          <div className="text-lg font-bold text-purple-600">{report.teacher_attendance_rate}/10</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-xs text-gray-600">السلوك</div>
-                          <div className="text-lg font-bold text-green-600">{report.general_behavior}/10</div>
-                        </div>
-                      </div>
-                      
+                      {/* View Button */}
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -1249,6 +1250,7 @@ const VicePrincipalDashboard = () => {
                           setSelectedSupervisorReport(report);
                           setShowSupervisorModal(true);
                         }}
+                        className="shrink-0"
                       >
                         <Eye className="w-4 h-4 ml-1" />
                         عرض
