@@ -2576,8 +2576,90 @@ const DirectorDashboard = () => {
                 {/* Educational Supervision Report Details */}
                 {selectedReport.type === "educational_supervision" && selectedReport.teacher_evaluations && (
                   <div className="space-y-4">
-                    <div className="bg-cyan-50 p-4 rounded-lg">
-                      <h4 className="font-semibold text-cyan-800 mb-3">تقييم تحسين المعلمين</h4>
+                    <div className="bg-cyan-50 p-4 rounded-lg border-2 border-cyan-200">
+                      <h4 className="font-bold text-cyan-900 mb-4 text-lg">📋 تقييمات المعلمين - تقرير الإشراف التربوي</h4>
+                      <div className="space-y-4">
+                        {selectedReport.teacher_evaluations.map((evaluation, idx) => (
+                          <Card key={`eval-${idx}`} className="bg-white border-2 border-cyan-300">
+                            <CardHeader className="bg-cyan-100 pb-3">
+                              <CardTitle className="text-cyan-900 text-base">
+                                المعلم: {evaluation.teacher_name}
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="pt-4 space-y-4">
+                              {/* Ratings */}
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                  <p className="text-xs text-blue-600 font-semibold mb-1">التخطيط</p>
+                                  <p className="text-2xl font-bold text-blue-800">{evaluation.planning}/10</p>
+                                </div>
+                                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                  <p className="text-xs text-green-600 font-semibold mb-1">الأداء</p>
+                                  <p className="text-2xl font-bold text-green-800">{evaluation.performance}/10</p>
+                                </div>
+                                <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                                  <p className="text-xs text-purple-600 font-semibold mb-1">إدارة الوقت</p>
+                                  <p className="text-2xl font-bold text-purple-800">{evaluation.time_management}/10</p>
+                                </div>
+                                <div className="bg-orange-50 p-3 rounded-lg border border-orange-200">
+                                  <p className="text-xs text-orange-600 font-semibold mb-1">تحقيق الأهداف</p>
+                                  <p className="text-2xl font-bold text-orange-800">{evaluation.goal_achievement}/10</p>
+                                </div>
+                              </div>
+
+                              {/* Average Score */}
+                              <div className="bg-gradient-to-r from-cyan-100 to-blue-100 p-3 rounded-lg border-2 border-cyan-300">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-sm font-semibold text-cyan-900">المعدل الكلي:</span>
+                                  <span className="text-3xl font-bold text-cyan-900">
+                                    {((evaluation.planning + evaluation.performance + evaluation.time_management + evaluation.goal_achievement) / 4).toFixed(1)}/10
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Strategies */}
+                              <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-sm font-semibold text-yellow-800">استخدام استراتيجيات تعليمية:</span>
+                                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                                    evaluation.uses_strategies === 'yes' 
+                                      ? 'bg-green-200 text-green-800' 
+                                      : 'bg-red-200 text-red-800'
+                                  }`}>
+                                    {evaluation.uses_strategies === 'yes' ? 'نعم ✓' : 'لا ✗'}
+                                  </span>
+                                </div>
+                                {evaluation.strategies_notes && (
+                                  <p className="text-sm text-gray-700 mt-2 pr-4">
+                                    <strong>ملاحظات:</strong> {evaluation.strategies_notes}
+                                  </p>
+                                )}
+                              </div>
+
+                              {/* Strengths */}
+                              {evaluation.strengths && (
+                                <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                                  <p className="text-sm font-semibold text-green-800 mb-2">💪 نقاط القوة:</p>
+                                  <p className="text-sm text-gray-800 whitespace-pre-wrap">{evaluation.strengths}</p>
+                                </div>
+                              )}
+
+                              {/* Needs Support */}
+                              {evaluation.needs_support && (
+                                <div className="bg-red-50 p-3 rounded-lg border border-red-200">
+                                  <p className="text-sm font-semibold text-red-800 mb-2">🎯 نقاط تحتاج دعم:</p>
+                                  <p className="text-sm text-gray-800 whitespace-pre-wrap">{evaluation.needs_support}</p>
+                                </div>
+                              )}
+                            </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    {/* Overall Teacher Progress View */}
+                    <div className="bg-gradient-to-br from-cyan-50 to-blue-50 p-4 rounded-lg border-2 border-cyan-200">
+                      <h4 className="font-semibold text-cyan-900 mb-3">📊 ملخص تحسين المعلمين (جميع التقارير)</h4>
                       <TeacherProgressView branch={user.branch} compact={false} />
                     </div>
                   </div>
