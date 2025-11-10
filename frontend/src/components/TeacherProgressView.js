@@ -644,8 +644,8 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
 
               <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="bg-blue-50 p-3 rounded-lg text-center">
-                  <p className="text-xs text-gray-600">التقييم الأول</p>
-                  <p className="text-2xl font-bold text-blue-600">{teacher.firstAverage}/10</p>
+                  <p className="text-xs text-gray-600">التقييم السابق</p>
+                  <p className="text-2xl font-bold text-blue-600">{teacher.previousAverage || teacher.firstAverage}/10</p>
                 </div>
                 <div className="bg-green-50 p-3 rounded-lg text-center">
                   <p className="text-xs text-gray-600">التقييم الحالي</p>
