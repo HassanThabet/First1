@@ -274,7 +274,13 @@ const EducationalSupervisionTeacherProgress = () => {
             fontSize: 11,
             bold: true,
             color: '#2563eb',
-            margin: [0, 10, 0, 5]
+            margin: [0, 10, 0, 2]
+          },
+          {
+            text: `المشرف التربوي: ${eval_item.supervisor_name}`,
+            fontSize: 9,
+            color: '#4b5563',
+            margin: [0, 0, 0, 5]
           },
           {
             table: {
