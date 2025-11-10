@@ -74,6 +74,7 @@ const VicePrincipalDashboard = () => {
       );
       
       setSupervisorReports(filteredSupervisorReports);
+      setAllSupervisorReports(filteredSupervisorReports);
       setMyReports(myReportsRes.data);
       setUsers(allUsers);
       setTeachers(teachersRes.data);
