@@ -45,6 +45,7 @@ const EducationalSupervisionTeacherProgress = () => {
           
           teacherMap[eval_item.teacher_id].evaluations.push({
             date: report.date,
+            supervisor_name: report.supervisor_name || report.created_by_name || "غير محدد",
             planning: eval_item.planning,
             performance: eval_item.performance,
             time_management: eval_item.time_management,
