@@ -17,6 +17,7 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
   const [allTeacherProgress, setAllTeacherProgress] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedTeacher, setSelectedTeacher] = useState("all");
+  const [expandedTeachers, setExpandedTeachers] = useState({});
 
   useEffect(() => {
     fetchReportsAndCalculateProgress();
