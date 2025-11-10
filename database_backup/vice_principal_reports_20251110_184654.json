@@ -1,0 +1,22 @@
+[
+  {
+    "_id": "69102ebb373a404890b1e844",
+    "problems": [],
+    "suggestions": [],
+    "week_start": "2025-11-08",
+    "week_end": "2025-11-08",
+    "absent_teachers": [
+      {
+        "teacher": "شاكر احمد سعيد  عفيف",
+        "absent_days": 1
+      }
+    ],
+    "supervisor_reports": [
+      "140511ae-609d-430f-be7e-cbfb849a23fa"
+    ],
+    "id": "2bd11c6f-ec09-4c57-9a0c-50fb6d71ab9b",
+    "user_id": "bdc8971d-6e2d-4437-b866-ebdfa0b64b30",
+    "branch": "boys",
+    "created_at": "2025-11-09T06:03:39.767243+00:00"
+  }
+]

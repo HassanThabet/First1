@@ -1,0 +1,54 @@
+{
+  "timestamp": "20251110_184654",
+  "database": "test_database",
+  "collections": {
+    "sessions": {
+      "filename": "sessions_20251110_184654.json",
+      "document_count": 309
+    },
+    "director_reports": {
+      "filename": "director_reports_20251110_184654.json",
+      "document_count": 1
+    },
+    "vice_principal_reports": {
+      "filename": "vice_principal_reports_20251110_184654.json",
+      "document_count": 1
+    },
+    "supervisor_reports": {
+      "filename": "supervisor_reports_20251110_184654.json",
+      "document_count": 6
+    },
+    "activities_reports": {
+      "filename": "activities_reports_20251110_184654.json",
+      "document_count": 2
+    },
+    "subjects": {
+      "filename": "subjects_20251110_184654.json",
+      "document_count": 16
+    },
+    "quality_reports": {
+      "filename": "quality_reports_20251110_184654.json",
+      "document_count": 0
+    },
+    "teachers": {
+      "filename": "teachers_20251110_184654.json",
+      "document_count": 119
+    },
+    "educational_supervision_reports": {
+      "filename": "educational_supervision_reports_20251110_184654.json",
+      "document_count": 5
+    },
+    "social_specialist_reports": {
+      "filename": "social_specialist_reports_20251110_184654.json",
+      "document_count": 2
+    },
+    "users": {
+      "filename": "users_20251110_184654.json",
+      "document_count": 30
+    },
+    "classrooms": {
+      "filename": "classrooms_20251110_184654.json",
+      "document_count": 57
+    }
+  }
+}

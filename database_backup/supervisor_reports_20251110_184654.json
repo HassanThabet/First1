@@ -1,0 +1,176 @@
+[
+  {
+    "_id": "690ed09c4f251e6f4010f291",
+    "date": "2025-11-08",
+    "student_discipline": 10,
+    "student_discipline_notes": "",
+    "classroom_cleanliness": 10,
+    "classroom_cleanliness_notes": "",
+    "teacher_attendance_rate": 10,
+    "late_teachers": [],
+    "teacher_attendance_notes": "",
+    "student_movement": "",
+    "student_movement_classes": [],
+    "student_movement_notes": "",
+    "general_behavior": 10,
+    "general_notes": "",
+    "incidents": [],
+    "covering_teachers": [],
+    "absent_students_count": 0,
+    "id": "76f5a19c-2041-4fa8-b3ed-abafebfef3a4",
+    "user_id": "a3efcbab-ccfa-4e15-9bdb-d4068a896b9d",
+    "branch": "girls",
+    "created_at": "2025-11-08T05:09:48.614223+00:00"
+  },
+  {
+    "_id": "690f03fe8c0a6e8e8c921bae",
+    "date": "2025-11-08",
+    "student_discipline": 10,
+    "student_discipline_notes": "لايوجد",
+    "classroom_cleanliness": 10,
+    "classroom_cleanliness_notes": "ممتاز",
+    "teacher_attendance_rate": 10,
+    "late_teachers": [],
+    "teacher_attendance_notes": "الصف الرابع ( ج ) ",
+    "student_movement": "",
+    "student_movement_classes": [],
+    "student_movement_notes": "لا يوجد",
+    "general_behavior": 10,
+    "general_notes": "( ستائر لصف الخامس (  أ \nالمعلم الغياب ا/  الاستاذ شاكر المعلم المغطي مشرف الدور عبدالله جلاد الحصه السابعه ",
+    "incidents": [],
+    "covering_teachers": [],
+    "absent_students_count": 18,
+    "id": "140511ae-609d-430f-be7e-cbfb849a23fa",
+    "user_id": "f37de223-2b1f-4e4b-aba4-be470758bd66",
+    "branch": "boys",
+    "created_at": "2025-11-08T08:49:02.870872+00:00"
+  },
+  {
+    "_id": "690f05558c0a6e8e8c921bb2",
+    "date": "2025-11-08",
+    "student_discipline": 8,
+    "student_discipline_notes": "",
+    "classroom_cleanliness": 8,
+    "classroom_cleanliness_notes": "",
+    "teacher_attendance_rate": 10,
+    "late_teachers": [
+      {
+        "subject": "اللغة العربية",
+        "teacher": "حسين حسين علي درويش",
+        "period": "6"
+      }
+    ],
+    "teacher_attendance_notes": "تأخر عن الحصة 10 دقائق ",
+    "student_movement": "",
+    "student_movement_classes": [],
+    "student_movement_notes": "",
+    "general_behavior": 9,
+    "general_notes": "ثلاثة طلاب تأخروا ما بين 10-15 دقيقة بعد حصة الرياضة ",
+    "incidents": [],
+    "covering_teachers": [],
+    "absent_students_count": 12,
+    "id": "39266942-4f33-4d4d-9db9-e43405a17f70",
+    "user_id": "7edcdcea-68e2-46d2-90db-d500706edbf4",
+    "branch": "boys",
+    "created_at": "2025-11-08T08:54:45.012334+00:00"
+  },
+  {
+    "_id": "690f05c38c0a6e8e8c921bb4",
+    "date": "2025-11-08",
+    "student_discipline": 7,
+    "student_discipline_notes": "زياده المعلمين أو لجنه منظمه تساعد في انضباط   الطابور متابعة نظام البصمه يسبب زحمه عند المدخل ",
+    "classroom_cleanliness": 8,
+    "classroom_cleanliness_notes": "اضافه سلة مهملات للممرات",
+    "teacher_attendance_rate": 7,
+    "late_teachers": [],
+    "teacher_attendance_notes": "",
+    "student_movement": "",
+    "student_movement_classes": [],
+    "student_movement_notes": "لا يوجد هناك بعض الطلاب تم تعامل معهم بشكل المطلوب",
+    "general_behavior": 8,
+    "general_notes": "تصليح شباك صف تاسع ج\nتصليح طاولة صف سابع أ\nتصليح شباك صف اول ثانوي ب\nتصليح سبوره صف سابع أ ",
+    "incidents": [],
+    "covering_teachers": [
+      {
+        "subject": "العلوم",
+        "teacher": "محمد علي عبد الله جبلي",
+        "period": "1"
+      },
+      {
+        "subject": "العلوم",
+        "teacher": "سعد عمر عبيد عمر",
+        "period": "2"
+      }
+    ],
+    "absent_students_count": 28,
+    "id": "5c197141-2e69-44eb-9f87-ab128011ba60",
+    "user_id": "a6746ff3-5833-4aed-abec-64324cd7381d",
+    "branch": "boys",
+    "created_at": "2025-11-08T08:56:35.583946+00:00",
+    "updated_at": "2025-11-08T08:58:16.083454+00:00"
+  },
+  {
+    "_id": "6910c54415d1a95facc0a22e",
+    "date": "2025-11-09",
+    "student_discipline": 8,
+    "student_discipline_notes": "",
+    "classroom_cleanliness": 8,
+    "classroom_cleanliness_notes": "",
+    "teacher_attendance_rate": 8,
+    "late_teachers": [
+      {
+        "subject": "الإسلامية",
+        "teacher": "يوسف فرج سليمان الأهدل",
+        "period": "3"
+      }
+    ],
+    "teacher_attendance_notes": "تأخر الأستاذ يوسف فرج 10 دقائق عن الحصة",
+    "student_movement": "",
+    "student_movement_classes": [],
+    "student_movement_notes": "",
+    "general_behavior": 7,
+    "general_notes": "",
+    "incidents": [],
+    "covering_teachers": [],
+    "absent_students_count": 11,
+    "id": "abb282eb-be6f-4990-9875-fae2a16f6e54",
+    "user_id": "7edcdcea-68e2-46d2-90db-d500706edbf4",
+    "branch": "boys",
+    "created_at": "2025-11-09T16:45:56.636310+00:00"
+  },
+  {
+    "_id": "691188df7c53ea464b8367f4",
+    "date": "2025-11-10",
+    "student_discipline": 10,
+    "student_discipline_notes": "",
+    "classroom_cleanliness": 10,
+    "classroom_cleanliness_notes": "",
+    "teacher_attendance_rate": 10,
+    "late_teachers": [
+      {
+        "subject": "القرآن الكريم",
+        "teacher": "أحمد حسين سليمان الأهدل",
+        "period": "5"
+      }
+    ],
+    "teacher_attendance_notes": "",
+    "student_movement": "",
+    "student_movement_classes": [],
+    "student_movement_notes": "",
+    "general_behavior": 10,
+    "general_notes": "",
+    "incidents": [],
+    "covering_teachers": [
+      {
+        "subject": "اللغة العربية",
+        "teacher": "حسين حسين علي درويش",
+        "period": "5"
+      }
+    ],
+    "absent_students_count": 20,
+    "id": "415e5e5c-c0b9-4ebc-9cab-180cd9eef42e",
+    "user_id": "7edcdcea-68e2-46d2-90db-d500706edbf4",
+    "branch": "boys",
+    "created_at": "2025-11-10T06:40:31.533586+00:00"
+  }
+]
