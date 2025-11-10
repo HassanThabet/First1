@@ -1,0 +1,302 @@
+[
+  {
+    "_id": "6905f14ef81c65fa6595b9f5",
+    "id": "bc5cf282-56fa-43e9-89d7-e83cae82de39",
+    "username": "مدارس الفجر الجديد الأهلية",
+    "password": "$2b$12$MHDdXGGRgeTagsdSnsZ0xOD2PwiK02Rda53XMB1mBpagUxODpmUna",
+    "role": "admin",
+    "branch": "both",
+    "created_at": "2025-11-01T11:38:54.594159+00:00"
+  },
+  {
+    "_id": "6905f45c0a9fc49da0813b06",
+    "id": "f4a23bb9-b610-43ae-9d18-0dba7375fe95",
+    "username": "ماجد",
+    "role": "vice_principal",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-01T11:51:56.127120+00:00",
+    "password": "$2b$12$/OqAxYX4j5gofl27dCC/Iux4IjMowiEhkTYJ2JGCP1ER7XwJU1whu"
+  },
+  {
+    "_id": "690622b3e83fabefaf4c297f",
+    "id": "bdc8971d-6e2d-4437-b866-ebdfa0b64b30",
+    "username": "خالد",
+    "role": "vice_principal",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-01T15:09:39.189203+00:00",
+    "password": "$2b$12$us.bWLfCHXHArQH9IgU51e.mu/NTCKXeBU7rUal0FB17LsdFYrmRq"
+  },
+  {
+    "_id": "690622c0e83fabefaf4c2980",
+    "id": "adb1d8cd-bc5b-492d-9dee-83fa158c32d1",
+    "username": "اقبال",
+    "role": "director",
+    "branch": "girls",
+    "assigned_to": "",
+    "created_at": "2025-11-01T15:09:52.108887+00:00",
+    "password": "$2b$12$/U3gHmx8jD5xnb.RFoR30Od23B4GglySOmXf.TGV19nq8/XihzTri"
+  },
+  {
+    "_id": "690622cce83fabefaf4c2981",
+    "id": "628e94af-db15-412c-9eb1-3f8b5a036a3b",
+    "username": "فاطمة",
+    "role": "vice_principal",
+    "branch": "girls",
+    "assigned_to": "",
+    "created_at": "2025-11-01T15:10:04.478475+00:00",
+    "password": "$2b$12$tDafMCpsZAaYsIdBaGxGTedYp7fJvAxxizkWt5UQZktMUldN924ea"
+  },
+  {
+    "_id": "690622d7e83fabefaf4c2982",
+    "id": "bba31c91-05d9-4f4f-85db-b46fa2c2eb57",
+    "username": "مريم",
+    "role": "vice_principal",
+    "branch": "girls",
+    "assigned_to": "",
+    "created_at": "2025-11-01T15:10:15.742969+00:00",
+    "password": "$2b$12$jOaM2eH0w9VxrLYDfyGwqeRtC/ijqqR21DsJmmSfXEMQl7O4Zyzmq"
+  },
+  {
+    "_id": "6906404f212b67df6de579c0",
+    "id": "3e4cca1a-38c6-46b8-9fa0-23787c914ef7",
+    "username": "ثابت",
+    "role": "chairman",
+    "branch": "both",
+    "assigned_to": "",
+    "created_at": "2025-11-01T17:15:59.717089+00:00",
+    "password": "$2b$12$h/OljVyMuwRY6j2DaFkaM.ibovj4ui8XvShWYy/0wvMjMNpbGnjOC"
+  },
+  {
+    "_id": "69065141767cfe6e28799e8a",
+    "id": "563e1958-b882-40f3-ae31-8735b93c8718",
+    "username": "سراج",
+    "role": "supervisor",
+    "branch": "boys",
+    "assigned_to": "f4a23bb9-b610-43ae-9d18-0dba7375fe95",
+    "created_at": "2025-11-01T18:28:17.730622+00:00",
+    "password": "$2b$12$IJfX4fESZarw/cECp3JLae4.s7J/UW8jIaOh5zsRjZbamUfRO3sD6"
+  },
+  {
+    "_id": "6906da4a2eeac2c2c66f3f3f",
+    "id": "ea5e71a1-eafc-42f4-b6d4-c543a0653cf2",
+    "username": "حمزة",
+    "role": "quality",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-02T04:12:58.249513+00:00",
+    "password": "$2b$12$rgHlx1pBw45FYdxT.AWH5OQ4LV/f0H624huGqxSC0vCDWhfleZww2"
+  },
+  {
+    "_id": "6906de298d917ffdc5622b32",
+    "id": "a6746ff3-5833-4aed-abec-64324cd7381d",
+    "username": "سليمان",
+    "role": "supervisor",
+    "branch": "boys",
+    "assigned_to": "f4a23bb9-b610-43ae-9d18-0dba7375fe95",
+    "created_at": "2025-11-02T04:29:29.080730+00:00",
+    "password": "$2b$12$n0drNpJpIK7aHnUJqhkd8eXJW7bTiPu0ORG/DFGzUw3Mx.rjQbU72"
+  },
+  {
+    "_id": "6906de3a8d917ffdc5622b33",
+    "id": "7edcdcea-68e2-46d2-90db-d500706edbf4",
+    "username": "معاذ",
+    "role": "supervisor",
+    "branch": "boys",
+    "assigned_to": "f4a23bb9-b610-43ae-9d18-0dba7375fe95",
+    "created_at": "2025-11-02T04:29:46.045718+00:00",
+    "password": "$2b$12$KxOSbJJ2LiPdJrFMTWdLUuUNP9kNJFpZyVtabPQpBoJqz9YuKgobG"
+  },
+  {
+    "_id": "6906e0628d917ffdc5622b43",
+    "id": "f37de223-2b1f-4e4b-aba4-be470758bd66",
+    "username": "عبدالله جلاد",
+    "role": "supervisor",
+    "branch": "boys",
+    "assigned_to": "bdc8971d-6e2d-4437-b866-ebdfa0b64b30",
+    "created_at": "2025-11-02T04:38:58.680375+00:00",
+    "password": "$2b$12$WV0hDvTW0fhtfhtgT48XlOSVzIfNa060fTMXxR1Ijzg0IdygGY/xC"
+  },
+  {
+    "_id": "6906e06f8d917ffdc5622b44",
+    "id": "ec4a850f-2cee-4c5a-b380-bbd88bd451cb",
+    "username": "أحمد حسين",
+    "role": "supervisor",
+    "branch": "boys",
+    "assigned_to": "bdc8971d-6e2d-4437-b866-ebdfa0b64b30",
+    "created_at": "2025-11-02T04:39:11.947207+00:00",
+    "password": "$2b$12$HOW4EDw1YRyO/FTSCUi/8.T8QqRI4MDi.Ln8SQ55WKOIhK.oZhIC."
+  },
+  {
+    "_id": "6906e34a8d917ffdc5622b5c",
+    "id": "390b316d-4866-4f64-9b31-f3f7659e609a",
+    "username": "ابراهيم",
+    "role": "director",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-02T04:51:22.467115+00:00",
+    "password": "$2b$12$0TnC313DxX/q7HulOvu/puBnnYN5qpQyOEwQ9dAx8.RVcbZLWqegG"
+  },
+  {
+    "_id": "6906f2ea9a2c9f1f69480dbc",
+    "id": "7ed4687e-d8eb-4cd6-aa33-1f771ca85b37",
+    "username": "ahmed",
+    "role": "director",
+    "branch": "both",
+    "assigned_to": null,
+    "created_at": "2025-11-02T05:58:02.866641+00:00",
+    "password": "$2b$12$BYQGgbs3onuCixOYk/Ag5OUuJKh3qsAxHxO/uuXw6XDse6DMbLTSW",
+    "full_name": "أحمد المدير"
+  },
+  {
+    "_id": "6909c695596051c11a0149ed",
+    "id": "eb0fbcb0-e253-40ea-b1f7-e591469d930d",
+    "username": "عيسى",
+    "role": "educational_supervision",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-04T09:25:41.567823+00:00",
+    "password": "$2b$12$eUUnp/HihFOQIi7OLsh.2eZ.DVSsXvwuVyHgSq8Bt/wDacEO0VBLu"
+  },
+  {
+    "_id": "690a1c0710790a02598292c3",
+    "id": "f1c81dd7-b60a-4b4b-8d8d-d519d428d053",
+    "username": "احمد طاهري",
+    "role": "activities",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-04T15:30:15.179198+00:00",
+    "password": "$2b$12$FAnWHyxfNvXKiiz4ydoCyuU7BxdBdno7o8W8vb.4TSweEd1DjXqzq"
+  },
+  {
+    "_id": "690a284db1c10613a605ee97",
+    "id": "9a193db4-2c6f-4a64-ab92-0997de95c5c3",
+    "username": "محمد امين",
+    "role": "social_specialist",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-04T16:22:37.158869+00:00",
+    "password": "$2b$12$dpziaEbN4Gc9//b2FoQsTuEeUDLwuTKuSVRibfCSQBEBlE.H3f5WW"
+  },
+  {
+    "_id": "690cd39f085c87c830c3dac6",
+    "id": "e498543c-ebc2-4db2-8e43-e5d5266304bb",
+    "username": "منى",
+    "role": "supervisor",
+    "branch": "girls",
+    "assigned_to": "628e94af-db15-412c-9eb1-3f8b5a036a3b",
+    "created_at": "2025-11-06T16:58:07.459271+00:00",
+    "password": "$2b$12$XSK3AS5XoOMrpbw8ojon7uI7AaJiOpMt4/KDCQQHMv2HhFlx3A2ya"
+  },
+  {
+    "_id": "690cd3b4085c87c830c3dac7",
+    "id": "bd0dc60f-4812-4075-a4c5-3f5ef8682085",
+    "username": "هند",
+    "role": "supervisor",
+    "branch": "girls",
+    "assigned_to": "628e94af-db15-412c-9eb1-3f8b5a036a3b",
+    "created_at": "2025-11-06T16:58:28.931985+00:00",
+    "password": "$2b$12$lsK1aZml5OdnQK9CS1.usudT1wubolL2QmMdHAT9CDyka9Q1B45EW"
+  },
+  {
+    "_id": "690cd3cf085c87c830c3dac8",
+    "id": "3227c3d6-7532-4020-b370-abe19d86ce3c",
+    "username": "حنان",
+    "role": "supervisor",
+    "branch": "girls",
+    "assigned_to": "bba31c91-05d9-4f4f-85db-b46fa2c2eb57",
+    "created_at": "2025-11-06T16:58:55.356684+00:00",
+    "password": "$2b$12$J27nf2QJnSsqMXyTzymb.O06HB9e7Ot7dCuZqlF7pa/LWwlsJoU/6"
+  },
+  {
+    "_id": "690cd3e1085c87c830c3dac9",
+    "id": "a3efcbab-ccfa-4e15-9bdb-d4068a896b9d",
+    "username": "رملة",
+    "role": "supervisor",
+    "branch": "girls",
+    "assigned_to": "bba31c91-05d9-4f4f-85db-b46fa2c2eb57",
+    "created_at": "2025-11-06T16:59:13.256482+00:00",
+    "password": "$2b$12$PRuXJBmp/SdAjoJ408GgBOwuSuotwSixjXKVbpSLfBaIt/AbjlTgq"
+  },
+  {
+    "_id": "690cd3fa085c87c830c3daca",
+    "id": "1b06d5d9-6392-405a-b1b4-d57e8d9fa727",
+    "username": "عائشة",
+    "role": "educational_supervision",
+    "branch": "girls",
+    "assigned_to": "",
+    "created_at": "2025-11-06T16:59:38.580687+00:00",
+    "password": "$2b$12$OPN8Rpn61/p.TFqL4Dgb0eE53vzXHjpi3HGwEQbHrIMyo8O.yhW22"
+  },
+  {
+    "_id": "690cd40e085c87c830c3dacb",
+    "id": "b37041e8-9aee-42cf-8deb-529b9ef74d38",
+    "username": "امنة",
+    "role": "social_specialist",
+    "branch": "girls",
+    "assigned_to": "",
+    "created_at": "2025-11-06T16:59:58.122407+00:00",
+    "password": "$2b$12$pH/eXntZOtCRkXPrQOYvZexvJEMyV8WtBTRT4rLa/2qhOnPhdD3sC"
+  },
+  {
+    "_id": "690cd41c085c87c830c3dacc",
+    "id": "310396f7-de3f-4ed2-a6bd-50deddf5a851",
+    "username": "دليلة",
+    "role": "social_specialist",
+    "branch": "girls",
+    "assigned_to": "",
+    "created_at": "2025-11-06T17:00:12.553610+00:00",
+    "password": "$2b$12$THSEqJPxcQYKViuKznIfreb6V0HR3D185qUf.uctPSK833KQ2.b7K"
+  },
+  {
+    "_id": "690cd428085c87c830c3dacd",
+    "id": "e1dbd953-87c1-4142-9f31-4f48989dce50",
+    "username": "مارية",
+    "role": "activities",
+    "branch": "girls",
+    "assigned_to": "",
+    "created_at": "2025-11-06T17:00:24.196827+00:00",
+    "password": "$2b$12$c/pL4d845mXqV7VO66k8iuuW5jcv3Xo3U11sly1MqHUwxCYK.6mbO"
+  },
+  {
+    "_id": "69102a59373a404890b1e842",
+    "id": "06533c76-741e-4c7d-9393-378e5741f0be",
+    "username": "عبد العزيز",
+    "role": "educational_supervision",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-09T05:44:57.554673+00:00",
+    "password": "$2b$12$Wtcl75bHk9STaYnxGgnac.GeG28zpR64UTwpvE9BDul3BVmz/P9Kq"
+  },
+  {
+    "_id": "6911bdd291f99aece231f79d",
+    "id": "ca09d920-f2a6-41e4-93c9-592e7c479ff6",
+    "username": "ا",
+    "role": "educational_supervision",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-10T10:26:26.754000+00:00",
+    "password": "$2b$12$ahA5Tdy6Pv7XDJ7jJe3qaeIdOkyKql69dVLbl8DTLr3TpTQhkSpra"
+  },
+  {
+    "_id": "6911bdd391f99aece231f7a1",
+    "id": "8421ab33-6ab5-4eeb-a052-7f4ddb21c8eb",
+    "username": "ب",
+    "role": "supervisor",
+    "branch": "boys",
+    "assigned_to": "",
+    "created_at": "2025-11-10T10:26:27.648463+00:00",
+    "password": "$2b$12$umJRDJmmDxlEdVvt.OzQNu38jRd3bDA2I1WMUEA2.tiGn.Ow0d4QS"
+  },
+  {
+    "_id": "6911bdd491f99aece231f7a5",
+    "id": "7727ee91-2236-4e1e-964d-c4132edc240a",
+    "username": "ت",
+    "role": "social_specialist",
+    "branch": "girls",
+    "assigned_to": "",
+    "created_at": "2025-11-10T10:26:28.508198+00:00",
+    "password": "$2b$12$SU8pR5RyE92hmmi7jqAKueozK39Jme66Ft.84pAsLXJHcxnmaCNCy"
+  }
+]

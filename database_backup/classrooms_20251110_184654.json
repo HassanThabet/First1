@@ -1,0 +1,458 @@
+[
+  {
+    "_id": "6905f39cc235d2e9c41faaae",
+    "id": "c04bf094-5b27-4951-a31c-24636ee15cf5",
+    "name": "الصف الثاني",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T11:48:44.607509+00:00"
+  },
+  {
+    "_id": "6905f39cc235d2e9c41faaaf",
+    "id": "582da49c-d340-478b-a1c1-33c1d06baec0",
+    "name": "الصف الأول",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T11:48:44.607514+00:00"
+  },
+  {
+    "_id": "6905f39cc235d2e9c41faab0",
+    "id": "5255609e-1e4a-4b7c-b984-d3799be6f87a",
+    "name": "الصف الأول",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T11:48:44.607518+00:00"
+  },
+  {
+    "_id": "690623b5e83fabefaf4c2992",
+    "id": "af8bd460-865b-488a-af16-226c78409e58",
+    "name": "الصف الاول ",
+    "section": "ج",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:13:57.177123+00:00"
+  },
+  {
+    "_id": "690623e4e83fabefaf4c2993",
+    "id": "17ca3cc6-c390-4cd4-bbde-dc623c6a35e4",
+    "name": "الصف الاول ",
+    "section": "د",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:14:44.570536+00:00"
+  },
+  {
+    "_id": "690623f5e83fabefaf4c2994",
+    "id": "fe71fe00-5165-4610-aa2c-af1f9a3c3edf",
+    "name": "الصف الاول",
+    "section": "ه",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:15:01.339427+00:00"
+  },
+  {
+    "_id": "690623fde83fabefaf4c2995",
+    "id": "6c2ce4c0-40cd-4bdb-8c78-58ea87cc359e",
+    "name": "الصف الثاني ",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:15:09.268764+00:00"
+  },
+  {
+    "_id": "69062417e83fabefaf4c2996",
+    "id": "44017a4b-d783-4a24-82c1-67a84a76e72d",
+    "name": "الصف الثاني",
+    "section": "ج",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:15:35.326370+00:00"
+  },
+  {
+    "_id": "69062424e83fabefaf4c2997",
+    "id": "ef058b0c-767c-4fe3-b9c0-85312dcd62f9",
+    "name": "الصف الثاني",
+    "section": "د",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:15:48.883042+00:00"
+  },
+  {
+    "_id": "69062434e83fabefaf4c2998",
+    "id": "5c39cf3b-5e1f-4c4d-8727-ebc3e441c42e",
+    "name": "الصف الثاني ",
+    "section": "ه",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:16:04.404807+00:00"
+  },
+  {
+    "_id": "6906243ce83fabefaf4c2999",
+    "id": "049edb54-f0d7-4a93-8268-c90aedd0b37c",
+    "name": "الصف الثالث ",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:16:12.282706+00:00"
+  },
+  {
+    "_id": "69062446e83fabefaf4c299a",
+    "id": "93cbde58-6cad-450b-ad64-71d7a73398b4",
+    "name": "الصف الثالث ",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:16:22.839806+00:00"
+  },
+  {
+    "_id": "6906244ee83fabefaf4c299b",
+    "id": "03bfaaaa-a7e7-46ef-b61d-871a33831aad",
+    "name": "الصف الثالث ",
+    "section": "ج",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:16:30.380186+00:00"
+  },
+  {
+    "_id": "69062456e83fabefaf4c299c",
+    "id": "622a2b84-1c85-4733-a4cf-f083717bbe1a",
+    "name": "الصف الثالث ",
+    "section": "د",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:16:38.526091+00:00"
+  },
+  {
+    "_id": "69062463e83fabefaf4c299d",
+    "id": "c6fb6ffc-ea8f-4c7e-8b16-17529f2e0dca",
+    "name": "الصف الثالث ",
+    "section": "ه",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:16:51.287515+00:00"
+  },
+  {
+    "_id": "6906246ae83fabefaf4c299e",
+    "id": "9678f469-fe96-47e6-8506-8f899bc64e2d",
+    "name": "الصف الرابع ",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:16:58.876188+00:00"
+  },
+  {
+    "_id": "69062471e83fabefaf4c299f",
+    "id": "cd5261e5-3955-4150-add9-b1a527a52f4d",
+    "name": "الصف الرابع",
+    "section": "ب",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:17:05.044599+00:00"
+  },
+  {
+    "_id": "69062478e83fabefaf4c29a0",
+    "id": "782b9d18-5b41-49b5-ab56-0ae7347e4e31",
+    "name": "الصف الرابع",
+    "section": "ج",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:17:12.203587+00:00"
+  },
+  {
+    "_id": "69062486e83fabefaf4c29a1",
+    "id": "f1069231-22b1-4678-9eda-17eaad963847",
+    "name": "الصف الخامس",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:17:26.357360+00:00"
+  },
+  {
+    "_id": "6906249be83fabefaf4c29a2",
+    "id": "9b5c9853-46a0-4d4f-b443-68014451d119",
+    "name": "الصف الخامس",
+    "section": "ج",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:17:47.158479+00:00"
+  },
+  {
+    "_id": "690624a0e83fabefaf4c29a3",
+    "id": "d14ecc88-5b23-421d-a68c-5bd02dffc1e1",
+    "name": "الصف السادس",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:17:52.518664+00:00"
+  },
+  {
+    "_id": "690624a5e83fabefaf4c29a4",
+    "id": "de31e3ab-c03d-4c96-8264-591e9b93b5db",
+    "name": "الصف السادس ",
+    "section": "ب",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:17:57.518645+00:00"
+  },
+  {
+    "_id": "690624b0e83fabefaf4c29a5",
+    "id": "7e507468-d302-40e8-b46e-bf12d786cdc7",
+    "name": "الصف السادس ",
+    "section": "ج",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:18:08.674464+00:00"
+  },
+  {
+    "_id": "690624b6e83fabefaf4c29a7",
+    "id": "428baec2-8bf5-4322-b115-d919cac8df30",
+    "name": "الصف السابع",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:18:14.682294+00:00"
+  },
+  {
+    "_id": "690624c5e83fabefaf4c29a8",
+    "id": "aab75f87-5624-4a34-81b4-18fe0e2ba6cc",
+    "name": "الصف السابع",
+    "section": "ب",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:18:29.200092+00:00"
+  },
+  {
+    "_id": "690624cde83fabefaf4c29a9",
+    "id": "4ae78f38-af34-41e0-ae10-93642ae63461",
+    "name": "الصف السابع ",
+    "section": "ج",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:18:37.322794+00:00"
+  },
+  {
+    "_id": "690624d7e83fabefaf4c29aa",
+    "id": "6d175dbb-248c-498e-964f-813d09a640b2",
+    "name": "الصف الثامن",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:18:47.925882+00:00"
+  },
+  {
+    "_id": "690624e0e83fabefaf4c29ab",
+    "id": "866f42a9-124b-49b8-8b2b-565479668e09",
+    "name": "الصف الثامن ",
+    "section": "ب",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:18:56.298856+00:00"
+  },
+  {
+    "_id": "690624e7e83fabefaf4c29ac",
+    "id": "ef4bcd31-7ccf-4e16-ac16-f0132b90c380",
+    "name": "الصف الثامن ",
+    "section": "ج",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:19:03.685600+00:00"
+  },
+  {
+    "_id": "690624eee83fabefaf4c29ad",
+    "id": "dc0cbb29-137e-4283-989a-295fb50f46ad",
+    "name": "الصف التاسع",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:19:10.480479+00:00"
+  },
+  {
+    "_id": "690624f4e83fabefaf4c29af",
+    "id": "e47bfcbd-3c95-4b5d-b0a5-639e87f7f2e4",
+    "name": "الصف التاسع",
+    "section": "ب",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:19:16.116117+00:00"
+  },
+  {
+    "_id": "690624fae83fabefaf4c29b0",
+    "id": "82f803ac-7856-469d-a019-ab62b1947b86",
+    "name": "الصف التاسع ",
+    "section": "ج",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:19:22.138969+00:00"
+  },
+  {
+    "_id": "6906251ce83fabefaf4c29b1",
+    "id": "407119e2-dcbb-4f8e-b9a2-aea87f68bd98",
+    "name": "الصف الاول ثانوي ",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:19:56.293563+00:00"
+  },
+  {
+    "_id": "69062528e83fabefaf4c29b3",
+    "id": "26d58a2d-4105-494d-97c0-04d23ce76170",
+    "name": "الصف الاول ثانوي ",
+    "section": "ب",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:20:08.556269+00:00"
+  },
+  {
+    "_id": "69062531e83fabefaf4c29b4",
+    "id": "54bd4e48-2f68-4119-b5dc-df324aa20d48",
+    "name": "الصف الاول ثانوي",
+    "section": "ج",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:20:17.003018+00:00"
+  },
+  {
+    "_id": "6906253ae83fabefaf4c29b6",
+    "id": "05133324-40b9-4c82-9d58-89d527885c8a",
+    "name": "الصف الثاني ثانوي ",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:20:26.944325+00:00"
+  },
+  {
+    "_id": "69062541e83fabefaf4c29b7",
+    "id": "d2f1e955-7387-4a4b-a8ad-5e33d0be6d1e",
+    "name": "الصف الثاني ثانوي ",
+    "section": "ب",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:20:33.919344+00:00"
+  },
+  {
+    "_id": "69062548e83fabefaf4c29b8",
+    "id": "52b14d0d-a630-4ac2-89ae-79b1ba4fbf10",
+    "name": "الصف الثالث ثانوي",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:20:40.180991+00:00"
+  },
+  {
+    "_id": "69062551e83fabefaf4c29b9",
+    "id": "1f50fb31-27e3-47d0-839a-55c95b62e06f",
+    "name": "الصف الثالث ثانوي ",
+    "section": "ب",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:20:49.535361+00:00"
+  },
+  {
+    "_id": "69062559e83fabefaf4c29ba",
+    "id": "d7af822f-3da4-4223-bd5b-ab90a5ec2133",
+    "name": "الصف الثالث ثانوي ",
+    "section": "ج",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:20:57.554794+00:00"
+  },
+  {
+    "_id": "69062560e83fabefaf4c29bb",
+    "id": "ea208d10-cb46-4422-a45c-29ab966a85ea",
+    "name": "الصف الرابع",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:21:04.959529+00:00"
+  },
+  {
+    "_id": "69062569e83fabefaf4c29bc",
+    "id": "f12cc756-5533-49af-a9a8-a368750d4768",
+    "name": "الصف الرابع",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:21:13.643028+00:00"
+  },
+  {
+    "_id": "69062572e83fabefaf4c29bd",
+    "id": "207f5d5b-6519-41d2-ad0b-b4097421aaab",
+    "name": "الصف الخامس ",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:21:22.308430+00:00"
+  },
+  {
+    "_id": "6906257ee83fabefaf4c29be",
+    "id": "1e6a82d9-d44c-44fd-bc83-3cced2e177f3",
+    "name": "الصف السادس",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:21:34.556722+00:00"
+  },
+  {
+    "_id": "69062586e83fabefaf4c29bf",
+    "id": "5858725c-4009-4cab-8211-9fba7c5638e2",
+    "name": "الصف السادس ",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:21:42.524477+00:00"
+  },
+  {
+    "_id": "69062590e83fabefaf4c29c0",
+    "id": "1cd93bdf-571a-4f44-89e0-8d49e7ee8da9",
+    "name": "الصف السابع ",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:21:52.441355+00:00"
+  },
+  {
+    "_id": "69062596e83fabefaf4c29c1",
+    "id": "2101aa6a-35aa-43fd-ac7d-41e50ce51f5f",
+    "name": "الصف السابع",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:21:58.167607+00:00"
+  },
+  {
+    "_id": "6906259ce83fabefaf4c29c2",
+    "id": "698e339d-f045-42f1-a1a4-65e26c43e8ff",
+    "name": "الصف الثامن",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:22:04.362925+00:00"
+  },
+  {
+    "_id": "690625a4e83fabefaf4c29c3",
+    "id": "c7055f5f-6125-4676-ac14-43f13b1abaa0",
+    "name": "الصف الثامن ",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:22:12.327468+00:00"
+  },
+  {
+    "_id": "690625bfe83fabefaf4c29c5",
+    "id": "2e5b69ca-04a0-4fda-b922-509b55ffa26b",
+    "name": "الصف التاسع",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:22:39.495502+00:00"
+  },
+  {
+    "_id": "690625c7e83fabefaf4c29c6",
+    "id": "2a0a9cf1-1e7c-4463-ba16-1b015ec4f660",
+    "name": "الصف التاسع ",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:22:47.243581+00:00"
+  },
+  {
+    "_id": "690625cfe83fabefaf4c29c7",
+    "id": "b27741ce-8dee-41fb-8048-b2394eb1de66",
+    "name": "الصف الاول ثانوي",
+    "section": "أ",
+    "branch": "boys",
+    "created_at": "2025-11-01T15:22:55.182965+00:00"
+  },
+  {
+    "_id": "690625d6e83fabefaf4c29c9",
+    "id": "dab520db-05f5-454a-832f-32fb26b66fcb",
+    "name": "الصف الاول ثانوي ",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:23:02.959628+00:00"
+  },
+  {
+    "_id": "690625e3e83fabefaf4c29ca",
+    "id": "4f4e8621-1a4c-4849-af21-ad66c638a0e9",
+    "name": "الصف الثاني ثانوي",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:23:15.804471+00:00"
+  },
+  {
+    "_id": "690625eee83fabefaf4c29cb",
+    "id": "361c038f-713d-4df1-95f0-a82a14a1b58c",
+    "name": "الصف الثاني ثانوي",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:23:26.479639+00:00"
+  },
+  {
+    "_id": "690625f8e83fabefaf4c29cc",
+    "id": "cfebeba7-2cfc-4600-b39b-87713cae9152",
+    "name": "الصف الثالث ثانوي",
+    "section": "أ",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:23:36.916719+00:00"
+  },
+  {
+    "_id": "69062601e83fabefaf4c29cd",
+    "id": "c70ad8c6-e4f7-482b-9495-ba82ae7e886d",
+    "name": "الصف الثالث ثانوي ",
+    "section": "ب",
+    "branch": "girls",
+    "created_at": "2025-11-01T15:23:45.283327+00:00"
+  }
+]

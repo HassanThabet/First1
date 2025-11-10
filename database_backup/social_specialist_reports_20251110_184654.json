@@ -1,0 +1,38 @@
+[
+  {
+    "_id": "69118c9baa69dd6bd096cefd",
+    "date": "2025-11-10",
+    "psychological_cases": 5,
+    "academic_cases": 6,
+    "behavioral_cases": 9,
+    "sessions_count": 9,
+    "families_contacted": 8,
+    "referrals_count": 5,
+    "follow_ups_count": 8,
+    "guidance_programs": "ايااي",
+    "challenges": "بةاي",
+    "recommendations": "اياي",
+    "id": "559a4a40-3768-4276-9250-7d609d21cc18",
+    "user_id": "9a193db4-2c6f-4a64-ab92-0997de95c5c3",
+    "branch": "boys",
+    "created_at": "2025-11-10T06:56:27.199500+00:00"
+  },
+  {
+    "_id": "69118cb5aa69dd6bd096cefe",
+    "date": "2025-11-10",
+    "psychological_cases": 6,
+    "academic_cases": 9,
+    "behavioral_cases": 9,
+    "sessions_count": 2,
+    "families_contacted": 5,
+    "referrals_count": 5,
+    "follow_ups_count": 3,
+    "guidance_programs": "اايا",
+    "challenges": "تيت",
+    "recommendations": "تبتت",
+    "id": "7b416fbf-5184-41b6-b531-f2b1fc9841fc",
+    "user_id": "9a193db4-2c6f-4a64-ab92-0997de95c5c3",
+    "branch": "boys",
+    "created_at": "2025-11-10T06:56:53.260307+00:00"
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "_id": "691181fd7c53ea464b8367e6",
+    "report_date": "2025-11-10",
+    "activities": [
+      {
+        "name": "ب",
+        "date": "2025-11-10",
+        "target_group": "تي",
+        "type": "فني",
+        "supervisors": [
+          "af506ea9-73e2-4972-a498-a7413f0ed219"
+        ],
+        "participants_count": 20,
+        "interaction_rate": 7,
+        "cooperating_teachers": [
+          "60b2e157-78b7-447f-87bc-55e0c1de5848"
+        ],
+        "admin_cooperation": "",
+        "educational_impact": "",
+        "problems": "",
+        "recommendations": ""
+      }
+    ],
+    "id": "48b1dbd0-35a4-4759-a69c-2cbd2f2948fc",
+    "user_id": "f1c81dd7-b60a-4b4b-8d8d-d519d428d053",
+    "branch": "boys",
+    "created_at": "2025-11-10T06:11:09.748157+00:00"
+  },
+  {
+    "_id": "691182467c53ea464b8367e7",
+    "report_date": "2025-11-10",
+    "activities": [
+      {
+        "name": "ي",
+        "date": "2025-11-10",
+        "target_group": "م",
+        "type": "علمي",
+        "supervisors": [
+          "3b464ab9-6cb0-4cad-85e0-3ce64eac03da"
+        ],
+        "participants_count": 7,
+        "interaction_rate": 7,
+        "cooperating_teachers": [],
+        "admin_cooperation": "",
+        "educational_impact": "",
+        "problems": "",
+        "recommendations": ""
+      }
+    ],
+    "id": "e03b7308-7882-470f-a330-aead82aed04c",
+    "user_id": "f1c81dd7-b60a-4b4b-8d8d-d519d428d053",
+    "branch": "boys",
+    "created_at": "2025-11-10T06:12:22.111372+00:00"
+  }
+]

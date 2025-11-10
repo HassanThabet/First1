@@ -1,0 +1,112 @@
+[
+  {
+    "_id": "69117ca42df6e6385e949a3e",
+    "date": "2025-11-10",
+    "teacher_evaluations": [
+      {
+        "teacher_id": "cb2789d6-9784-4a72-95e1-316968e35392",
+        "teacher_name": "إبراهيم احمد إبراهيم الأهدل",
+        "planning": 5,
+        "performance": 5,
+        "time_management": 5,
+        "goal_achievement": 5,
+        "uses_strategies": "no",
+        "strategies_notes": "نن",
+        "strengths": "ننبنبز",
+        "needs_support": "زنون"
+      }
+    ],
+    "id": "4ad1b37b-c8b2-496c-a5d5-d3d3ba2e0d61",
+    "user_id": "eb0fbcb0-e253-40ea-b1f7-e591469d930d",
+    "branch": "boys",
+    "created_at": "2025-11-10T05:48:20.951996+00:00"
+  },
+  {
+    "_id": "69117cc22df6e6385e949a3f",
+    "date": "2025-11-10",
+    "teacher_evaluations": [
+      {
+        "teacher_id": "cb2789d6-9784-4a72-95e1-316968e35392",
+        "teacher_name": "إبراهيم احمد إبراهيم الأهدل",
+        "planning": 9,
+        "performance": 9,
+        "time_management": 8,
+        "goal_achievement": 6,
+        "uses_strategies": "yes",
+        "strategies_notes": "تتبوب",
+        "strengths": "نلوزبزبزبزبزبزيظيظ",
+        "needs_support": "ززلزبزقزقزقز"
+      }
+    ],
+    "id": "acaafa07-6410-48ed-84e5-e40e32ac659f",
+    "user_id": "eb0fbcb0-e253-40ea-b1f7-e591469d930d",
+    "branch": "boys",
+    "created_at": "2025-11-10T05:48:50.462553+00:00"
+  },
+  {
+    "_id": "691185477c53ea464b8367ef",
+    "date": "2025-11-10",
+    "teacher_evaluations": [
+      {
+        "teacher_id": "8bd5e598-dc11-4e22-862f-53a2b1752ff5",
+        "teacher_name": "عصام يوسف محمد لطيفي",
+        "planning": 9,
+        "performance": 8,
+        "time_management": 5,
+        "goal_achievement": 5,
+        "uses_strategies": "yes",
+        "strategies_notes": "",
+        "strengths": "ابب",
+        "needs_support": "اا"
+      }
+    ],
+    "id": "47d887fc-b7e5-42ea-b4f2-307dd90c85f6",
+    "user_id": "06533c76-741e-4c7d-9393-378e5741f0be",
+    "branch": "boys",
+    "created_at": "2025-11-10T06:25:11.496469+00:00"
+  },
+  {
+    "_id": "69118b69aa69dd6bd096cef6",
+    "date": "2025-11-10",
+    "teacher_evaluations": [
+      {
+        "teacher_id": "cb2789d6-9784-4a72-95e1-316968e35392",
+        "teacher_name": "إبراهيم احمد إبراهيم الأهدل",
+        "planning": 9,
+        "performance": 8,
+        "time_management": 8,
+        "goal_achievement": 9,
+        "uses_strategies": "yes",
+        "strategies_notes": "تت",
+        "strengths": "تت",
+        "needs_support": "ووي"
+      }
+    ],
+    "id": "5791f305-0b2a-4547-8ed2-10d1b8ae80dc",
+    "user_id": "eb0fbcb0-e253-40ea-b1f7-e591469d930d",
+    "branch": "boys",
+    "created_at": "2025-11-10T06:51:21.750804+00:00"
+  },
+  {
+    "_id": "6911bac174726e44976a7736",
+    "date": "2025-11-09",
+    "teacher_evaluations": [
+      {
+        "teacher_id": "8bd5e598-dc11-4e22-862f-53a2b1752ff5",
+        "teacher_name": "عصام يوسف محمد لطيفي",
+        "planning": 9,
+        "performance": 8,
+        "time_management": 9,
+        "goal_achievement": 8,
+        "uses_strategies": "no",
+        "strategies_notes": "الطريقة التقليدية",
+        "strengths": "التحضير للدرس\nتنظيم العرض",
+        "needs_support": "التواصل مع الطالب داخل الفصل\n"
+      }
+    ],
+    "id": "ba0bc9c7-c0dd-4683-a5b5-83a9d05d5518",
+    "user_id": "06533c76-741e-4c7d-9393-378e5741f0be",
+    "branch": "boys",
+    "created_at": "2025-11-10T10:13:21.343421+00:00"
+  }
+]
