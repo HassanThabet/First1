@@ -2036,7 +2036,7 @@ const DirectorDashboard = () => {
                                         {reportTypeArabic}
                                       </span>
                                       <span className="text-xs text-gray-600">
-                                        {report.date || report.week_start || 'غير محدد'}
+                                        {report.report_date || report.date || report.week_start || 'غير محدد'}
                                       </span>
                                     </div>
                                     <h3 className="font-bold text-gray-800 mb-1">{report.userName || 'غير معروف'}</h3>
