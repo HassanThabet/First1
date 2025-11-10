@@ -789,6 +789,27 @@ const ActivitiesDashboard = () => {
 
         <TabsContent value="create">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* تاريخ التقرير العام */}
+            <Card>
+              <CardHeader>
+                <CardTitle>معلومات التقرير</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="max-w-md">
+                  <Label>تاريخ التقرير *</Label>
+                  <Input
+                    type="date"
+                    value={reportDate}
+                    onChange={(e) => setReportDate(e.target.value)}
+                    required
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    التاريخ الذي تم فيه إنشاء هذا التقرير
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
             {activities.map((activity, index) => (
               <Card key={`activity-form-${index}-${activity.name || ''}`}>
                 <CardHeader>
