@@ -498,7 +498,7 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
                 </ResponsiveContainer>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 mb-4">
                 <div className="bg-blue-50 p-3 rounded-lg text-center">
                   <p className="text-xs text-gray-600">التقييم الأول</p>
                   <p className="text-2xl font-bold text-blue-600">{teacher.firstAverage}/10</p>
@@ -507,6 +507,73 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
                   <p className="text-xs text-gray-600">التقييم الحالي</p>
                   <p className="text-2xl font-bold text-green-600">{teacher.currentAverage}/10</p>
                 </div>
+              </div>
+
+              {/* All Evaluations Details */}
+              <div className="space-y-3 mt-4 pt-4 border-t border-gray-200">
+                <h5 className="font-bold text-sm text-cyan-900 mb-3">📋 جميع التقييمات التفصيلية:</h5>
+                {teacher.evaluations.map((eval_item, evalIdx) => (
+                  <div key={`eval-detail-${evalIdx}`} className="bg-gradient-to-r from-cyan-50 to-blue-50 p-4 rounded-lg border-2 border-cyan-200">
+                    <div className="flex justify-between items-center mb-3">
+                      <span className="text-sm font-semibold text-cyan-900">التقييم #{evalIdx + 1}</span>
+                      <span className="text-xs text-gray-600">{new Date(eval_item.date).toLocaleDateString('ar-SA')}</span>
+                    </div>
+                    
+                    {/* Ratings Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                      <div className="bg-blue-50 p-2 rounded border border-blue-200">
+                        <p className="text-xs text-blue-600 font-semibold">التخطيط</p>
+                        <p className="text-lg font-bold text-blue-800">{eval_item.planning}/10</p>
+                      </div>
+                      <div className="bg-green-50 p-2 rounded border border-green-200">
+                        <p className="text-xs text-green-600 font-semibold">الأداء</p>
+                        <p className="text-lg font-bold text-green-800">{eval_item.performance}/10</p>
+                      </div>
+                      <div className="bg-purple-50 p-2 rounded border border-purple-200">
+                        <p className="text-xs text-purple-600 font-semibold">إدارة الوقت</p>
+                        <p className="text-lg font-bold text-purple-800">{eval_item.time_management}/10</p>
+                      </div>
+                      <div className="bg-orange-50 p-2 rounded border border-orange-200">
+                        <p className="text-xs text-orange-600 font-semibold">تحقيق الأهداف</p>
+                        <p className="text-lg font-bold text-orange-800">{eval_item.goal_achievement}/10</p>
+                      </div>
+                    </div>
+
+                    {/* Average */}
+                    <div className="bg-gradient-to-r from-cyan-100 to-blue-100 p-2 rounded border-2 border-cyan-300 mb-3">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-semibold text-cyan-900">المعدل:</span>
+                        <span className="text-xl font-bold text-cyan-900">{eval_item.average.toFixed(1)}/10</span>
+                      </div>
+                    </div>
+
+                    {/* Strategies */}
+                    <div className="bg-yellow-50 p-2 rounded border border-yellow-200 mb-2">
+                      <span className="text-xs font-semibold text-yellow-800">استخدام استراتيجيات تعليمية: </span>
+                      <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                        eval_item.uses_strategies ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+                      }`}>
+                        {eval_item.uses_strategies ? 'نعم ✓' : 'لا ✗'}
+                      </span>
+                    </div>
+
+                    {/* Strengths */}
+                    {eval_item.strengths && (
+                      <div className="bg-green-50 p-2 rounded border border-green-200 mb-2">
+                        <p className="text-xs font-semibold text-green-800 mb-1">💪 نقاط القوة:</p>
+                        <p className="text-xs text-gray-800">{eval_item.strengths}</p>
+                      </div>
+                    )}
+
+                    {/* Needs Support */}
+                    {eval_item.needs_support && (
+                      <div className="bg-red-50 p-2 rounded border border-red-200">
+                        <p className="text-xs font-semibold text-red-800 mb-1">🎯 نقاط تحتاج دعم:</p>
+                        <p className="text-xs text-gray-800">{eval_item.needs_support}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </CardContent>
           </Card>
