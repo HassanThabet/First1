@@ -592,27 +592,33 @@ const SocialSpecialistDashboard = () => {
                     <Label>الحالات النفسية</Label>
                     <Input
                       type="number"
+                      inputMode="numeric"
                       min="0"
+                      placeholder="أدخل عدد الحالات النفسية"
                       value={formData.psychological_cases}
-                      onChange={(e) => setFormData({ ...formData, psychological_cases: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setFormData({ ...formData, psychological_cases: e.target.value })}
                     />
                   </div>
                   <div>
                     <Label>الحالات الأكاديمية</Label>
                     <Input
                       type="number"
+                      inputMode="numeric"
                       min="0"
+                      placeholder="أدخل عدد الحالات الأكاديمية"
                       value={formData.academic_cases}
-                      onChange={(e) => setFormData({ ...formData, academic_cases: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setFormData({ ...formData, academic_cases: e.target.value })}
                     />
                   </div>
                   <div>
                     <Label>الحالات السلوكية</Label>
                     <Input
                       type="number"
+                      inputMode="numeric"
                       min="0"
+                      placeholder="أدخل عدد الحالات السلوكية"
                       value={formData.behavioral_cases}
-                      onChange={(e) => setFormData({ ...formData, behavioral_cases: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setFormData({ ...formData, behavioral_cases: e.target.value })}
                     />
                   </div>
                 </div>
