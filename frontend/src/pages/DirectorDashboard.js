@@ -2198,7 +2198,7 @@ const DirectorDashboard = () => {
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.late_teachers.map((lt, idx) => (
                             <li key={idx} className="text-sm">
-                              {typeof lt === 'object' ? `${lt.teacher || ''} - ${lt.subject || ''} - ${lt.minutes_late || 0} دقيقة` : lt}
+                              {typeof lt === 'object' ? `${lt.teacher || ''} - ${lt.subject || ''} - حصة ${lt.period || '-'}` : lt}
                             </li>
                           ))}
                         </ul>
