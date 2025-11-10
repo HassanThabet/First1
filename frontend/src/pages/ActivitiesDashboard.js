@@ -894,9 +894,11 @@ const ActivitiesDashboard = () => {
                       <Label>عدد المشاركين *</Label>
                       <Input
                         type="number"
+                        inputMode="numeric"
                         min="0"
                         value={activity.participants_count}
-                        onChange={(e) => updateActivity(index, "participants_count", parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateActivity(index, "participants_count", e.target.value)}
+                        placeholder="أدخل عدد المشاركين"
                         required
                       />
                     </div>
@@ -904,10 +906,12 @@ const ActivitiesDashboard = () => {
                       <Label>معدل التفاعل (من 10) *</Label>
                       <Input
                         type="number"
+                        inputMode="numeric"
                         min="0"
                         max="10"
                         value={activity.interaction_rate}
-                        onChange={(e) => updateActivity(index, "interaction_rate", parseInt(e.target.value) || 0)}
+                        onChange={(e) => updateActivity(index, "interaction_rate", e.target.value)}
+                        placeholder="أدخل معدل التفاعل من 0 إلى 10"
                         required
                       />
                     </div>
