@@ -981,7 +981,7 @@ async def create_director_report(report_data: dict, current_user: dict = Depends
     report_obj = DirectorReport(**report_data)
     return report_obj
 
-@api_router.get("/reports/director", response_model=List[DirectorReport])
+@api_router.get("/reports/director")
 async def get_director_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     query = {}
     
@@ -994,6 +994,12 @@ async def get_director_reports(user_id: Optional[str] = None, branch: Optional[s
         query["branch"] = branch
     
     reports = await db.director_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Add user name to each report
+    for report in reports:
+        user = await db.users.find_one({"id": report["user_id"]}, {"_id": 0, "username": 1, "full_name": 1})
+        report["user_name"] = (user.get("full_name") or user.get("username")) if user else "مستخدم محذوف"
+    
     return reports
 
 @api_router.put("/reports/director/{report_id}")
