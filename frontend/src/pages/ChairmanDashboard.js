@@ -282,6 +282,10 @@ const ChairmanDashboard = () => {
           const todayDate = new Date(todayStr);
           return todayDate >= weekStart && todayDate <= weekEnd;
         }
+        // Use report_date for activities reports if available
+        if (r.report_date) {
+          return r.report_date === todayStr;
+        }
         return r.date === todayStr;
       });
     } else if (timeFilter === "weekly") {
@@ -300,7 +304,8 @@ const ChairmanDashboard = () => {
           const reportWeekEnd = new Date(r.week_end);
           return (reportWeekStart <= weekEnd && reportWeekEnd >= weekStart);
         }
-        const reportDate = new Date(r.date);
+        // Use report_date for activities reports if available
+        const reportDate = r.report_date ? new Date(r.report_date) : new Date(r.date);
         return reportDate >= weekStart && reportDate <= weekEnd;
       });
     } else if (timeFilter === "monthly") {
@@ -311,7 +316,8 @@ const ChairmanDashboard = () => {
           const reportWeekStart = new Date(r.week_start);
           return reportWeekStart.getMonth() === currentMonth && reportWeekStart.getFullYear() === currentYear;
         }
-        const reportDate = new Date(r.date);
+        // Use report_date for activities reports if available
+        const reportDate = r.report_date ? new Date(r.report_date) : new Date(r.date);
         return reportDate.getMonth() === currentMonth && reportDate.getFullYear() === currentYear;
       });
     } else if (timeFilter === "custom" && customStartDate && customEndDate) {
@@ -325,7 +331,8 @@ const ChairmanDashboard = () => {
           const reportWeekEnd = new Date(r.week_end);
           return (reportWeekStart <= end && reportWeekEnd >= start);
         }
-        const reportDate = new Date(r.date);
+        // Use report_date for activities reports if available
+        const reportDate = r.report_date ? new Date(r.report_date) : new Date(r.date);
         return reportDate >= start && reportDate <= end;
       });
     }
