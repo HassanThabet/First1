@@ -2354,40 +2354,69 @@ const ChairmanDashboard = () => {
                 {/* Social Specialist Report Details */}
                 {selectedReport.type === "social" && (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="p-3 bg-pink-50 rounded-lg">
-                        <span className="text-xs text-gray-600">حالات نفسية</span>
-                        <p className="text-2xl font-bold text-pink-700">{selectedReport.psychological_cases || 0}</p>
-                      </div>
-                      <div className="p-3 bg-amber-50 rounded-lg">
-                        <span className="text-xs text-gray-600">حالات أكاديمية</span>
-                        <p className="text-2xl font-bold text-amber-700">{selectedReport.academic_cases || 0}</p>
-                      </div>
-                      <div className="p-3 bg-red-50 rounded-lg">
-                        <span className="text-xs text-gray-600">حالات سلوكية</span>
-                        <p className="text-2xl font-bold text-red-700">{selectedReport.behavioral_cases || 0}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-3 bg-emerald-50 rounded-lg">
-                        <span className="text-xs text-gray-600">عدد الجلسات</span>
-                        <p className="text-2xl font-bold text-emerald-700">{selectedReport.sessions_count || 0}</p>
-                      </div>
-                      <div className="p-3 bg-teal-50 rounded-lg">
-                        <span className="text-xs text-gray-600">التواصل مع الأسر</span>
-                        <p className="text-2xl font-bold text-teal-700">{selectedReport.family_contacts || 0}</p>
+                    {/* Cases Section */}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-3">📊 الحالات المتابعة:</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div className="p-3 bg-pink-50 rounded-lg border border-pink-200">
+                          <span className="text-xs text-gray-600">حالات نفسية</span>
+                          <p className="text-2xl font-bold text-pink-700">{selectedReport.psychological_cases || 0}</p>
+                        </div>
+                        <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                          <span className="text-xs text-gray-600">حالات أكاديمية</span>
+                          <p className="text-2xl font-bold text-amber-700">{selectedReport.academic_cases || 0}</p>
+                        </div>
+                        <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                          <span className="text-xs text-gray-600">حالات سلوكية</span>
+                          <p className="text-2xl font-bold text-red-700">{selectedReport.behavioral_cases || 0}</p>
+                        </div>
                       </div>
                     </div>
                     
-                    {selectedReport.actions && selectedReport.actions.length > 0 && (
-                      <div className="p-4 bg-green-50 rounded-lg">
-                        <h4 className="font-semibold text-green-800 mb-2">الإجراءات المتخذة:</h4>
-                        <ul className="list-disc list-inside space-y-1">
-                          {selectedReport.actions.map((action, idx) => (
-                            <li key={`action-${selectedReport.id}-${idx}-${action}`} className="text-sm">{action}</li>
-                          ))}
-                        </ul>
+                    {/* Actions Section */}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-gray-800 mb-3">🎯 الإجراءات المتخذة:</h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-200">
+                          <span className="text-xs text-gray-600">عدد الجلسات</span>
+                          <p className="text-2xl font-bold text-emerald-700">{selectedReport.sessions_count || 0}</p>
+                        </div>
+                        <div className="p-3 bg-teal-50 rounded-lg border border-teal-200">
+                          <span className="text-xs text-gray-600">التواصل مع الأسر</span>
+                          <p className="text-2xl font-bold text-teal-700">{selectedReport.families_contacted || selectedReport.family_contacts || 0}</p>
+                        </div>
+                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                          <span className="text-xs text-gray-600">عدد الإحالات</span>
+                          <p className="text-2xl font-bold text-blue-700">{selectedReport.referrals_count || 0}</p>
+                        </div>
+                        <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                          <span className="text-xs text-gray-600">المتابعات</span>
+                          <p className="text-2xl font-bold text-purple-700">{selectedReport.follow_ups_count || 0}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Programs Section */}
+                    {selectedReport.guidance_programs && (
+                      <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <h4 className="font-semibold text-blue-800 mb-2">📚 البرامج الإرشادية:</h4>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedReport.guidance_programs}</p>
+                      </div>
+                    )}
+                    
+                    {/* Challenges Section */}
+                    {selectedReport.challenges && (
+                      <div className="p-4 bg-orange-50 rounded-lg border border-orange-200">
+                        <h4 className="font-semibold text-orange-800 mb-2">⚠️ التحديات:</h4>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedReport.challenges}</p>
+                      </div>
+                    )}
+                    
+                    {/* Recommendations Section */}
+                    {selectedReport.recommendations && (
+                      <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                        <h4 className="font-semibold text-green-800 mb-2">💡 التوصيات:</h4>
+                        <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedReport.recommendations}</p>
                       </div>
                     )}
                   </div>
