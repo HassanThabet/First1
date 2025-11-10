@@ -344,21 +344,23 @@ const EducationalSupervisionTeacherProgress = () => {
       {allTeacherProgress.length > 0 && (
         <Card>
           <CardContent className="p-4">
-            <div className="flex items-center gap-4">
-              <Label className="font-semibold">تصفية حسب المعلم:</Label>
-              <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-                <SelectTrigger className="w-64">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">جميع المعلمين</SelectItem>
-                  {allTeacherProgress.map((teacher) => (
-                    <SelectItem key={teacher.teacher_id} value={teacher.teacher_id}>
-                      {teacher.teacher_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+                <Label className="font-semibold whitespace-nowrap">تصفية حسب المعلم:</Label>
+                <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
+                  <SelectTrigger className="w-full sm:w-64">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="all">جميع المعلمين ({allTeacherProgress.length})</SelectItem>
+                    {allTeacherProgress.map((teacher) => (
+                      <SelectItem key={teacher.teacher_id} value={teacher.teacher_id}>
+                        {teacher.teacher_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               {selectedTeacher === "all" && (
                 <span className="text-sm text-gray-600">
                   (عرض {teacherProgress.length} معلم)
