@@ -664,9 +664,13 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
                   <div className="space-y-3">
                     {teacher.evaluations.map((eval_item, evalIdx) => (
                       <div key={`eval-detail-${evalIdx}`} className="bg-gradient-to-r from-cyan-50 to-blue-50 p-4 rounded-lg border-2 border-cyan-200">
-                        <div className="flex justify-between items-center mb-3">
+                        <div className="flex justify-between items-center mb-2">
                           <span className="text-sm font-semibold text-cyan-900">التقييم #{evalIdx + 1}</span>
                           <span className="text-xs text-gray-600">{new Date(eval_item.date).toLocaleDateString('ar-SA')}</span>
+                        </div>
+                        <div className="mb-3">
+                          <span className="text-xs text-gray-500">المشرف التربوي: </span>
+                          <span className="text-xs font-semibold text-blue-700">{eval_item.supervisor_name}</span>
                         </div>
                         
                         {/* Ratings Grid */}
