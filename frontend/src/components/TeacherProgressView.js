@@ -290,6 +290,13 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
     return new Date(dateString).toLocaleDateString('ar-SA', { month: 'short', day: 'numeric' });
   };
 
+  const toggleTeacherDetails = (teacherId) => {
+    setExpandedTeachers(prev => ({
+      ...prev,
+      [teacherId]: !prev[teacherId]
+    }));
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
