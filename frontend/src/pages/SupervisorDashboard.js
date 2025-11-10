@@ -383,44 +383,55 @@ const SupervisorDashboard = () => {
                 <div>
                   <Label className="mb-2 block">المعلمون المتأخرون</Label>
                   {formData.late_teachers.map((lt, index) => (
-                    <div key={`late-teacher-${index}-${lt.teacher}-${lt.subject}`} className="flex gap-2 mb-2">
-                      <Select 
-                        value={lt.subject} 
-                        onValueChange={(value) => updateLateTeacher(index, "subject", value)}
-                        key={`subject-select-${index}`}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر المادة" />
-                        </SelectTrigger>
-                        <SelectContent key={`subject-content-${index}`}>
-                          {subjects.map(subject => (
-                            <SelectItem key={`subject-${subject.id}-${index}`} value={subject.name}>{subject.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Select 
-                        value={lt.teacher} 
-                        onValueChange={(value) => updateLateTeacher(index, "teacher", value)}
-                        key={`teacher-select-${index}`}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="اختر المعلم" />
-                        </SelectTrigger>
-                        <SelectContent key={`teacher-content-${index}`}>
-                          {teachers.filter(t => t.subject === lt.subject).map(teacher => (
-                            <SelectItem key={`teacher-${teacher.id}-${lt.subject}`} value={teacher.name}>{teacher.name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        key={`period-input-${index}`}
-                        placeholder="رقم الحصة"
-                        value={lt.period}
-                        onChange={(e) => updateLateTeacher(index, "period", e.target.value)}
-                      />
-                      <Button type="button" variant="destructive" size="icon" onClick={() => removeLateTeacher(index)}>
-                        <X className="w-4 h-4" />
-                      </Button>
+                    <div key={`late-teacher-${index}-${lt.teacher}-${lt.subject}`} className="grid grid-cols-1 md:grid-cols-12 gap-2 mb-3">
+                      <div className="md:col-span-3">
+                        <Select 
+                          value={lt.subject} 
+                          onValueChange={(value) => updateLateTeacher(index, "subject", value)}
+                          key={`subject-select-${index}`}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر المادة" />
+                          </SelectTrigger>
+                          <SelectContent key={`subject-content-${index}`}>
+                            {subjects.map(subject => (
+                              <SelectItem key={`subject-${subject.id}-${index}`} value={subject.name}>{subject.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="md:col-span-5">
+                        <Select 
+                          value={lt.teacher} 
+                          onValueChange={(value) => updateLateTeacher(index, "teacher", value)}
+                          key={`teacher-select-${index}`}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="اختر المعلم" />
+                          </SelectTrigger>
+                          <SelectContent key={`teacher-content-${index}`}>
+                            {teachers.filter(t => t.subject === lt.subject).map(teacher => (
+                              <SelectItem key={`teacher-${teacher.id}-${lt.subject}`} value={teacher.name}>{teacher.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="md:col-span-3">
+                        <Input
+                          key={`period-input-${index}`}
+                          type="number"
+                          inputMode="numeric"
+                          min="1"
+                          placeholder="رقم الحصة"
+                          value={lt.period}
+                          onChange={(e) => updateLateTeacher(index, "period", e.target.value)}
+                        />
+                      </div>
+                      <div className="md:col-span-1">
+                        <Button type="button" variant="destructive" size="icon" onClick={() => removeLateTeacher(index)} className="w-full">
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                   <Button type="button" variant="outline" onClick={addLateTeacher} className="w-full">
