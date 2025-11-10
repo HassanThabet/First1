@@ -395,14 +395,14 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
       {/* Filter and Export */}
       <Card>
         <CardContent className="p-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4 flex-1">
-              <Label className="font-semibold">تصفية حسب المعلم:</Label>
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+              <Label className="font-semibold whitespace-nowrap">تصفية حسب المعلم:</Label>
               <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-                <SelectTrigger className="w-64">
+                <SelectTrigger className="w-full sm:w-64">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-[300px]">
                   <SelectItem value="all">جميع المعلمين ({allTeacherProgress.length})</SelectItem>
                   {allTeacherProgress.map((teacher) => (
                     <SelectItem key={teacher.teacher_id} value={teacher.teacher_id}>
@@ -414,7 +414,7 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
             </div>
             <Button
               onClick={() => exportToPDF()}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
             >
               <FileText className="w-4 h-4 ml-2" />
               تصدير الكل PDF
