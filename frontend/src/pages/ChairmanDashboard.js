@@ -2170,7 +2170,7 @@ const ChairmanDashboard = () => {
                   </div>
                   <div>
                     <span className="font-semibold text-gray-700">التاريخ:</span>
-                    <p className="text-gray-900">{selectedReport.date || selectedReport.week_start || 'غير محدد'}</p>
+                    <p className="text-gray-900">{selectedReport.report_date || selectedReport.date || selectedReport.week_start || 'غير محدد'}</p>
                   </div>
                   {selectedReport.week_end && (
                     <div>
