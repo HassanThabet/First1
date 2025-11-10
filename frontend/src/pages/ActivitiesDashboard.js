@@ -699,17 +699,24 @@ const ActivitiesDashboard = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Convert empty strings to numbers for participants_count and interaction_rate
+      const processedActivities = activities.map(activity => ({
+        ...activity,
+        participants_count: parseInt(activity.participants_count) || 0,
+        interaction_rate: parseInt(activity.interaction_rate) || 0
+      }));
+
       if (editingReport) {
         await axios.put(`${API}/reports/activities/${editingReport.id}`, {
           report_date: reportDate,
-          activities: activities
+          activities: processedActivities
         });
         toast.success("تم تحديث التقرير بنجاح");
         setEditingReport(null);
       } else {
         await axios.post(`${API}/reports/activities`, {
           report_date: reportDate,
-          activities: activities
+          activities: processedActivities
         });
         toast.success("تم إنشاء التقرير بنجاح");
       }
