@@ -99,6 +99,10 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
       
       progressData.sort((a, b) => b.improvement - a.improvement);
       
+      // Extract unique supervisors
+      const uniqueSupervisors = [...new Set(allReports.map(r => r.supervisor_name || r.created_by_name || "غير محدد"))].sort();
+      setSupervisors(uniqueSupervisors);
+      
       setReports(allReports);
       setAllTeacherProgress(progressData);
       setTeacherProgress(progressData);
