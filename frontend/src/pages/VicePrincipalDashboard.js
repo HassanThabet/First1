@@ -792,11 +792,19 @@ const VicePrincipalDashboard = () => {
   return (
     <DashboardLayout title="لوحة تحكم الوكيل">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-6">
-          <TabsTrigger value="create" data-testid="create-report-tab">إنشاء تقرير</TabsTrigger>
-          <TabsTrigger value="merged-stats">الإحصائيات المدمجة</TabsTrigger>
-          <TabsTrigger value="supervisor-reports">تقارير المشرفين</TabsTrigger>
-          <TabsTrigger value="reports">تقاريري</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-2 mb-6 h-auto p-2">
+          <TabsTrigger value="create" data-testid="create-report-tab" className="text-sm py-3">
+            📝 إنشاء تقرير
+          </TabsTrigger>
+          <TabsTrigger value="merged-stats" className="text-sm py-3">
+            📊 الإحصائيات المدمجة
+          </TabsTrigger>
+          <TabsTrigger value="supervisor-reports" className="text-sm py-3">
+            👥 تقارير المشرفين
+          </TabsTrigger>
+          <TabsTrigger value="reports" className="text-sm py-3">
+            📄 تقاريري
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="create">
