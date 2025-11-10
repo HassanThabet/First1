@@ -701,26 +701,29 @@ const ActivitiesDashboard = () => {
     try {
       if (editingReport) {
         await axios.put(`${API}/reports/activities/${editingReport.id}`, {
+          report_date: reportDate,
           activities: activities
         });
         toast.success("تم تحديث التقرير بنجاح");
         setEditingReport(null);
       } else {
         await axios.post(`${API}/reports/activities`, {
+          report_date: reportDate,
           activities: activities
         });
         toast.success("تم إنشاء التقرير بنجاح");
       }
       fetchReports();
       setActiveTab("reports");
+      setReportDate("");
       setActivities([{
         name: "",
         date: "",
         target_group: "",
         type: "",
         supervisors: [],
-        participants_count: 0,
-        interaction_rate: 0,
+        participants_count: "",
+        interaction_rate: "",
         cooperating_teachers: [],
         admin_cooperation: "",
         educational_impact: "",
