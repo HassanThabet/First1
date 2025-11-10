@@ -36,13 +36,13 @@ const SocialSpecialistDashboard = () => {
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
-    psychological_cases: 0,
-    academic_cases: 0,
-    behavioral_cases: 0,
-    sessions_count: 0,
-    families_contacted: 0,
-    referrals_count: 0,
-    follow_ups_count: 0,
+    psychological_cases: "",
+    academic_cases: "",
+    behavioral_cases: "",
+    sessions_count: "",
+    families_contacted: "",
+    referrals_count: "",
+    follow_ups_count: "",
     guidance_programs: "",
     challenges: "",
     recommendations: ""
