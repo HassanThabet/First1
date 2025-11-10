@@ -3373,7 +3373,7 @@ const QualityDashboard = () => {
                         <ul className="list-disc list-inside space-y-1">
                           {selectedReport.late_teachers.map((lt, idx) => (
                             <li key={idx} className="text-sm">
-                              {typeof lt === 'object' ? `${lt.teacher} - ${lt.subject} - ${lt.minutes_late} دقيقة` : lt}
+                              {typeof lt === 'object' ? `${lt.teacher} - ${lt.subject} - حصة ${lt.period || '-'}` : lt}
                             </li>
                           ))}
                         </ul>
