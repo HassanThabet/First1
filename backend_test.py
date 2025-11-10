@@ -2599,5 +2599,5 @@ class BackendTester:
 
 if __name__ == "__main__":
     tester = BackendTester()
-    # Run quality report data structure test as requested
-    tester.run_all_tests()
+    # Run priority health check as requested
+    tester.run_priority_health_check()
