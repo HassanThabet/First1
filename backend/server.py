@@ -711,7 +711,7 @@ async def create_activities_report(report_data: dict, current_user: dict = Depen
     report_obj = ActivitiesReport(**report_data)
     return report_obj
 
-@api_router.get("/reports/activities", response_model=List[ActivitiesReport])
+@api_router.get("/reports/activities")
 async def get_activities_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     query = {}
     
@@ -728,6 +728,12 @@ async def get_activities_reports(user_id: Optional[str] = None, branch: Optional
         query["branch"] = branch
     
     reports = await db.activities_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Add user name to each report
+    for report in reports:
+        user = await db.users.find_one({"id": report["user_id"]}, {"_id": 0, "username": 1, "full_name": 1})
+        report["user_name"] = (user.get("full_name") or user.get("username")) if user else "مستخدم محذوف"
+    
     return reports
 
 @api_router.put("/reports/activities/{report_id}")
