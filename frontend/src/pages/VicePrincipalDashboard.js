@@ -52,6 +52,23 @@ const VicePrincipalDashboard = () => {
     fetchData();
   }, []);
 
+  // Filter supervisor reports based on date and name
+  useEffect(() => {
+    let filtered = [...allSupervisorReports];
+
+    // Filter by date
+    if (supervisorDateFilter) {
+      filtered = filtered.filter(report => report.date === supervisorDateFilter);
+    }
+
+    // Filter by supervisor name
+    if (supervisorNameFilter !== "all") {
+      filtered = filtered.filter(report => report.user_id === supervisorNameFilter);
+    }
+
+    setSupervisorReports(filtered);
+  }, [supervisorDateFilter, supervisorNameFilter, allSupervisorReports]);
+
   const fetchData = async () => {
     try {
       const [supervisorRes, myReportsRes, usersRes, teachersRes] = await Promise.all([
