@@ -644,7 +644,7 @@ async def create_vice_principal_report(report_data: dict, current_user: dict = D
     report_obj = VicePrincipalReport(**report_data)
     return report_obj
 
-@api_router.get("/reports/vice-principal", response_model=List[VicePrincipalReport])
+@api_router.get("/reports/vice-principal")
 async def get_vice_principal_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     query = {}
     
@@ -661,6 +661,12 @@ async def get_vice_principal_reports(user_id: Optional[str] = None, branch: Opti
         query["branch"] = branch
     
     reports = await db.vice_principal_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Add user name to each report
+    for report in reports:
+        user = await db.users.find_one({"id": report["user_id"]}, {"_id": 0, "username": 1, "full_name": 1})
+        report["user_name"] = (user.get("full_name") or user.get("username")) if user else "مستخدم محذوف"
+    
     return reports
 
 @api_router.put("/reports/vice-principal/{report_id}")
