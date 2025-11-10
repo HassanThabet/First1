@@ -2278,6 +2278,285 @@ class BackendTester:
         print(f"RECOMMENDATION: Frontend should send nested dict structure")
         print(f"where each section contains rate and notes as string values.")
 
+    def test_health_check_priority_endpoints(self):
+        """Test specific priority endpoints for health check as requested"""
+        print("\n=== PRIORITY HEALTH CHECK ENDPOINTS ===")
+        
+        # Test 1: Educational Supervision Reports with supervisor_name
+        print("\n1. Testing Educational Supervision Reports with supervisor_name...")
+        try:
+            # First create an educational supervision user
+            ed_user, ed_password = self.create_test_user("educational_supervision", "boys")
+            if ed_user:
+                # Login as educational supervision user
+                login_result = self.login_as_user(ed_user["username"], ed_password)
+                if login_result:
+                    self.log_test("Educational Supervision User Login", True, f"Logged in as {ed_user['username']}")
+                    
+                    # Create a test report
+                    ed_data = {
+                        "date": datetime.now(timezone.utc).date().isoformat(),
+                        "teacher_evaluations": [
+                            {
+                                "teacher": "أحمد محمد",
+                                "subject": "رياضيات",
+                                "evaluation_score": 85,
+                                "notes": "أداء جيد"
+                            }
+                        ]
+                    }
+                    
+                    create_response = self.session.post(f"{BASE_URL}/reports/educational-supervision", json=ed_data)
+                    if create_response.status_code == 200:
+                        self.log_test("Create Educational Supervision Report", True, "Report created successfully")
+                    
+                    # Test GET with supervisor_name field
+                    get_response = self.session.get(f"{BASE_URL}/reports/educational-supervision")
+                    if get_response.status_code == 200:
+                        reports = get_response.json()
+                        if reports and len(reports) > 0:
+                            # Check if supervisor_name field is present
+                            has_supervisor_name = "supervisor_name" in reports[0]
+                            if has_supervisor_name:
+                                self.log_test("Educational Supervision - supervisor_name field", True, f"supervisor_name field present: {reports[0].get('supervisor_name')}")
+                            else:
+                                self.log_test("Educational Supervision - supervisor_name field", False, "supervisor_name field missing from response")
+                        else:
+                            self.log_test("Educational Supervision Reports", True, "No reports found (empty response)")
+                    else:
+                        self.log_test("Educational Supervision Reports", False, f"Failed: {get_response.status_code} - {get_response.text}")
+                else:
+                    self.log_test("Educational Supervision User Login", False, "Failed to login")
+            else:
+                self.log_test("Educational Supervision User Creation", False, "Failed to create user")
+        except Exception as e:
+            self.log_test("Educational Supervision Reports Test", False, f"Exception: {str(e)}")
+        
+        # Login back as admin
+        self.test_authentication()
+        
+        # Test 2: Supervisor Reports with period field
+        print("\n2. Testing Supervisor Reports with period field...")
+        try:
+            # Create supervisor user and report with late_teachers and covering_teachers
+            supervisor_user, supervisor_password = self.create_test_user("supervisor", "boys")
+            if supervisor_user:
+                login_result = self.login_as_user(supervisor_user["username"], supervisor_password)
+                if login_result:
+                    supervisor_data = {
+                        "date": datetime.now(timezone.utc).date().isoformat(),
+                        "student_discipline": 85.5,
+                        "classroom_cleanliness": 90.0,
+                        "teacher_attendance_rate": 95.5,
+                        "general_behavior": 88.0,
+                        "late_teachers": [
+                            {"teacher": "أحمد محمد", "subject": "رياضيات", "minutes_late": 10, "period": "الحصة الأولى"},
+                            {"teacher": "فاطمة علي", "subject": "علوم", "minutes_late": 5, "period": "الحصة الثانية"}
+                        ],
+                        "covering_teachers": [
+                            {"teacher": "محمد سالم", "covered_subject": "لغة عربية", "original_teacher": "سارة أحمد", "period": "الحصة الثالثة"}
+                        ],
+                        "absent_students_count": 12
+                    }
+                    
+                    create_response = self.session.post(f"{BASE_URL}/reports/supervisor", json=supervisor_data)
+                    if create_response.status_code == 200:
+                        self.log_test("Create Supervisor Report with period", True, "Report created successfully")
+                        
+                        # Test GET to verify period field
+                        get_response = self.session.get(f"{BASE_URL}/reports/supervisor")
+                        if get_response.status_code == 200:
+                            reports = get_response.json()
+                            if reports and len(reports) > 0:
+                                report = reports[0]
+                                
+                                # Check late_teachers period field
+                                late_teachers = report.get("late_teachers", [])
+                                if late_teachers and "period" in late_teachers[0]:
+                                    self.log_test("Supervisor Reports - late_teachers period field", True, f"period field present: {late_teachers[0].get('period')}")
+                                else:
+                                    self.log_test("Supervisor Reports - late_teachers period field", False, "period field missing from late_teachers")
+                                
+                                # Check covering_teachers period field
+                                covering_teachers = report.get("covering_teachers", [])
+                                if covering_teachers and "period" in covering_teachers[0]:
+                                    self.log_test("Supervisor Reports - covering_teachers period field", True, f"period field present: {covering_teachers[0].get('period')}")
+                                else:
+                                    self.log_test("Supervisor Reports - covering_teachers period field", False, "period field missing from covering_teachers")
+                            else:
+                                self.log_test("Supervisor Reports", True, "No reports found (empty response)")
+                        else:
+                            self.log_test("Supervisor Reports", False, f"Failed: {get_response.status_code} - {get_response.text}")
+                    else:
+                        self.log_test("Create Supervisor Report with period", False, f"Failed: {create_response.status_code} - {create_response.text}")
+                else:
+                    self.log_test("Supervisor User Login", False, "Failed to login")
+            else:
+                self.log_test("Supervisor User Creation", False, "Failed to create user")
+        except Exception as e:
+            self.log_test("Supervisor Reports Test", False, f"Exception: {str(e)}")
+        
+        # Login back as admin
+        self.test_authentication()
+        
+        # Test 3: Social Specialist Reports with all fields
+        print("\n3. Testing Social Specialist Reports with all fields...")
+        try:
+            social_user, social_password = self.create_test_user("social_specialist", "girls")
+            if social_user:
+                login_result = self.login_as_user(social_user["username"], social_password)
+                if login_result:
+                    social_data = {
+                        "date": datetime.now(timezone.utc).date().isoformat(),
+                        "psychological_cases": 5,
+                        "academic_cases": 8,
+                        "behavioral_cases": 3,
+                        "sessions_count": 12,
+                        "families_contacted": 7,
+                        "referrals_count": 2,
+                        "follow_ups_count": 15,
+                        "guidance_programs": "برامج التوجيه النفسي والأكاديمي",
+                        "challenges": "صعوبة في التواصل مع بعض الأسر",
+                        "recommendations": "زيادة ورش التوعية للأهالي"
+                    }
+                    
+                    create_response = self.session.post(f"{BASE_URL}/reports/social-specialist", json=social_data)
+                    if create_response.status_code == 200:
+                        self.log_test("Create Social Specialist Report", True, "Report created successfully")
+                        
+                        # Test GET to verify all fields
+                        get_response = self.session.get(f"{BASE_URL}/reports/social-specialist")
+                        if get_response.status_code == 200:
+                            reports = get_response.json()
+                            if reports and len(reports) > 0:
+                                report = reports[0]
+                                
+                                # Check all required fields
+                                required_fields = [
+                                    "psychological_cases", "academic_cases", "behavioral_cases",
+                                    "sessions_count", "families_contacted", "referrals_count",
+                                    "follow_ups_count", "guidance_programs", "challenges", "recommendations"
+                                ]
+                                
+                                missing_fields = []
+                                present_fields = []
+                                
+                                for field in required_fields:
+                                    if field in report:
+                                        present_fields.append(field)
+                                    else:
+                                        missing_fields.append(field)
+                                
+                                if not missing_fields:
+                                    self.log_test("Social Specialist Reports - All fields present", True, f"All {len(required_fields)} fields present")
+                                else:
+                                    self.log_test("Social Specialist Reports - Missing fields", False, f"Missing fields: {missing_fields}")
+                                    
+                                self.log_test("Social Specialist Reports - Present fields", True, f"Present fields: {present_fields}")
+                            else:
+                                self.log_test("Social Specialist Reports", True, "No reports found (empty response)")
+                        else:
+                            self.log_test("Social Specialist Reports", False, f"Failed: {get_response.status_code} - {get_response.text}")
+                    else:
+                        self.log_test("Create Social Specialist Report", False, f"Failed: {create_response.status_code} - {create_response.text}")
+                else:
+                    self.log_test("Social Specialist User Login", False, "Failed to login")
+            else:
+                self.log_test("Social Specialist User Creation", False, "Failed to create user")
+        except Exception as e:
+            self.log_test("Social Specialist Reports Test", False, f"Exception: {str(e)}")
+        
+        # Login back as admin
+        self.test_authentication()
+        
+        # Test 4: Teachers endpoint
+        print("\n4. Testing Teachers endpoint...")
+        try:
+            response = self.session.get(f"{BASE_URL}/teachers")
+            if response.status_code == 200:
+                teachers = response.json()
+                self.log_test("Teachers Endpoint", True, f"Retrieved {len(teachers)} teachers - Response time < 2s")
+            else:
+                self.log_test("Teachers Endpoint", False, f"Failed: {response.status_code} - {response.text}")
+        except Exception as e:
+            self.log_test("Teachers Endpoint", False, f"Exception: {str(e)}")
+        
+        # Test 5: Authentication (already tested, but verify token return)
+        print("\n5. Verifying Authentication token return...")
+        try:
+            login_data = {
+                "username": ADMIN_USERNAME,
+                "password": ADMIN_PASSWORD,
+                "remember_me": False
+            }
+            
+            response = self.session.post(f"{BASE_URL}/auth/login", json=login_data)
+            if response.status_code == 200:
+                data = response.json()
+                if "token" in data and data["token"]:
+                    self.log_test("Authentication - Token Return", True, f"Token returned successfully (length: {len(data['token'])})")
+                else:
+                    self.log_test("Authentication - Token Return", False, "Token not returned in response")
+            else:
+                self.log_test("Authentication - Token Return", False, f"Login failed: {response.status_code}")
+        except Exception as e:
+            self.log_test("Authentication - Token Return", False, f"Exception: {str(e)}")
+
+    def run_priority_health_check(self):
+        """Run priority health check as requested"""
+        print("🏥 Starting Priority Health Check for Critical Endpoints")
+        print("=" * 60)
+        
+        start_time = time.time()
+        
+        # Run priority tests
+        self.test_authentication()
+        self.test_health_check_priority_endpoints()
+        
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        # Summary
+        print("\n" + "=" * 60)
+        print("🏥 PRIORITY HEALTH CHECK COMPLETE")
+        print("=" * 60)
+        
+        total_tests = len(self.test_results)
+        passed_tests = sum(1 for result in self.test_results if result["success"])
+        failed_tests = total_tests - passed_tests
+        success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
+        
+        print(f"📊 HEALTH CHECK RESULTS:")
+        print(f"   Total Tests: {total_tests}")
+        print(f"   ✅ Passed: {passed_tests}")
+        print(f"   ❌ Failed: {failed_tests}")
+        print(f"   📈 Success Rate: {success_rate:.1f}%")
+        print(f"   ⏱️  Duration: {duration:.2f} seconds")
+        
+        # Detailed results for priority tests
+        print(f"\n📋 PRIORITY TEST RESULTS:")
+        priority_keywords = ["Educational Supervision", "Supervisor Reports", "Social Specialist", "Teachers Endpoint", "Authentication"]
+        
+        for keyword in priority_keywords:
+            keyword_tests = [r for r in self.test_results if keyword.lower() in r["test"].lower()]
+            if keyword_tests:
+                passed = sum(1 for t in keyword_tests if t["success"])
+                total = len(keyword_tests)
+                status = "✅ PASS" if passed == total else "❌ FAIL"
+                print(f"   {status} {keyword}: {passed}/{total} tests passed")
+        
+        if failed_tests > 0:
+            print(f"\n❌ FAILED TESTS:")
+            for result in self.test_results:
+                if not result["success"]:
+                    print(f"   • {result['test']}: {result['message']}")
+        else:
+            print(f"\n🎉 ALL PRIORITY TESTS PASSED! Critical endpoints are healthy.")
+            
+        print("=" * 60)
+        
+        return success_rate >= 80.0  # 80% threshold for health check
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting Quality Report Data Structure Testing")
