@@ -647,36 +647,44 @@ const SocialSpecialistDashboard = () => {
                   <Label>عدد الجلسات</Label>
                   <Input
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    placeholder="أدخل عدد الجلسات"
                     value={formData.sessions_count}
-                    onChange={(e) => setFormData({ ...formData, sessions_count: parseInt(e.target.value) || 0 })}
+                    onChange={(e) => setFormData({ ...formData, sessions_count: e.target.value })}
                   />
                 </div>
                 <div>
                   <Label>التواصل مع الأسر</Label>
                   <Input
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    placeholder="أدخل عدد مرات التواصل"
                     value={formData.families_contacted}
-                    onChange={(e) => setFormData({ ...formData, families_contacted: parseInt(e.target.value) || 0 })}
+                    onChange={(e) => setFormData({ ...formData, families_contacted: e.target.value })}
                   />
                 </div>
                 <div>
                   <Label>عدد الإحالات</Label>
                   <Input
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    placeholder="أدخل عدد الإحالات"
                     value={formData.referrals_count}
-                    onChange={(e) => setFormData({ ...formData, referrals_count: parseInt(e.target.value) || 0 })}
+                    onChange={(e) => setFormData({ ...formData, referrals_count: e.target.value })}
                   />
                 </div>
                 <div>
                   <Label>المتابعات</Label>
                   <Input
                     type="number"
+                    inputMode="numeric"
                     min="0"
+                    placeholder="أدخل عدد المتابعات"
                     value={formData.follow_ups_count}
-                    onChange={(e) => setFormData({ ...formData, follow_ups_count: parseInt(e.target.value) || 0 })}
+                    onChange={(e) => setFormData({ ...formData, follow_ups_count: e.target.value })}
                   />
                 </div>
               </CardContent>
