@@ -577,23 +577,43 @@ const TeacherProgressView = ({ branch = null, compact = false }) => {
       {/* Filter and Export */}
       <Card>
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
-              <Label className="font-semibold whitespace-nowrap">تصفية حسب المعلم:</Label>
-              <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
-                <SelectTrigger className="w-full sm:w-64">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="max-h-[300px]">
-                  <SelectItem value="all">جميع المعلمين ({allTeacherProgress.length})</SelectItem>
-                  {allTeacherProgress.map((teacher) => (
-                    <SelectItem key={teacher.teacher_id} value={teacher.teacher_id}>
-                      {teacher.teacher_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+                <Label className="font-semibold whitespace-nowrap">المشرف التربوي:</Label>
+                <Select value={selectedSupervisor} onValueChange={setSelectedSupervisor}>
+                  <SelectTrigger className="w-full sm:w-64">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="all">جميع المشرفين ({supervisors.length})</SelectItem>
+                    {supervisors.map((supervisor) => (
+                      <SelectItem key={supervisor} value={supervisor}>
+                        {supervisor}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+                <Label className="font-semibold whitespace-nowrap">تصفية حسب المعلم:</Label>
+                <Select value={selectedTeacher} onValueChange={setSelectedTeacher}>
+                  <SelectTrigger className="w-full sm:w-64">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px]">
+                    <SelectItem value="all">جميع المعلمين ({teacherProgress.length})</SelectItem>
+                    {teacherProgress.map((teacher) => (
+                      <SelectItem key={teacher.teacher_id} value={teacher.teacher_id}>
+                        {teacher.teacher_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
+            
             <Button
               onClick={() => exportToPDF()}
               className="bg-green-600 hover:bg-green-700 w-full md:w-auto"
