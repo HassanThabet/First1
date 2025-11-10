@@ -762,7 +762,7 @@ async def create_educational_supervision_report(report_data: dict, current_user:
     report_obj = EducationalSupervisionReport(**report_data)
     return report_obj
 
-@api_router.get("/reports/educational-supervision", response_model=List[EducationalSupervisionReport])
+@api_router.get("/reports/educational-supervision")
 async def get_educational_supervision_reports(user_id: Optional[str] = None, branch: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     query = {}
     
@@ -779,6 +779,12 @@ async def get_educational_supervision_reports(user_id: Optional[str] = None, bra
         query["branch"] = branch
     
     reports = await db.educational_supervision_reports.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    
+    # Add supervisor name to each report
+    for report in reports:
+        user = await db.users.find_one({"id": report["user_id"]}, {"_id": 0, "username": 1})
+        report["supervisor_name"] = user["username"] if user else "غير محدد"
+    
     return reports
 
 @api_router.put("/reports/educational-supervision/{report_id}")
