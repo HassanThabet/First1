@@ -36,14 +36,15 @@ const ActivitiesDashboard = () => {
   const [mergedEndDate, setMergedEndDate] = useState("");
   const [selectedActivity, setSelectedActivity] = useState("all"); // للفلترة حسب النشاط
 
+  const [reportDate, setReportDate] = useState(""); // تاريخ التقرير العام
   const [activities, setActivities] = useState([{
     name: "",
     date: "",
     target_group: "",
     type: "",
     supervisors: [], // Changed from supervisor to supervisors (array)
-    participants_count: 0,
-    interaction_rate: 0,
+    participants_count: "",
+    interaction_rate: "",
     cooperating_teachers: [], // Changed from teacher_cooperation to cooperating_teachers (array)
     admin_cooperation: "",
     educational_impact: "",
