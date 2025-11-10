@@ -1208,6 +1208,11 @@ const ActivitiesDashboard = () => {
                 <DialogTitle className="text-2xl">
                   تقرير الأنشطة - {selectedReport?.activities.length} نشاط
                 </DialogTitle>
+                {selectedReport?.report_date && (
+                  <p className="text-sm text-blue-600 font-semibold mt-2">
+                    📅 تاريخ التقرير: {new Date(selectedReport.report_date).toLocaleDateString("ar-SA")}
+                  </p>
+                )}
               </DialogHeader>
 
               {selectedReport && (
